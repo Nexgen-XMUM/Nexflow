@@ -1,0 +1,123 @@
+# ==========================================
+# Nexgen Hackathon - .gitignore
+# ==========================================
+
+
+# ------------------------------------------
+# 1. Environment Variables / API Keys
+# ------------------------------------------
+
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+
+
+# ------------------------------------------
+# 2. Python
+# ------------------------------------------
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+.venv/
+venv/
+env/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.coverage
+htmlcov/
+
+*.egg-info/
+dist/
+build/
+
+
+# ------------------------------------------
+# 3. JavaScript / TypeScript / Node.js
+# ------------------------------------------
+
+node_modules/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.next/
+.nuxt/
+.svelte-kit/
+
+.vite/
+coverage/
+
+
+# ------------------------------------------
+# 4. IDE / Editors
+# ------------------------------------------
+
+.idea/
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+
+# ------------------------------------------
+# 5. Operating System
+# ------------------------------------------
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+
+# ------------------------------------------
+# 6. Temporary Files
+# ------------------------------------------
+
+*.tmp
+*.temp
+*.swp
+*.swo
+
+*.bak
+*.log
+
+.cache/
+tmp/
+temp/
+
+
+# ------------------------------------------
+# 7. Local Databases
+# ------------------------------------------
+
+*.sqlite
+*.sqlite3
+*.db
+
+
+# ------------------------------------------
+# 8. Local Secrets / Credentials
+# ------------------------------------------
+
+secrets/
+credentials/
+
+service-account*.json
+
+
+# ------------------------------------------
+# 9. Optional Local References
+# ------------------------------------------
+
+# Uncomment if you have local-only reference files:
+# Conferences/
+# references/
