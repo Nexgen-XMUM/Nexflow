@@ -10,6 +10,7 @@
 .env
 .env.*
 !.env.example
+!.env.*.example
 
 *.pem
 *.key
@@ -32,7 +33,11 @@ env/
 .ruff_cache/
 
 .coverage
+.coverage.*
+coverage.xml
 htmlcov/
+.tox/
+.nox/
 
 *.egg-info/
 dist/
@@ -55,6 +60,9 @@ pnpm-debug.log*
 .svelte-kit/
 
 .vite/
+.turbo/
+.pnpm-store/
+*.tsbuildinfo
 coverage/
 
 
@@ -74,6 +82,7 @@ coverage/
 # ------------------------------------------
 
 .DS_Store
+._*
 Thumbs.db
 Desktop.ini
 
@@ -102,6 +111,15 @@ temp/
 *.sqlite
 *.sqlite3
 *.db
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+*.db-journal
+*.db-wal
+*.db-shm
 
 
 # ------------------------------------------
@@ -112,6 +130,10 @@ secrets/
 credentials/
 
 service-account*.json
+
+# Generated demo activity; keep the shared JSON fixtures tracked.
+/data/activity.json
+/data/local/
 
 
 # ------------------------------------------
