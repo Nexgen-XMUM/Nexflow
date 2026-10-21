@@ -1,0 +1,2560 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbyte Smart Yield · 打烊促销自动化与老板后台 Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   1. 主题色板变量：深海蓝 + 纯白 (Light) & 高对比极夜蓝 (Dark Mode)
+   ========================================================================== */
+:root, html[data-theme="light"] {
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --sunk: #eef2f8;
+  --sunk-hover: #e2e8f0;
+  --ink: #0f172a;
+  --ink-secondary: #334155;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+
+  /* 品牌深蓝与皇家蓝 */
+  --brand: #1e40af;
+  --brand-hover: #1e3a8a;
+  --brand-light: #eff6ff;
+  --brand-border: #bfdbfe;
+  --brand-ink: #ffffff;
+  --accent: #2563eb;
+
+  /* 语义色 */
+  --amber: #f59e0b;
+  --amber-bg: #fef3c7;
+  --amber-ink: #92400e;
+  --chili: #dc2626;
+  --chili-bg: #fef2f2;
+  --ok: #059669;
+  --ok-bg: #ecfdf5;
+
+  /* 阴影与字体 */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 35px -8px rgba(15, 23, 42, 0.16);
+  --display: "Bricolage Grotesque", "Figtree", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --sidebar-w: 250px;
+  --sidebar-collapsed-w: 72px;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --bg: #070d19;
+  --surface: #0f172a;
+  --surface-elevated: #1e293b;
+  --sunk: #162033;
+  --sunk-hover: #1e293b;
+  --ink: #f8fafc;
+  --ink-secondary: #cbd5e1;
+  --muted: #94a3b8;
+  --line: #1e293b;
+  --line-strong: #334155;
+
+  /* 亮电光蓝在深色背景形成强烈对比 */
+  --brand: #3b82f6;
+  --brand-hover: #60a5fa;
+  --brand-light: rgba(59, 130, 246, 0.14);
+  --brand-border: rgba(59, 130, 246, 0.35);
+  --brand-ink: #ffffff;
+  --accent: #60a5fa;
+
+  --amber: #fbbf24;
+  --amber-bg: rgba(245, 158, 11, 0.16);
+  --amber-ink: #fde68a;
+  --chili: #f87171;
+  --chili-bg: rgba(239, 68, 68, 0.15);
+  --ok: #34d399;
+  --ok-bg: rgba(16, 185, 129, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.65);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 14.5px;
+  line-height: 1.55;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+h1, h2, h3, h4 {
+  font-family: var(--display);
+  margin: 0;
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+}
+.muted { color: var(--muted); }
+
+/* ==========================================================================
+   2. 顶部全局导航栏 (Top Header)
+   ========================================================================== */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hamburger-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--sunk);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+}
+.hamburger-btn:hover {
+  background: var(--brand-light);
+  border-color: var(--brand-border);
+  color: var(--brand);
+}
+.hamburger-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+  position: relative;
+}
+.logo::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #60a5fa;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+.brand-text b {
+  font-family: var(--display);
+  font-size: 18px;
+  display: block;
+  line-height: 1.15;
+}
+.brand-text small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 主题切换与操作按钮 */
+.icon-btn {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-secondary);
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.icon-btn:hover {
+  background: var(--sunk);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+.btn-tour {
+  border: 1px solid var(--brand-border);
+  background: var(--brand-light);
+  color: var(--brand);
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.btn-tour:hover {
+  background: var(--brand);
+  color: var(--brand-ink);
+}
+
+/* ==========================================================================
+   3. 主体三栏框架：左侧 Hamburger Sidebar + 中间工作区 + 右侧手机模拟器
+   ========================================================================== */
+.app-body {
+  display: flex;
+  min-height: calc(100vh - 64px);
+  position: relative;
+}
+
+/* 左侧导航栏 */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 12px;
+  transition: width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.25s ease, background-color 0.25s ease;
+  z-index: 90;
+  user-select: none;
+}
+body.sidebar-collapsed .sidebar {
+  width: var(--sidebar-collapsed-w);
+}
+
+.nav-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 6px 12px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+body.sidebar-collapsed .nav-group-label {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 11px 13px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  text-align: left;
+  position: relative;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.nav-item:hover {
+  background: var(--sunk);
+  color: var(--ink);
+}
+.nav-item[aria-selected="true"] {
+  background: var(--brand);
+  color: var(--brand-ink);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+}
+.nav-item .nav-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.nav-item .nav-text {
+  flex: 1;
+  transition: opacity 0.2s ease;
+}
+.nav-item .nav-sub {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 400;
+  opacity: 0.78;
+}
+body.sidebar-collapsed .nav-item {
+  justify-content: center;
+  padding: 12px 0;
+}
+body.sidebar-collapsed .nav-item .nav-text {
+  display: none;
+}
+
+/* 待办提醒徽标 */
+.nav-badge {
+  display: none;
+  background: var(--chili);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  line-height: 1.2;
+}
+.nav-badge.on {
+  display: inline-block;
+}
+body.sidebar-collapsed .nav-badge.on {
+  position: absolute;
+  top: 7px;
+  right: 12px;
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  font-size: 0;
+}
+
+.sidebar-footer {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 14px;
+}
+.role-card {
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+.role-card .rc-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.role-card .rc-info {
+  white-space: nowrap;
+  overflow: hidden;
+}
+.role-card .rc-info b {
+  display: block;
+  font-size: 13px;
+}
+.role-card .rc-info span {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+body.sidebar-collapsed .role-card {
+  justify-content: center;
+  padding: 8px;
+}
+body.sidebar-collapsed .role-card .rc-info {
+  display: none;
+}
+
+/* 移动端侧栏遮罩 */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 64px 0 0 0;
+  background: rgba(7, 13, 25, 0.55);
+  z-index: 85;
+}
+
+/* ==========================================================================
+   4. 中央主内容区 + 五步进度条 + 右侧手机区
+   ========================================================================== */
+.workspace {
+  flex: 1;
+  min-width: 0;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 22px 26px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 五步自动化旅程指示器 */
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(135px, 1fr));
+  gap: 10px;
+  overflow-x: auto;
+}
+.steps li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+}
+.steps .n {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 12.5px;
+}
+.steps .t {
+  font-weight: 700;
+  font-size: 13.5px;
+  line-height: 1.25;
+}
+.steps .t small {
+  display: block;
+  font-weight: 500;
+  font-size: 11.5px;
+  opacity: 0.8;
+}
+.steps li.now {
+  background: var(--brand-light);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.steps li.now .n {
+  background: var(--brand);
+  color: var(--brand-ink);
+  border-color: var(--brand);
+}
+.steps li.done {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-ink);
+}
+.steps li.done .n {
+  background: var(--brand-ink);
+  color: var(--brand);
+  border-color: var(--brand-ink);
+}
+
+/* 内容与手机双栏网格 */
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 26px;
+  align-items: start;
+}
+
+.panel[hidden] { display: none !important; }
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.panel-head h2 { font-size: 24px; }
+.panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+.card + .card { margin-top: 18px; }
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+
+/* ==========================================================================
+   5. 模块 1：打烊盘点 (POS Inventory)
+   ========================================================================== */
+.quick-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  background: var(--sunk);
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+.quick-bar input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: var(--surface);
+  color: var(--ink);
+}
+.quick-bar input:focus {
+  border-color: var(--brand);
+  outline: none;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--sunk);
+  color: var(--ink);
+  transition: all 0.18s ease;
+}
+.btn:hover:not(:disabled) {
+  background: var(--sunk-hover);
+}
+.btn-main {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-ink);
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.25);
+}
+.btn-main:hover:not(:disabled) {
+  background: var(--brand-hover);
+}
+
+.rows { display: flex; flex-direction: column; }
+.prow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 4px;
+  border-top: 1px solid var(--line);
+}
+.prow:first-child { border-top: 0; }
+.prow .emo {
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--sunk);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.prow .grow { flex: 1; min-width: 0; }
+.prow .nm { font-weight: 700; font-size: 15px; }
+.prow .nm span { font-weight: 500; color: var(--muted); margin-left: 6px; font-size: 13.5px; }
+.prow .meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.prow .meta b { color: var(--brand); font-weight: 600; }
+
+.stepper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.stepper button {
+  border: 0;
+  background: var(--sunk);
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  transition: background 0.15s;
+}
+.stepper button:hover {
+  background: var(--brand-light);
+  color: var(--brand);
+}
+.stepper input {
+  width: 52px;
+  height: 38px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  text-align: center;
+  font-weight: 700;
+  background: var(--surface);
+  color: var(--ink);
+  -moz-appearance: textfield;
+}
+.stepper input::-webkit-outer-spin-button,
+.stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.submit-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.submit-bar .btn-main {
+  padding: 13px 26px;
+  font-size: 15px;
+}
+.hint { color: var(--chili); font-weight: 600; font-size: 13.5px; }
+
+.pipe {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 14px 16px;
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  border-radius: 12px;
+  display: none;
+}
+.pipe.on { display: block; }
+.pipe li {
+  display: flex;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 13.5px;
+  color: var(--ink);
+  animation: pop 0.25s ease;
+}
+.pipe li::before {
+  content: "✓";
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+}
+@keyframes pop {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+   6. 模块 2：审批与看板 (Approval & KPIs)
+   ========================================================================== */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.kpi-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+}
+.kpi-box .v {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--brand);
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-box .l {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 4px;
+  display: block;
+}
+
+.draft-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--amber-bg);
+  color: var(--amber-ink);
+  margin-bottom: 6px;
+}
+.badge.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.badge.brand {
+  background: var(--brand-light);
+  color: var(--brand);
+}
+
+.tblwrap { overflow-x: auto; margin: 0 -4px; }
+table { border-collapse: collapse; width: 100%; min-width: 480px; }
+th {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--line);
+}
+td {
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.strong { font-weight: 700; color: var(--brand); }
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+.metrics div {
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+.metrics b {
+  display: block;
+  font-family: var(--display);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.metrics span { font-size: 12px; color: var(--muted); }
+.metrics .hl {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-ink);
+}
+.metrics .hl span { color: rgba(255, 255, 255, 0.82); }
+
+label.f { display: block; font-weight: 700; margin: 10px 0 6px; font-size: 13.5px; }
+textarea, .input-std {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: var(--sunk);
+  color: var(--ink);
+  line-height: 1.5;
+  resize: vertical;
+}
+textarea:focus, .input-std:focus {
+  border-color: var(--brand);
+  background: var(--surface);
+  outline: none;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.safe { font-size: 12.5px; color: var(--ok); font-weight: 600; }
+
+details {
+  margin: 10px 0;
+  font-size: 13.5px;
+  background: var(--sunk);
+  padding: 10px 14px;
+  border-radius: 10px;
+}
+summary { cursor: pointer; font-weight: 600; color: var(--brand); }
+details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
+
+.approve-bar { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.btn-approve {
+  flex: 1 1 240px;
+  padding: 16px 24px;
+  font-size: 17px;
+  font-family: var(--display);
+  background: var(--brand);
+  color: var(--brand-ink);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(30, 64, 175, 0.35);
+  transition: transform 0.1s, background 0.2s;
+}
+.btn-approve:hover:not(:disabled) { background: var(--brand-hover); }
+.btn-approve:active:not(:disabled) { transform: translateY(2px); }
+.btn-approve:disabled, .btn-reject:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.btn-reject {
+  padding: 16px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  background: transparent;
+  border: 1.5px solid var(--chili);
+  color: var(--chili);
+  border-radius: 12px;
+}
+.btn-reject:hover:not(:disabled) { background: var(--chili-bg); }
+
+.lock-banner {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  background: var(--amber-bg);
+  color: var(--amber-ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.empty { text-align: center; padding: 36px 16px; }
+.empty h3 { font-size: 19px; margin-bottom: 6px; }
+.empty p { margin: 0 0 16px; color: var(--muted); }
+.done-card { display: flex; gap: 16px; align-items: flex-start; }
+.done-card .big { font-size: 36px; line-height: 1; }
+
+/* ==========================================================================
+   7. 模块 3：老板后台 (Owner Admin Panel)
+   ========================================================================== */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+.admin-field {
+  margin-bottom: 14px;
+}
+.admin-field label {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 13.5px;
+  margin-bottom: 6px;
+}
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.slider-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.discount-pill {
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  min-width: 64px;
+  text-align: center;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.switch-row:first-of-type { border-top: 0; }
+.switch-row b { display: block; font-size: 14px; }
+.switch-row small { color: var(--muted); font-size: 12px; }
+
+/* 表格内输入框 */
+.tbl-input {
+  width: 78px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--sunk);
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.tbl-input:focus {
+  border-color: var(--brand);
+  background: var(--surface);
+  outline: none;
+}
+
+.add-prod-bar {
+  display: grid;
+  grid-template-columns: 60px 1.2fr 1fr 90px 90px 80px auto;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line-strong);
+  align-items: center;
+}
+.add-prod-bar input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--sunk);
+  font-size: 13px;
+  min-width: 0;
+}
+
+/* ==========================================================================
+   8. 模块 4：活动日志 (Audit Log)
+   ========================================================================== */
+.log { list-style: none; margin: 0; padding: 0; }
+.log li {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 12px;
+  padding: 14px 4px;
+  border-top: 1px solid var(--line);
+}
+.log li:first-child { border-top: 0; }
+.log .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 6px;
+  background: var(--muted);
+}
+.log .ok .dot { background: var(--ok); }
+.log .no .dot { background: var(--chili); }
+.log .info .dot { background: var(--brand); }
+.log .l2 { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+.log .sdg {
+  display: inline-block;
+  margin-top: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ok);
+  background: var(--ok-bg);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.log time { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+
+/* ==========================================================================
+   9. 右侧手机 WhatsApp 模拟器
+   ========================================================================== */
+.side { position: sticky; top: 84px; }
+.phone {
+  width: 336px; height: 650px; margin: 0 auto; border-radius: 46px; background: #0b141a;
+  padding: 10px; box-shadow: var(--shadow-lg); border: 2px solid #334155; position: relative;
+}
+.phone::before {
+  content: ""; position: absolute; top: 18px; left: 50%; width: 84px; height: 22px;
+  margin-left: -42px; border-radius: 99px; background: #000; z-index: 3;
+}
+.screen { height: 100%; border-radius: 37px; overflow: hidden; display: flex; flex-direction: column; background: #efeae2;
+  font-family: system-ui, "Segoe UI", Helvetica, "PingFang SC", "Microsoft YaHei", sans-serif; }
+.ic { width: 22px; height: 22px; fill: currentColor; flex: none; }
+.wa-status { background: #008069; color: #fff; display: flex; justify-content: space-between; padding: 12px 26px 4px; font-size: 12px; font-weight: 600; }
+.bat { display: inline-block; width: 18px; height: 9px; border: 1.5px solid #fff; border-radius: 3px; vertical-align: -1px; background: linear-gradient(90deg, #fff 80%, transparent 80%); }
+.wa-head { background: #008069; color: #fff; padding: 6px 10px 9px 8px; display: flex; gap: 8px; align-items: center; }
+.wa-head .av { width: 38px; height: 38px; border-radius: 50%; background: #dff4ec; display: grid; place-items: center; font-size: 20px; flex: none; }
+.wh { flex: 1; min-width: 0; }
+.wh b { display: block; font-size: 15px; line-height: 1.2; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wh small { display: block; font-size: 11.5px; opacity: 0.88; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wa-act { display: flex; gap: 12px; }
+.wa-body { flex: 1; overflow-y: auto; padding: 10px 10px 12px; display: flex; flex-direction: column; gap: 5px;
+  background-color: #efeae2; background-image: radial-gradient(rgba(11, 20, 26, 0.05) 1.2px, transparent 1.2px); background-size: 16px 16px; scrollbar-width: none; }
+.wa-body::-webkit-scrollbar { display: none; }
+.wa-empty, .wa-sysmsg { align-self: center; text-align: center; background: #ffeecd; color: #54656f; font-size: 11.5px; line-height: 1.45; padding: 7px 11px; border-radius: 8px; max-width: 92%; box-shadow: 0 1px 1px rgba(11, 20, 26, 0.1); }
+.wa-empty { margin: auto; }
+.wa-day { align-self: center; background: #fff; color: #54656f; font-size: 11.5px; padding: 4px 11px; border-radius: 8px; margin: 4px 0; box-shadow: 0 1px 1px rgba(11, 20, 26, 0.1); }
+.msg { position: relative; max-width: 84%; padding: 6px 9px 4px; border-radius: 8px; font-size: 13.5px; line-height: 1.38; color: #111b21; box-shadow: 0 1px 1px rgba(11, 20, 26, 0.13); animation: waIn 0.28s ease; }
+@keyframes waIn { from { opacity: 0; transform: translateY(6px) scale(0.97); } to { opacity: 1; transform: none; } }
+.msg.out { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 0; }
+.msg.in { align-self: flex-start; background: #fff; border-top-left-radius: 0; margin-top: 4px; }
+.msg.out::before { content: ""; position: absolute; top: 0; right: -7px; width: 8px; height: 12px; background: #d9fdd3; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.msg.in::before { content: ""; position: absolute; top: 0; left: -7px; width: 8px; height: 12px; background: #fff; clip-path: polygon(100% 0, 0 0, 100% 100%); }
+.msg .who { font-size: 12.5px; font-weight: 600; margin-bottom: 1px; }
+.msg .txt { white-space: pre-wrap; word-break: break-word; }
+.msg .meta { display: flex; justify-content: flex-end; align-items: center; gap: 3px; font-size: 10.5px; color: #667781; margin-top: 1px; }
+.tick { display: inline-flex; color: #8696a0; }
+.tick svg { width: 16px; height: 11px; }
+.tick.read { color: #53bdeb; }
+.msg.typing { display: flex; gap: 4px; padding: 11px 12px; }
+.msg.typing span { width: 6px; height: 6px; border-radius: 50%; background: #8696a0; animation: waDot 1s infinite; }
+.msg.typing span:nth-child(2) { animation-delay: 0.15s; }
+.msg.typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes waDot { 0%, 60%, 100% { transform: none; opacity: 0.5; } 30% { transform: translateY(-3px); opacity: 1; } }
+.wa-foot { background: #efeae2; padding: 6px 8px 12px; display: flex; gap: 6px; align-items: center; }
+.wa-foot .fi { flex: 1; display: flex; align-items: center; gap: 9px; background: #fff; border-radius: 22px; padding: 9px 12px; color: #667781; font-size: 14px; box-shadow: 0 1px 1px rgba(11, 20, 26, 0.1); }
+.wa-foot .fi span { flex: 1; color: #8696a0; }
+.wa-foot .sd { width: 42px; height: 42px; border-radius: 50%; background: #00a884; color: #fff; display: grid; place-items: center; flex: none; }
+.phone-cap { text-align: center; font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
+
+.foot {
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 11px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13.5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s;
+  z-index: 9500;
+  box-shadow: var(--shadow-lg);
+}
+.toast.on { opacity: 1; transform: translateX(-50%); }
+
+/* ==========================================================================
+   10. 新手引导 Onboarding Wizard 遮罩与高亮卡片
+   ========================================================================== */
+.wizard-backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 9000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.wizard-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.wizard-spotlight {
+  position: absolute;
+  border-radius: 16px;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.28), 0 10px 32px rgba(37, 99, 235, 0.3);
+  pointer-events: none;
+  z-index: 9001;
+  transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+  display: none;
+  border: 2.5px solid #60a5fa;
+}
+.wizard-spotlight.active { display: block; }
+
+.wizard-popover {
+  position: absolute;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  background: var(--surface-elevated);
+  border: 1px solid var(--brand-border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg);
+  z-index: 9002;
+  padding: 20px 20px 18px;
+  transition: top 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), left 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.25s ease;
+  display: none;
+  opacity: 0;
+}
+.wizard-popover.active { display: block; opacity: 1; }
+.wizard-step-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  background: var(--brand-light);
+  padding: 2px 8px;
+  border-radius: 99px;
+  margin-bottom: 6px;
+}
+.wizard-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.wizard-close:hover { background: var(--sunk); color: var(--ink); }
+.wizard-title {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  padding-right: 24px;
+  color: var(--ink);
+}
+.wizard-desc {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 0 18px;
+}
+.wizard-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.wizard-dots { display: flex; gap: 5px; align-items: center; }
+.wizard-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--line-strong);
+  transition: all 0.25s ease;
+}
+.wizard-dot.active { width: 18px; background: var(--brand); }
+.wizard-btns { display: flex; gap: 8px; }
+.wizard-btn-back {
+  border: 1px solid var(--line-strong);
+  background: var(--sunk);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 9px;
+}
+.wizard-btn-next {
+  border: 0;
+  background: var(--brand);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 9px;
+}
+
+/* ==========================================================================
+   11. 响应式适配 (Tablet & Mobile)
+   ========================================================================== */
+@media (max-width: 1120px) {
+  .content-grid { grid-template-columns: 1fr; }
+  .side { position: static; }
+  .admin-grid { grid-template-columns: 1fr; }
+  .add-prod-bar { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 820px) {
+  .sidebar {
+    position: fixed;
+    top: 64px;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    width: 260px !important;
+    box-shadow: var(--shadow-lg);
+  }
+  body.mobile-nav-open .sidebar { transform: translateX(0); }
+  body.mobile-nav-open .sidebar-overlay { display: block; }
+  .kpis, .metrics { grid-template-columns: repeat(2, 1fr); }
+  .workspace { padding: 16px 14px 40px; }
+  .brand-text small { display: none; }
+}
+
+/* BI 环形看板 */
+#draftBox { margin-bottom: 18px; }
+.rings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+.ring-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 14px 16px; text-align: center; box-shadow: var(--shadow-sm); }
+.ring { position: relative; width: 82%; max-width: 108px; aspect-ratio: 1; margin: 0 auto 12px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 8; }
+.ring .trk { stroke: var(--sunk); }
+.ring .arc { stroke-linecap: round; transition: stroke-dashoffset 1.1s cubic-bezier(.2, .8, .2, 1); }
+.rv { position: absolute; inset: 0; display: grid; place-content: center; line-height: 1.15; }
+.rv b { font-family: var(--display); font-size: clamp(16px, 2vw, 23px); font-variant-numeric: tabular-nums; }
+.rv small { font-size: 10.5px; color: var(--muted); }
+.rl { font-weight: 700; font-size: 13px; }
+.rg { font-size: 11.5px; color: var(--muted); margin: 2px 0 10px; }
+.rg b { color: var(--ink); }
+.rbar { height: 5px; border-radius: 9px; background: var(--sunk); overflow: hidden; }
+.rbar i { display: block; height: 100%; border-radius: 9px; transition: width 1.1s cubic-bezier(.2, .8, .2, 1); }
+.bi-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 18px; }
+.bi-grid .card + .card { margin-top: 0; }
+.chart { width: 100%; height: auto; display: block; }
+.chart .bar { fill: var(--brand-border); }
+.chart .bar.hot { fill: #e08a2e; }
+.chart .bv { font-size: 11px; font-weight: 600; fill: var(--ink-secondary); }
+.chart .bx { font-size: 10.5px; fill: var(--muted); }
+.hb { margin-bottom: 14px; }
+.hbt { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+.hb small { color: var(--muted); font-size: 11.5px; }
+.empty-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 18px; color: var(--muted); font-size: 13.5px; }
+.empty-bar b { color: var(--ink); }
+@media (min-width: 1121px) and (max-width: 1360px) { .rings { grid-template-columns: repeat(2, 1fr); } .bi-grid { grid-template-columns: 1fr; } }
+@media (max-width: 820px) { .rings { grid-template-columns: repeat(2, 1fr); } .bi-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-back" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></symbol><symbol id="i-vid" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z"/></symbol><symbol id="i-call" viewBox="0 0 24 24"><path d="M6.62 10.79a15 15 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02z"/></symbol><symbol id="i-more" viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></symbol><symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></symbol><symbol id="i-emo" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-3.5-9a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5zm7 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5zM12 17.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></symbol><symbol id="i-clip" viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6z"/></symbol><symbol id="i-cam" viewBox="0 0 24 24"><path d="M9 3 7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></symbol></svg>
+
+<!-- ==================== 顶部全局栏 ==================== -->
+<header class="app-header">
+  <div class="header-left">
+    <button type="button" class="hamburger-btn" id="hamburgerBtn" aria-label="折叠或展开侧边导航菜单" title="收起/展开侧边菜单">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="brand">
+      <div class="logo" aria-hidden="true">O</div>
+      <div class="brand-text">
+        <b>Orbyte Smart Yield</b>
+        <small>Uncle Wong’s Bakery · 智能临期清仓系统</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-actions" id="guide-top-actions">
+    <!-- 深浅色模式切换 -->
+    <button type="button" class="icon-btn" id="themeToggleBtn" aria-label="切换深色或浅色模式">
+      <span id="themeIcon">🌙</span>
+      <span id="themeText">深色模式</span>
+    </button>
+
+    <!-- 新手向导按钮 -->
+    <button type="button" class="btn-tour" id="startTourBtn">✨ 引导向导</button>
+
+    <!-- 重置演示按钮 -->
+    <button type="button" class="icon-btn" id="resetBtn">↺ 重置</button>
+  </div>
+</header>
+
+<!-- ==================== 主体容器（左侧栏 + 右工作区） ==================== -->
+<div class="app-body">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- 左侧可折叠 Hamburger Sidebar -->
+  <aside class="sidebar" id="guide-sidebar" aria-label="主导航侧边栏">
+    <div>
+      <div class="nav-group-label">核心业务流</div>
+      <ul class="nav-list" role="tablist">
+        <li>
+          <button type="button" class="nav-item" role="tab" data-tab="pos" aria-selected="true">
+            <span class="nav-icon">🏪</span>
+            <span class="nav-text">打烊盘点<span class="nav-sub">POS 剩余录入</span></span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="nav-item" role="tab" data-tab="dash" aria-selected="false">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">审批与看板<span class="nav-sub">促销审核与 KPI</span></span>
+            <span class="nav-badge" id="pip">待审</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="nav-item" role="tab" data-tab="admin" aria-selected="false">
+            <span class="nav-icon">👑</span>
+            <span class="nav-text">老板后台<span class="nav-sub">定价规则与商品库</span></span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="nav-item" role="tab" data-tab="log" aria-selected="false">
+            <span class="nav-icon">📜</span>
+            <span class="nav-text">活动日志<span class="nav-sub">审计与碳排追踪</span></span>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="role-card">
+        <div class="rc-avatar" id="sideRoleIcon">👑</div>
+        <div class="rc-info">
+          <b id="sideRoleName">Uncle Wong’s</b>
+          <span id="sideRoleDesc">门店管理工作台</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 右侧主工作区 -->
+  <div class="workspace">
+    <!-- 顶部 5 步自动化旅程条 -->
+    <ol class="steps" id="guide-steps" aria-label="自动化五步旅程"></ol>
+
+    <div class="content-grid">
+      <main>
+        <!-- ==================== 视图 1：打烊盘点 (POS) ==================== -->
+        <section class="panel" id="tab-pos">
+          <div class="panel-head">
+            <div>
+              <h2>🏪 今晚打烊还剩什么？</h2>
+              <p>店员只需清点数量，折扣定价、毛利保护与 WhatsApp 文案全部自动生成。</p>
+            </div>
+            <span class="badge brand" id="posRuleBadge">当前清仓折扣：50% OFF</span>
+          </div>
+
+          <div class="card" id="guide-pos-card">
+            <div class="card-title">⚡ 自然语言快速录入</div>
+            <p class="card-sub">支持中英文混合输入，例如输入 <code>12 croissants, 5 chocolate slices</code></p>
+            <div class="quick-bar">
+              <input id="quickText" type="text" placeholder="试试输入：10 croissants, 4 chocolate, 3 sourdough" aria-label="快速输入剩余商品">
+              <button type="button" class="btn btn-main" data-act="parse">智能识别</button>
+            </div>
+
+            <div class="rows" id="posRows"></div>
+
+            <div class="submit-bar">
+              <span class="hint" id="posHint" role="status"></span>
+              <button type="button" class="btn btn-main" data-act="submit" id="submitBtn">生成清仓促销草稿 →</button>
+            </div>
+            <ul class="pipe" id="pipe" aria-live="polite"></ul>
+          </div>
+        </section>
+
+        <!-- ==================== 视图 2：审批与看板 (Dashboard) ==================== -->
+        <section class="panel" id="tab-dash" hidden>
+          <div class="panel-head">
+            <div>
+              <h2>📊 审批与经营看板</h2>
+              <p>实时统计累计挽回营收与减碳贡献，所有群发消息须经老板一键把关。</p>
+            </div>
+          </div>
+
+          <div class="rings" id="guide-kpis" aria-label="累计成果"></div>
+
+          <div id="draftBox"></div>
+
+          <div class="bi-grid" id="biCharts"></div>
+        </section>
+
+        <!-- ==================== 视图 3：老板后台 (Owner Admin Panel) ==================== -->
+        <section class="panel" id="tab-admin" hidden>
+          <div class="panel-head">
+            <div>
+              <h2>👑 老板后台 (Admin Panel)</h2>
+              <p>配置自动化折扣率、成本保护红线、维护烘焙商品库与 WhatsApp 熟客群模板。</p>
+            </div>
+          </div>
+
+          <div id="guide-admin-card">
+            <div class="admin-grid">
+              <!-- 卡片 A：自动定价与风控规则 -->
+              <div class="card">
+                <div class="card-title">⚙️ 自动定价与利润保护规则</div>
+                <p class="card-sub">修改后立即作用于下一次打烊盘点生成的促销方案。</p>
+
+                <div class="admin-field">
+                  <label for="discountRange">
+                    <span>默认打烊清仓价（占原价比例）</span>
+                    <span>清仓折扣力度</span>
+                  </label>
+                  <div class="slider-row">
+                    <input type="range" id="discountRange" min="20" max="85" step="5" value="50">
+                    <span class="discount-pill" id="discountValLabel">50%</span>
+                  </div>
+                </div>
+
+                <div class="switch-row">
+                  <div>
+                    <b>破发成本警告（Margin Protection）</b>
+                    <small>当折后清仓价低于单品成本价时，在审批单高亮预警</small>
+                  </div>
+                  <input type="checkbox" id="warnBelowCostToggle" checked style="width:18px;height:18px;accent-color:var(--brand)">
+                </div>
+
+                <div class="switch-row">
+                  <div>
+                    <b>附带 SDG 12.3 环保减碳印记</b>
+                    <small>在生成的促销单与日志中自动核算食物重量与碳排系数</small>
+                  </div>
+                  <input type="checkbox" id="sdgToggle" checked style="width:18px;height:18px;accent-color:var(--brand)">
+                </div>
+              </div>
+
+              <!-- 卡片 B：WhatsApp 熟客渠道配置 -->
+              <div class="card">
+                <div class="card-title">💬 WhatsApp 熟客群与文案模板</div>
+                <p class="card-sub">自定义推送的目标群组名称与宣传抬头。</p>
+
+                <div class="admin-field">
+                  <label for="waGroupNameInput">目标熟客群名称</label>
+                  <input type="text" class="input-std" id="waGroupNameInput" value="Pelanggan Setia 🥐">
+                </div>
+
+                <div class="admin-field">
+                  <label for="promoHeaderInput">群发促销标题抬头</label>
+                  <input type="text" class="input-std" id="promoHeaderInput" value="🌙 【Uncle Wong's 打烊特惠】">
+                </div>
+
+                <button type="button" class="btn btn-main" data-act="save-admin" id="saveAdminBtn" style="width:100%;margin-top:4px">
+                  💾 保存后台规则配置
+                </button>
+              </div>
+            </div>
+
+            <!-- 卡片 C：商品价格与库存管理 -->
+            <div class="card" style="margin-top:18px">
+              <div class="card-title">🥐 商品成本与原价管理（Product Catalog）</div>
+              <p class="card-sub">老板可直接在此调整单品成本、零售原价或新增季候甜点，POS 端实时同步。</p>
+
+              <div class="tblwrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>商品名称</th>
+                      <th class="num">成本价 (RM)</th>
+                      <th class="num">零售原价 (RM)</th>
+                      <th class="num">折后清仓预览</th>
+                      <th class="num">每日标准库存</th>
+                      <th class="num">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminProdRows"></tbody>
+                </table>
+              </div>
+
+              <!-- 新增商品栏 -->
+              <div class="add-prod-bar" id="addProdBar">
+                <input type="text" id="newEmoji" placeholder="🥯" value="🥯" aria-label="商品图标">
+                <input type="text" id="newName" placeholder="英文名 (如 Cinnamon Roll)" aria-label="商品英文名">
+                <input type="text" id="newZh" placeholder="中文名 (如 肉桂卷)" aria-label="商品中文名">
+                <input type="number" id="newCost" placeholder="成本 2.5" step="0.1" value="2.5" aria-label="成本价">
+                <input type="number" id="newRetail" placeholder="原价 7.5" step="0.1" value="7.5" aria-label="零售价">
+                <input type="number" id="newStock" placeholder="库存 12" value="12" aria-label="库存">
+                <button type="button" class="btn btn-main" data-act="add-product" id="addProdBtn">+ 新增商品</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== 视图 4：活动日志 (Audit Log) ==================== -->
+        <section class="panel" id="tab-log" hidden>
+          <div class="panel-head">
+            <div>
+              <h2>📜 活动与审计日志</h2>
+              <p>谁在什么时候录入盘点、修改了后台规则或批准群发，全程留痕可追溯。</p>
+            </div>
+          </div>
+          <div class="card">
+            <ul class="log" id="logList" aria-live="polite"></ul>
+          </div>
+        </section>
+
+        <p class="foot">
+          Orbyte Smart Yield · 价格与毛利全部由确定性代码规则计算，AI 仅负责润色群发文案，杜绝算术幻觉。支持浅色/深色高对比主题切换。
+        </p>
+      </main>
+
+      <!-- ==================== 右侧常驻：WhatsApp 熟客群模拟器 ==================== -->
+      <aside class="side" id="phoneWrap">
+        <div class="phone" id="guide-phone">
+          <div class="screen">
+            <div class="wa-status"><span id="waClock">22:21</span><span>5G <i class="bat"></i></span></div>
+            <div class="wa-head">
+              <svg class="ic"><use href="#i-back"/></svg>
+              <div class="av" aria-hidden="true">🥐</div>
+              <div class="wh">
+                <b id="waGroupTitle">Pelanggan Setia 🥐</b>
+                <small id="waSub">熟客福利群 · 在线</small>
+              </div>
+              <div class="wa-act"><svg class="ic"><use href="#i-vid"/></svg><svg class="ic"><use href="#i-call"/></svg><svg class="ic"><use href="#i-more"/></svg></div>
+            </div>
+            <div class="wa-body" id="waBody">
+              <div class="wa-empty">还没有群发消息。<br>店员提交盘点并经老板批准后，促销通知会实时推送到这里。</div>
+            </div>
+            <div class="wa-foot">
+              <div class="fi"><svg class="ic"><use href="#i-emo"/></svg><span>输入消息…</span><svg class="ic"><use href="#i-clip"/></svg><svg class="ic"><use href="#i-cam"/></svg></div>
+              <div class="sd" aria-hidden="true"><svg class="ic"><use href="#i-mic"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <p class="phone-cap">WhatsApp 实时模拟器（熟客群视角）</p>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- 全局轻提示 -->
+<div class="toast" id="toast" role="status"></div>
+
+<!-- ==================== Onboarding Wizard 导览遮罩与浮窗 ==================== -->
+<div class="wizard-backdrop" id="wizardBackdrop"></div>
+<div class="wizard-spotlight" id="wizardSpotlight"></div>
+<div class="wizard-popover" id="wizardPopover" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+  <span class="wizard-step-tag" id="wizardStepTag">步骤 1 / 7</span>
+  <button type="button" class="wizard-close" id="wizardClose" aria-label="关闭导览">✕</button>
+  <h4 class="wizard-title" id="wizardTitle">功能介绍</h4>
+  <p class="wizard-desc" id="wizardDesc">这是功能说明</p>
+  <div class="wizard-foot">
+    <div class="wizard-dots" id="wizardDots"></div>
+    <div class="wizard-btns">
+      <button type="button" class="wizard-btn-back" id="wizardBack">← 上一步</button>
+      <button type="button" class="wizard-btn-next" id="wizardNext">下一步 →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   核心状态与业务数据
+   ========================================================================== */
+const API = '';
+async function api(path, body) {
+  const res = await fetch(API + path, body === undefined ? {} : {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.error && data.error.message) || ('后端错误 ' + res.status));
+  return data;
+}
+
+const DEFAULT_PRODUCTS = [
+  { id: 'croissant', name: 'Butter Croissant', zh: '法式原味可颂', emoji: '🥐', cost_price: 2.0, retail_price: 6.5, on_hand: 20, aliases: ['croissant', 'croissants', '可颂', '牛角包'] },
+  { id: 'choc_slice', name: 'Chocolate Cake Slice', zh: '黑巧甘纳许切片', emoji: '🍰', cost_price: 3.5, retail_price: 9.0, on_hand: 15, aliases: ['chocolate', 'choc', 'cake', 'slice', 'slices', '蛋糕', '巧克力'] },
+  { id: 'sourdough', name: 'Artisan Sourdough', zh: '手工乡村酸种面包', emoji: '🍞', cost_price: 4.0, retail_price: 12.0, on_hand: 8, aliases: ['sourdough', 'bread', '酸种', '面包'] }
+];
+
+let products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+
+// 老板后台可配置规则
+let adminConfig = {
+  discountRatio: 0.50, // 默认 50%
+  warnBelowCost: true,
+  includeSDG: true,
+  waGroupName: 'Pelanggan Setia 🥐',
+  promoHeader: "🌙 【Uncle Wong's 打烊特惠】"
+};
+
+const STEPS = [
+  ['Trigger', '1. 触发盘点'],
+  ['Connected data', '2. 关联库存与成本'],
+  ['Decision logic', '3. 规则定价引擎'],
+  ['Human approval', '4. 老板人工把关'],
+  ['Visible outcome', '5. 群发与收益结果']
+];
+
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const money = n => (Number(n) < 0 ? '-RM' : 'RM') + Math.abs(Number(n)).toFixed(2);
+const clock = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function freshState() {
+  return {
+    tab: 'pos',
+    step: 1,
+    busy: false,
+    qty: { croissant: 6, choc_slice: 4, sourdough: 0 },
+    draft: null,
+    result: null,
+    kpi: { recovered: 142.50, co2: 18.4, food: 6.5, promos: 5 },
+    bi: {
+      trend: [['10/16', 22.5], ['10/17', 31], ['10/18', 28], ['10/19', 33], ['10/20', 28]],
+      prod: [['🥐 Butter Croissant', 58.5], ['🍰 Chocolate Cake Slice', 54], ['🍞 Artisan Sourdough', 30]]
+    },
+    log: [
+      {
+        t: '今天 ' + clock(),
+        who: '系统初始化',
+        act: '载入默认商品与老板定价规则',
+        detail: '当前清仓折扣率 50%，成本保护预警已开启',
+        sdg: 'SDG 12.3 碳排核算模块就绪',
+        type: 'info',
+        fresh: false
+      }
+    ]
+  };
+}
+
+let state = freshState();
+
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 2800);
+}
+
+/* ==========================================================================
+   深浅色主题切换 & 左侧 Hamburger 折叠控制
+   ========================================================================== */
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('orbyte_theme', theme);
+  const isDark = theme === 'dark';
+  $('#themeIcon').textContent = isDark ? '🌞' : '🌙';
+  $('#themeText').textContent = isDark ? '浅色模式' : '深色模式';
+}
+
+function initThemeAndSidebar() {
+  const savedTheme = localStorage.getItem('orbyte_theme') || 'light';
+  setTheme(savedTheme);
+
+  $('#themeToggleBtn').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    toast(next === 'dark' ? '🌙 已切换至深海暗夜模式' : '🌞 已切换至深蓝纯白模式');
+  });
+
+  $('#hamburgerBtn').addEventListener('click', () => {
+    if (window.innerWidth <= 820) {
+      document.body.classList.toggle('mobile-nav-open');
+    } else {
+      document.body.classList.toggle('sidebar-collapsed');
+      if (isWizardActive) setTimeout(updateWizardPosition, 280);
+    }
+  });
+
+  $('#sidebarOverlay').addEventListener('click', () => {
+    document.body.classList.remove('mobile-nav-open');
+  });
+}
+
+/* ==========================================================================
+   视图渲染函数
+   ========================================================================== */
+function renderSteps() {
+  $('#guide-steps').innerHTML = STEPS.map((s, i) => {
+    const n = i + 1;
+    const cls = n < state.step ? 'done' : (n === state.step ? 'now' : '');
+    return `<li class="${cls}">
+      <span class="n">${cls === 'done' ? '✓' : n}</span>
+      <span class="t">${s[1]}<small>${s[0]}</small></span>
+    </li>`;
+  }).join('');
+}
+function setStep(n) { state.step = n; renderSteps(); }
+
+function renderTabs() {
+  $$('.sidebar [data-tab]').forEach(b => {
+    b.setAttribute('aria-selected', String(b.dataset.tab === state.tab));
+  });
+  ['pos', 'dash', 'admin', 'log'].forEach(k => {
+    $('#tab-' + k).hidden = (k !== state.tab);
+  });
+  $('#pip').classList.toggle('on', !!state.draft);
+  document.body.classList.remove('mobile-nav-open');
+}
+function switchTab(t) {
+  state.tab = t;
+  renderTabs();
+  if (t === 'admin') renderAdmin();
+}
+
+function renderPOS() {
+  const pctOff = Math.round((1 - adminConfig.discountRatio) * 100);
+  $('#posRuleBadge').textContent = `当前清仓规则：${pctOff}% OFF（按原价 ${Math.round(adminConfig.discountRatio * 100)}% 结算）`;
+
+  $('#posRows').innerHTML = products.map(p => {
+    const clrPrice = (p.retail_price * adminConfig.discountRatio).toFixed(2);
+    return `<div class="prow">
+      <div class="emo" aria-hidden="true">${esc(p.emoji)}</div>
+      <div class="grow">
+        <div class="nm">${esc(p.name)}<span>${esc(p.zh)}</span></div>
+        <div class="meta">成本 ${money(p.cost_price)} · 原价 ${money(p.retail_price)} · <b>预计清仓价 RM${clrPrice}</b> · 库存 ${p.on_hand}</div>
+      </div>
+      <div class="stepper">
+        <button type="button" data-dec="${esc(p.id)}" aria-label="减少 ${esc(p.name)}">−</button>
+        <input type="text" inputmode="numeric" data-q="${esc(p.id)}" value="${state.qty[p.id] || 0}" aria-label="${esc(p.name)} 剩余数量">
+        <button type="button" data-inc="${esc(p.id)}" aria-label="增加 ${esc(p.name)}">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function countTo(el, from, to, dec, prefix = '') {
+  if (reduced) { el.textContent = prefix + to.toFixed(dec); return; }
+  const dur = 800, t0 = performance.now();
+  (function frame(t) {
+    const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = prefix + (from + (to - from) * e).toFixed(dec);
+    if (k < 1) requestAnimationFrame(frame);
+  })(t0);
+}
+
+const GOALS = { recovered: 800, co2: 50, food: 30, promos: 22 };
+const RINGS = [
+  ['recovered', '本月挽回营收', 'RM', '#e08a2e', 1, 'RM800'],
+  ['co2', '累计减碳', 'kg CO₂e', '#4f86e8', 1, '50 kg'],
+  ['food', '避免浪费食物', 'kg', '#e8b43a', 1, '30 kg'],
+  ['promos', '已执行促销批次', '批次', '#d94a5a', 0, '22 批']
+];
+const C = 2 * Math.PI * 42;
+function renderKPI(animate, prev) {
+  const k = state.kpi, box = $('#guide-kpis');
+  if (!box.firstChild) box.innerHTML = RINGS.map(r => `<div class="ring-card">
+    <div class="ring"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="42"/><circle class="arc" id="arc-${r[0]}" cx="50" cy="50" r="42" stroke="${r[3]}" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg>
+      <div class="rv"><b id="rv-${r[0]}">0</b><small>${r[2]}</small></div></div>
+    <div class="rl">${r[1]}</div><div class="rg">目标 <b>${r[5]}</b></div>
+    <div class="rbar"><i id="bar-${r[0]}" style="background:${r[3]}"></i></div></div>`).join('');
+  RINGS.forEach(r => {
+    const v = k[r[0]], f = Math.min(1, v / GOALS[r[0]]), el = $('#rv-' + r[0]);
+    if (animate && prev) countTo(el, prev[r[0]], v, r[4]); else el.textContent = v.toFixed(r[4]);
+    requestAnimationFrame(() => { $('#arc-' + r[0]).style.strokeDashoffset = C * (1 - f); $('#bar-' + r[0]).style.width = (f * 100) + '%'; });
+  });
+}
+
+function renderBI() {
+  const b = state.bi, W = 440, H = 200, pad = 22, n = b.trend.length;
+  const max = Math.max(...b.trend.map(t => t[1])) * 1.2, bw = (W - 2 * pad) / n;
+  const bars = b.trend.map((t, i) => {
+    const h = (H - 54) * t[1] / max, x = pad + i * bw + bw * 0.17, y = H - 24 - h, w = bw * 0.66;
+    return `<rect class="bar${i === n - 1 ? ' hot' : ''}" x="${x}" y="${y}" width="${w}" height="${h}" rx="6"/>
+      <text class="bv" x="${x + w / 2}" y="${y - 6}" text-anchor="middle">${t[1].toFixed(0)}</text>
+      <text class="bx" x="${x + w / 2}" y="${H - 7}" text-anchor="middle">${esc(t[0])}</text>`;
+  }).join('');
+  const tot = b.prod.reduce((a, p) => a + p[1], 0) || 1, cols = ['#e08a2e', '#4f86e8', '#e8b43a', '#d94a5a', '#7c6fd6'];
+  const hb = b.prod.map((p, i) => `<div class="hb"><div class="hbt"><span>${esc(p[0])}</span><b>${money(p[1])}</b></div>
+    <div class="rbar"><i style="width:${p[1] / tot * 100}%;background:${cols[i % 5]}"></i></div><small>占比 ${(p[1] / tot * 100).toFixed(0)}%</small></div>`).join('');
+  $('#biCharts').innerHTML = `<div class="card"><div class="card-title">📈 各批次挽回营收 (RM)</div>
+      <p class="card-sub">每次老板批准群发即新增一根柱子，橙色为最新批次</p>
+      <svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="各批次挽回营收柱状图">${bars}</svg></div>
+    <div class="card"><div class="card-title">🥐 品类贡献排行</div>
+      <p class="card-sub">累计挽回营收按商品拆分</p>${hb}</div>`;
+}
+
+function renderDraft() {
+  const box = $('#draftBox'), d = state.draft, r = state.result;
+  if (r) {
+    box.innerHTML = r.rejected
+      ? `<div class="card done-card">
+          <div class="big" aria-hidden="true">🛑</div>
+          <div>
+            <span class="badge">已驳回</span>
+            <h3>该批次促销草稿已被拒绝</h3>
+            <p class="muted" style="margin:6px 0 14px">未向 WhatsApp 群发送任何消息，操作已记录在活动日志中。</p>
+            <button type="button" class="btn btn-main" data-act="gopos">返回打烊盘点重新提交</button>
+          </div>
+        </div>`
+      : `<div class="card done-card">
+          <div class="big" aria-hidden="true">✅</div>
+          <div>
+            <span class="badge ok">已批准并群发</span>
+            <h3>促销已成功推送至「${esc(adminConfig.waGroupName)}」</h3>
+            <p class="muted" style="margin:6px 0 14px">本批次共计清仓 <b>${r.units}</b> 件商品，预计挽回营收 <b>${money(r.rev)}</b>，减少碳排放 <b>${r.co2.toFixed(2)} kg CO₂e</b>。请查看右侧手机模拟器中的熟客互动。</p>
+            <button type="button" class="btn" data-act="gopos">继续下一轮盘点</button>
+          </div>
+        </div>`;
+    return;
+  }
+  if (!d) {
+    box.innerHTML = `<div class="card empty-bar">
+      <span><b>当前没有待审批的促销草稿</b>　店员在「打烊盘点」提交后会自动生成审批单。</span>
+      <button type="button" class="btn btn-main" data-act="gopos">前往打烊盘点录入 →</button>
+    </div>`;
+    return;
+  }
+
+  const rows = d.items.map(i => {
+    const unitProfit = Number(i.gross_profit_total) / i.qty;
+    return `<tr>
+      <td><b>${esc(i.emoji)} ${esc(i.name)}</b></td>
+      <td class="num">${i.qty}</td>
+      <td class="num">${money(i.unit_cost_price)}</td>
+      <td class="num">${money(i.unit_retail_price)}</td>
+      <td class="num strong">${money(i.unit_clearance_price)}</td>
+      <td class="num" style="color:${unitProfit < 0 ? 'var(--chili)' : 'var(--ok)'};font-weight:600">${(unitProfit >= 0 ? '+' : '') + money(unitProfit)}</td>
+    </tr>`;
+  }).join('');
+
+  const warns = d.warnings && d.warnings.length
+    ? `<div class="lock-banner"><span>⚠️ ${d.warnings.map(w => esc(w.message)).join('<br>⚠️ ')}</span></div>`
+    : '';
+
+  box.innerHTML = `<div class="card">
+    <div class="draft-head">
+      <div>
+        <span class="badge">⏳ 待老板审批</span>
+        <h3>今晚的临期清仓促销方案</h3>
+        <p class="muted" style="margin:4px 0 0">基于老板后台设定的 ${Math.round(adminConfig.discountRatio * 100)}% 折扣率自动生成。</p>
+      </div>
+      <button type="button" class="btn" data-act="goadmin">⚙️ 调整定价规则</button>
+    </div>
+
+    <div class="tblwrap">
+      <table>
+        <thead>
+          <tr><th>商品</th><th class="num">剩余数量</th><th class="num">单位成本</th><th class="num">零售原价</th><th class="num">折后清仓价</th><th class="num">单件毛利</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${warns}
+
+    <div class="metrics">
+      <div class="hl"><b>${money(d.rev)}</b><span>预计挽回总营收</span></div>
+      <div><b>${money(d.profit)}</b><span>预计净毛利</span></div>
+      <div><b>${d.co2.toFixed(2)} kg</b><span>减少碳排 CO₂e</span></div>
+      <div><b>${d.kg.toFixed(2)} kg</b><span>避免浪费食物</span></div>
+    </div>
+
+    <label class="f" for="copyBox">WhatsApp 熟客群发文案（审批前可直接编辑微调）</label>
+    <textarea id="copyBox" rows="7">${esc(d.text)}</textarea>
+
+    <div class="tools">
+      <span class="safe">🛡️ 价格与毛利由确定性代码计算，AI 不接触算术</span>
+      <button type="button" class="btn" data-act="regen-copy" style="padding:6px 12px;font-size:12.5px">✨ 切换文案风格</button>
+    </div>
+
+    <details>
+      <summary>查看底层核算公式与规则说明</summary>
+      <ul>
+        <li>折后清仓价 = 零售原价 × ${Math.round(adminConfig.discountRatio * 100)}%（可在老板后台自由调节）。</li>
+        <li>预计挽回营收 = ∑ (剩余数量 × 清仓价)；单件毛利 = 清仓价 − 单位成本。</li>
+        <li>减碳量计算参考联合国 SDG 12.3 烘焙食品生命周期系数。</li>
+      </ul>
+    </details>
+
+    <div class="approve-bar">
+      <button type="button" class="btn-approve" data-act="approve">✅ 批准并群发至 WhatsApp</button>
+      <button type="button" class="btn-reject" data-act="reject">✕ 驳回草稿</button>
+    </div>
+  </div>`;
+}
+
+/* ==========================================================================
+   老板后台 (Admin Panel) 渲染与交互
+   ========================================================================== */
+function renderAdmin() {
+  const pct = Math.round(adminConfig.discountRatio * 100);
+  $('#discountRange').value = pct;
+  $('#discountValLabel').textContent = pct + '%';
+  $('#warnBelowCostToggle').checked = adminConfig.warnBelowCost;
+  $('#sdgToggle').checked = adminConfig.includeSDG;
+  $('#waGroupNameInput').value = adminConfig.waGroupName;
+  $('#promoHeaderInput').value = adminConfig.promoHeader;
+
+  $('#adminProdRows').innerHTML = products.map((p, idx) => {
+    const previewClr = (p.retail_price * adminConfig.discountRatio).toFixed(2);
+    const belowCost = Number(previewClr) < p.cost_price;
+    return `<tr>
+      <td><b>${esc(p.emoji)} ${esc(p.name)}</b> <span class="muted">${esc(p.zh)}</span></td>
+      <td class="num">
+        <input type="number" step="0.1" class="tbl-input" data-pidx="${idx}" data-field="cost_price" value="${p.cost_price.toFixed(2)}">
+      </td>
+      <td class="num">
+        <input type="number" step="0.1" class="tbl-input" data-pidx="${idx}" data-field="retail_price" value="${p.retail_price.toFixed(2)}">
+      </td>
+      <td class="num strong" style="color:${belowCost ? 'var(--chili)' : 'var(--brand)'}">
+        RM${previewClr} ${belowCost ? '⚠️' : ''}
+      </td>
+      <td class="num">
+        <input type="number" step="1" class="tbl-input" data-pidx="${idx}" data-field="on_hand" value="${p.on_hand}">
+      </td>
+      <td class="num">
+        <button type="button" class="btn" data-del-prod="${idx}" style="padding:5px 10px;font-size:12px" ${products.length <= 1 ? 'disabled' : ''}>删除</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function saveAdminSettings() {
+  const ratio = Number($('#discountRange').value) / 100;
+  adminConfig.discountRatio = ratio;
+  adminConfig.warnBelowCost = $('#warnBelowCostToggle').checked;
+  adminConfig.includeSDG = $('#sdgToggle').checked;
+  adminConfig.waGroupName = $('#waGroupNameInput').value.trim() || 'Pelanggan Setia 🥐';
+  adminConfig.promoHeader = $('#promoHeaderInput').value.trim() || "🌙 【Uncle Wong's 打烊特惠】";
+
+  $('#waGroupTitle').textContent = adminConfig.waGroupName;
+
+  // 若当前有未审批的草稿，同步用新规则重算草稿
+  if (state.draft) {
+    state.draft = buildLocalDraft(state.draft.items.map(i => ({ item: i.item, qty: i.qty })));
+  }
+
+  addLog('老板后台', '更新定价与群发配置', `清仓结算比例设为原价的 ${Math.round(ratio * 100)}%，目标群组：${adminConfig.waGroupName}`, '', 'info');
+  renderPOS();
+  renderAdmin();
+  renderDraft();
+  toast('✅ 老板后台配置已保存并实时生效！');
+}
+
+function addNewProduct() {
+  const emoji = ($('#newEmoji').value || '🥐').trim();
+  const name = $('#newName').value.trim();
+  const zh = $('#newZh').value.trim() || name;
+  const cost = parseFloat($('#newCost').value);
+  const retail = parseFloat($('#newRetail').value);
+  const stock = parseInt($('#newStock').value, 10) || 10;
+
+  if (!name || isNaN(cost) || isNaN(retail) || retail <= 0) {
+    toast('请填写完整的商品名称与有效价格');
+    return;
+  }
+  const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '_' + Date.now().toString().slice(-3);
+  products.push({
+    id, emoji, name, zh,
+    cost_price: cost,
+    retail_price: retail,
+    on_hand: stock,
+    aliases: [name.toLowerCase(), zh]
+  });
+  state.qty[id] = 2;
+  $('#newName').value = '';
+  $('#newZh').value = '';
+  addLog('老板后台', '新增烘焙商品', `${emoji} ${name} (${zh})，成本 ${money(cost)}，原价 ${money(retail)}`, '', 'ok');
+  renderAdmin();
+  renderPOS();
+  toast(`已新增商品：${name}`);
+}
+
+/* ==========================================================================
+   日志与打烊盘点提交流程
+   ========================================================================== */
+function renderLog() {
+  $('#logList').innerHTML = state.log.map(e =>
+    `<li class="${e.type}">
+      <span class="dot"></span>
+      <div>
+        <div><b>${esc(e.who)}</b> · ${esc(e.act)}</div>
+        <div class="l2">${esc(e.detail)}</div>
+        ${e.sdg ? `<div class="sdg">🌍 ${esc(e.sdg)}</div>` : ''}
+      </div>
+      <time>${esc(e.t)}</time>
+    </li>`
+  ).join('');
+}
+
+function addLog(who, act, detail, sdg, type) {
+  state.log.unshift({ t: '今天 ' + clock(), who, act, detail, sdg: sdg || '', type });
+  renderLog();
+}
+
+function buildLocalDraft(selectedList) {
+  const ratio = adminConfig.discountRatio;
+  const pctOff = Math.round((1 - ratio) * 100);
+  const warnings = [];
+
+  const fakeItems = selectedList.map(entry => {
+    const p = products.find(x => x.id === entry.item) || products[0];
+    const q = entry.qty;
+    const clr = +(p.retail_price * ratio).toFixed(2);
+    if (adminConfig.warnBelowCost && clr < p.cost_price) {
+      warnings.push({ message: `${p.name} 折后清仓价 (RM${clr.toFixed(2)}) 低于成本价 (RM${p.cost_price.toFixed(2)})` });
+    }
+    return {
+      item: p.id,
+      name: p.name,
+      emoji: p.emoji,
+      qty: q,
+      unit_cost_price: p.cost_price,
+      unit_retail_price: p.retail_price,
+      unit_clearance_price: clr,
+      gross_profit_total: (clr - p.cost_price) * q
+    };
+  });
+
+  const rev = fakeItems.reduce((acc, x) => acc + x.unit_clearance_price * x.qty, 0);
+  const profit = fakeItems.reduce((acc, x) => acc + x.gross_profit_total, 0);
+  const totalQty = fakeItems.reduce((acc, x) => acc + x.qty, 0);
+  const co2 = adminConfig.includeSDG ? totalQty * 0.42 : 0;
+  const kg = adminConfig.includeSDG ? totalQty * 0.15 : 0;
+
+  const text = `${adminConfig.promoHeader}\n今晚新鲜出炉烘焙限时 ${pctOff}% OFF 清仓特惠！\n` +
+    fakeItems.map(i => `• ${i.emoji} ${i.name}：RM${i.unit_clearance_price.toFixed(2)} (原价 RM${i.unit_retail_price.toFixed(2)}，仅剩 ${i.qty} 件)`).join('\n') +
+    `\n📍 先到先得，直接在本群回复数量即可帮您留单！`;
+
+  return {
+    items: fakeItems,
+    totals: { clearance_total: rev, gross_profit_total: profit, estimated_co2e_kg: co2.toFixed(2), estimated_food_kg: kg.toFixed(2), qty: totalQty },
+    rev, profit, co2, kg, text, warnings, edited: false
+  };
+}
+
+async function submitEOD() {
+  if (state.busy) return;
+  const items = products.filter(p => state.qty[p.id] > 0);
+  if (!items.length) {
+    $('#posHint').textContent = '⚠️ 请至少输入一件剩余数量大于 0 的商品。';
+    return;
+  }
+  $('#posHint').textContent = '';
+  state.busy = true;
+  state.result = null;
+  state.draft = null;
+  $('#submitBtn').disabled = true;
+
+  const pipe = $('#pipe');
+  pipe.innerHTML = '';
+  pipe.classList.add('on');
+  const push = t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    pipe.appendChild(li);
+  };
+
+  addLog('门店 POS', '提交打烊盘点', items.map(p => `${p.name} ×${state.qty[p.id]}`).join('、'), '', 'info');
+  setStep(2);
+
+  const d = buildLocalDraft(items.map(p => ({ item: p.id, qty: state.qty[p.id] })));
+
+  push(`已关联商品库：读取 ${items.length} 款烘焙单品的成本价与碳排系数`);
+  setStep(3);
+  await sleep(450);
+
+  push(`执行老板定价引擎：按原价 × ${Math.round(adminConfig.discountRatio * 100)}% 核算清仓价`);
+  await sleep(450);
+
+  state.draft = d;
+  push('文案模板引擎：已生成 WhatsApp 熟客群推广文案');
+  setStep(4);
+  await sleep(400);
+
+  push('已推送至「审批与看板」，等待老板批准群发');
+  await sleep(350);
+
+  state.busy = false;
+  $('#submitBtn').disabled = false;
+  renderDraft();
+  switchTab('dash');
+  toast('✨ 促销草稿已生成，请审阅并批准群发');
+}
+
+async function approve() {
+  const d = state.draft;
+  if (!d || state.busy) return;
+  const text = (($('#copyBox') || {}).value || d.text).trim();
+  if (!text) { toast('文案内容不能为空'); return; }
+
+  state.busy = true;
+  const units = d.totals.qty;
+  const prev = Object.assign({}, state.kpi);
+  state.kpi.recovered += d.rev;
+  state.kpi.co2 += d.co2;
+  state.kpi.food += d.kg;
+  state.kpi.promos += 1;
+  state.bi.trend.push([clock(), d.rev]);
+  d.items.forEach(i => {
+    const l = i.emoji + ' ' + i.name, r = i.unit_clearance_price * i.qty, e = state.bi.prod.find(p => p[0] === l);
+    if (e) e[1] += r; else state.bi.prod.push([l, r]);
+  });
+
+  addLog(
+    'Uncle Wong',
+    d.edited ? '微调文案后批准并群发' : '批准并群发清仓促销',
+    `${d.items.map(i => `${i.name} ×${i.qty}`).join('、')}，推送至「${adminConfig.waGroupName}」，预计挽回 ${money(d.rev)}`,
+    adminConfig.includeSDG ? `减少 ${d.co2.toFixed(2)} kg CO₂e（SDG 12.3）` : '',
+    'ok'
+  );
+
+  state.result = { units, rev: d.rev, co2: d.co2 };
+  const items = d.items;
+  state.draft = null;
+  setStep(6);
+  renderDraft();
+  renderTabs();
+  renderKPI(true, prev);
+  renderBI();
+  toast('🚀 已批准并群发至 WhatsApp 熟客群！');
+
+  if (window.innerWidth < 1120) {
+    $('#phoneWrap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  await broadcast(text, items);
+  state.busy = false;
+}
+
+function reject() {
+  if (!state.draft || state.busy) return;
+  addLog('Uncle Wong', '驳回促销草稿', '未向熟客群发送任何消息，库存保持原状', '', 'no');
+  state.result = { rejected: true };
+  state.draft = null;
+  setStep(6);
+  renderDraft();
+  renderTabs();
+  toast('已驳回该批次促销草稿');
+}
+
+const TK1 = '<svg viewBox="0 0 16 11"><path d="M3 6l3.5 3.5L13 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TK2 = '<svg viewBox="0 0 16 11"><path d="M1 6l3.5 3.5L11 1.5M6.5 8.5l.5.5L14 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+async function broadcast(text, items) {
+  const body = $('#waBody'), sub = $('#waSub'), ck = clock(), COL = ['#1f7aec', '#e542a3', '#c27a00'];
+  $('#waClock').textContent = ck;
+  const add = (html, cls) => {
+    const m = document.createElement('div');
+    m.className = 'msg ' + cls; m.innerHTML = html;
+    body.appendChild(m); body.scrollTop = body.scrollHeight;
+    return m;
+  };
+  body.innerHTML = '<div class="wa-sysmsg">🔒 此群消息已端到端加密，仅群成员可见</div><div class="wa-day">今天</div>';
+  const out = add(`<div class="txt">${esc(text)}</div><div class="meta">${ck}<span class="tick">${TK1}</span></div>`, 'out');
+  const tick = out.querySelector('.tick');
+  sub.textContent = '正在群发推送…';
+  await sleep(700);
+  tick.innerHTML = TK2;
+  sub.textContent = '已送达 128 位熟客';
+  await sleep(700);
+  tick.classList.add('read');
+  await sleep(700);
+
+  const a = items[0].name.toLowerCase();
+  const b = (items[1] || items[0]).name.toLowerCase();
+  const replies = [
+    ['Auntie Lim', `Nak 2 ${a}! Simpan untuk saya ya Uncle 🙏`],
+    ['Farid', 'Saya nak 3! Boleh pick up pukul 8.15pm?'],
+    ['Mei Ling', `留 2 个 ${b} 给我！马上过来拿 😍`]
+  ];
+  for (const [i, r] of replies.entries()) {
+    sub.textContent = r[0] + ' 正在输入…';
+    const ty = add('<span></span><span></span><span></span>', 'in typing');
+    await sleep(900);
+    ty.remove();
+    add(`<div class="who" style="color:${COL[i]}">${esc(r[0])}</div><div class="txt">${esc(r[1])}</div><div class="meta">${clock()}</div>`, 'in');
+    await sleep(450);
+  }
+  sub.textContent = '熟客群活跃中 · 已收到 3 笔留单';
+}
+
+function parseQuick() {
+  const s = $('#quickText').value.trim();
+  if (!s) {
+    $('#posHint').textContent = '请先输入文本，如：10 croissants, 4 chocolate';
+    return;
+  }
+  const found = {};
+  s.split(/[,，;；\n]|\band\b|和/i).forEach(part => {
+    const m = part.match(/(\d+)/);
+    if (!m) return;
+    const low = part.toLowerCase();
+    products.forEach(p => {
+      if ([p.id, p.name, p.zh, ...(p.aliases || [])].some(a => low.includes(a.toLowerCase()))) {
+        found[p.id] = parseInt(m[1], 10);
+      }
+    });
+  });
+  if (!Object.keys(found).length) {
+    $('#posHint').textContent = '未能匹配到商品名称，试试输入：12 croissants, 5 chocolate';
+    return;
+  }
+  products.forEach(p => { state.qty[p.id] = found[p.id] || 0; });
+  $('#posHint').textContent = '';
+  renderPOS();
+  toast('✅ 已自动识别并填入商品数量');
+}
+
+/* ==========================================================================
+   全新升级版 Onboarding Wizard：跟随新结构自动切页介绍全部模块
+   ========================================================================== */
+const WIZARD_STEPS = [
+  {
+    target: '#guide-sidebar',
+    tab: 'pos',
+    title: '全新可折叠左侧导航栏',
+    desc: '我们将工作台清晰划分为四大模块：【打烊盘点】、【审批与看板】、新增的【老板后台】以及【活动日志】。点击左上角 ☰ 按钮可随时折叠或展开菜单。',
+    placement: 'right'
+  },
+  {
+    target: '#guide-top-actions',
+    tab: 'pos',
+    title: '深色模式与快捷工具栏',
+    desc: '点击 🌙/🌞 按钮可在清爽的「深蓝纯白模式」与高对比「极夜深色模式」之间无缝切换；右侧还支持随时重开引导向导或一键重置演示数据。',
+    placement: 'bottom'
+  },
+  {
+    target: '#guide-steps',
+    tab: 'pos',
+    title: '全流程 5 步自动化追踪',
+    desc: '从触发盘点、关联商品库、代码规则定价、人工把关到最终 WhatsApp 群发，每一步状态实时高亮展示。',
+    placement: 'bottom'
+  },
+  {
+    target: '#guide-pos-card',
+    tab: 'pos',
+    title: '智能打烊盘点（POS 录入）',
+    desc: '支持通过自然语言快速识别剩余甜点数量，或用加减号微调。点击「生成清仓促销草稿」即可触发自动核算。',
+    placement: 'right'
+  },
+  {
+    target: '#guide-kpis',
+    tab: 'dash',
+    title: 'BI 经营看板',
+    desc: '已切换至【审批与看板】。四个环形仪表对照月度目标，实时展示挽回营收、减碳、避免浪费与促销批次；下方趋势图与品类占比同步更新，页面保持清晰可读。',
+    placement: 'phone'
+  },
+  {
+    target: '#guide-admin-card',
+    tab: 'admin',
+    title: '新增：👑 老板后台（Admin Panel）',
+    desc: '在老板后台中，您可以自由拉动滑块调节清仓折扣率、开启破发成本预警、修改商品成本/原价，或直接添加烘焙新品！',
+    placement: 'top'
+  },
+  {
+    target: '#guide-phone',
+    tab: 'pos',
+    title: 'WhatsApp 熟客群实时模拟器',
+    desc: '右侧常驻展示顾客端手机画面。当批准促销后，这里会实时演示群发到达、已读蓝勾以及熟客抢购留单的互动全过程。',
+    placement: 'left'
+  }
+];
+
+let wizardCurrentIndex = 0;
+let isWizardActive = false;
+
+function initWizard() {
+  renderWizardDots();
+  $('#startTourBtn').addEventListener('click', startWizard);
+  $('#wizardClose').addEventListener('click', stopWizard);
+  $('#wizardBack').addEventListener('click', prevWizardStep);
+  $('#wizardNext').addEventListener('click', nextWizardStep);
+  $('#wizardBackdrop').addEventListener('click', stopWizard);
+  window.addEventListener('resize', () => { if (isWizardActive) updateWizardPosition(); });
+  window.addEventListener('keydown', e => {
+    if (!isWizardActive) return;
+    if (e.key === 'Escape') stopWizard();
+    if (e.key === 'ArrowRight') nextWizardStep();
+    if (e.key === 'ArrowLeft') prevWizardStep();
+  });
+
+  if (!localStorage.getItem('orbyte_v2_tour_shown')) {
+    setTimeout(() => {
+      startWizard();
+      localStorage.setItem('orbyte_v2_tour_shown', '1');
+    }, 500);
+  }
+}
+
+function renderWizardDots() {
+  $('#wizardDots').innerHTML = WIZARD_STEPS.map((_, i) =>
+    `<span class="wizard-dot ${i === wizardCurrentIndex ? 'active' : ''}"></span>`
+  ).join('');
+}
+
+function startWizard() {
+  document.body.classList.remove('sidebar-collapsed');
+  wizardCurrentIndex = 0;
+  isWizardActive = true;
+  $('#wizardBackdrop').classList.add('active');
+  $('#wizardSpotlight').classList.add('active');
+  $('#wizardPopover').classList.add('active');
+  goToWizardStep(0);
+}
+
+function stopWizard() {
+  isWizardActive = false;
+  $('#wizardBackdrop').classList.remove('active');
+  $('#wizardSpotlight').classList.remove('active');
+  $('#wizardPopover').classList.remove('active');
+}
+
+function nextWizardStep() {
+  if (wizardCurrentIndex < WIZARD_STEPS.length - 1) {
+    goToWizardStep(wizardCurrentIndex + 1);
+  } else {
+    stopWizard();
+    toast('🎉 导览完成！现在可以自由体验盘点与老板后台了');
+  }
+}
+
+function prevWizardStep() {
+  if (wizardCurrentIndex > 0) {
+    goToWizardStep(wizardCurrentIndex - 1);
+  }
+}
+
+function goToWizardStep(index) {
+  wizardCurrentIndex = index;
+  const step = WIZARD_STEPS[index];
+
+  // 自动切换到对应功能所在的 Tab 页面
+  if (step.tab && state.tab !== step.tab) {
+    switchTab(step.tab);
+  }
+
+  renderWizardDots();
+  $('#wizardStepTag').textContent = `功能导览 ${index + 1} / ${WIZARD_STEPS.length}`;
+  $('#wizardTitle').textContent = step.title;
+  $('#wizardDesc').textContent = step.desc;
+  $('#wizardBack').style.visibility = index === 0 ? 'hidden' : 'visible';
+  $('#wizardNext').textContent = index === WIZARD_STEPS.length - 1 ? '开始体验 ✓' : '下一步 →';
+
+  setTimeout(updateWizardPosition, 60);
+}
+
+function updateWizardPosition() {
+  const step = WIZARD_STEPS[wizardCurrentIndex];
+  const el = $(step.target);
+  if (!el) return;
+
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+
+  const rect = el.getBoundingClientRect();
+  const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+  const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+
+  const pad = 6;
+  const spot = $('#wizardSpotlight');
+  spot.style.width = (rect.width + pad * 2) + 'px';
+  spot.style.height = (rect.height + pad * 2) + 'px';
+  spot.style.top = (rect.top + scrollY - pad) + 'px';
+  spot.style.left = (rect.left + scrollX - pad) + 'px';
+
+  const popover = $('#wizardPopover');
+  const popWidth = 340;
+  const popHeight = popover.offsetHeight || 220;
+
+  if (window.innerWidth <= 820) {
+    popover.style.position = 'fixed';
+    popover.style.top = (window.innerHeight - popHeight - 20) + 'px';
+    popover.style.left = '16px';
+    return;
+  }
+
+  popover.style.position = 'absolute';
+  let top = 0, left = 0;
+
+  if (step.placement === 'bottom') {
+    top = rect.bottom + scrollY + 14;
+    left = rect.left + scrollX + (rect.width / 2) - (popWidth / 2);
+  } else if (step.placement === 'top') {
+    top = Math.max(scrollY + 80, rect.top + scrollY - popHeight - 16);
+    left = rect.left + scrollX + (rect.width / 2) - (popWidth / 2);
+  } else if (step.placement === 'right') {
+    top = rect.top + scrollY + 12;
+    left = rect.right + scrollX + 18;
+    if (left + popWidth > window.innerWidth - 20) {
+      top = rect.bottom + scrollY + 14;
+      left = rect.left + scrollX;
+    }
+  } else if (step.placement === 'phone') {
+    const pr = $('#phoneWrap').getBoundingClientRect();
+    top = pr.top + scrollY + 40;
+    left = pr.right + scrollX - popWidth - 10;
+    if (window.innerWidth <= 1120) { top = rect.bottom + scrollY + 14; left = rect.left + scrollX; }
+  } else if (step.placement === 'left') {
+    top = rect.top + scrollY + 20;
+    left = rect.left + scrollX - popWidth - 18;
+    if (left < 20) {
+      top = rect.bottom + scrollY + 14;
+      left = 20;
+    }
+  }
+
+  if (left < 16) left = 16;
+  if (left + popWidth > window.innerWidth - 16) {
+    left = window.innerWidth - popWidth - 16;
+  }
+
+  popover.style.top = top + 'px';
+  popover.style.left = left + 'px';
+}
+
+/* ==========================================================================
+   全局事件绑定
+   ========================================================================== */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button');
+  if (!t) return;
+
+  if (t.dataset.tab) {
+    switchTab(t.dataset.tab);
+    return;
+  }
+  if (t.dataset.inc) {
+    state.qty[t.dataset.inc] = Math.min(999, (state.qty[t.dataset.inc] || 0) + 1);
+    renderPOS();
+    return;
+  }
+  if (t.dataset.dec) {
+    state.qty[t.dataset.dec] = Math.max(0, (state.qty[t.dataset.dec] || 0) - 1);
+    renderPOS();
+    return;
+  }
+  if (t.dataset.delProd !== undefined) {
+    const idx = parseInt(t.target ? t.dataset.delProd : t.getAttribute('data-del-prod'), 10);
+    if (products.length > 1) {
+      const removed = products.splice(idx, 1)[0];
+      addLog('老板后台', '移除商品', `已从商品库移除 ${removed.name}`, '', 'info');
+      renderAdmin();
+      renderPOS();
+      toast(`已移除商品：${removed.name}`);
+    }
+    return;
+  }
+
+  switch (t.dataset.act) {
+    case 'parse': parseQuick(); break;
+    case 'submit': submitEOD(); break;
+    case 'approve': approve(); break;
+    case 'reject': reject(); break;
+    case 'gopos': switchTab('pos'); break;
+    case 'goadmin': switchTab('admin'); break;
+    case 'save-admin': saveAdminSettings(); break;
+    case 'add-product': addNewProduct(); break;
+    case 'regen-copy':
+      if (state.draft) {
+        const alt = `⚡【打烊闪购 · ${adminConfig.waGroupName} 专属】\n` +
+          state.draft.items.map(i => `👉 ${i.emoji} ${i.name} 特惠价 RM${i.unit_clearance_price.toFixed(2)}（剩 ${i.qty} 份）`).join('\n') +
+          `\n新鲜现烤不过夜，群内直接回复“我要+数量”即可预留！`;
+        state.draft.text = alt;
+        state.draft.edited = true;
+        renderDraft();
+        toast('✨ 已为您切换另一版促销话术');
+      }
+      break;
+  }
+});
+
+document.addEventListener('input', e => {
+  if (e.target.dataset && e.target.dataset.q) {
+    const v = parseInt(e.target.value.replace(/\D/g, ''), 10);
+    state.qty[e.target.dataset.q] = isNaN(v) ? 0 : Math.min(999, v);
+  }
+  if (e.target.id === 'copyBox' && state.draft) {
+    state.draft.text = e.target.value;
+    state.draft.edited = true;
+  }
+  if (e.target.id === 'quickText') {
+    $('#posHint').textContent = '';
+  }
+  if (e.target.id === 'discountRange') {
+    $('#discountValLabel').textContent = e.target.value + '%';
+  }
+  if (e.target.dataset && e.target.dataset.pidx !== undefined) {
+    const idx = parseInt(e.target.dataset.pidx, 10);
+    const field = e.target.dataset.field;
+    const val = parseFloat(e.target.value);
+    if (!isNaN(val) && val >= 0 && products[idx]) {
+      products[idx][field] = field === 'on_hand' ? Math.round(val) : val;
+      renderPOS();
+    }
+  }
+});
+
+$('#quickText').addEventListener('keydown', e => { if (e.key === 'Enter') parseQuick(); });
+
+$('#resetBtn').addEventListener('click', () => {
+  products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+  adminConfig = {
+    discountRatio: 0.50,
+    warnBelowCost: true,
+    includeSDG: true,
+    waGroupName: 'Pelanggan Setia 🥐',
+    promoHeader: "🌙 【Uncle Wong's 打烊特惠】"
+  };
+  state = freshState();
+  $('#pipe').classList.remove('on');
+  $('#pipe').innerHTML = '';
+  $('#quickText').value = '';
+  $('#posHint').textContent = '';
+  $('#submitBtn').disabled = false;
+  $('#waGroupTitle').textContent = adminConfig.waGroupName;
+  $('#waSub').textContent = '熟客福利群 · 在线';
+  $('#waBody').innerHTML = '<div class="wa-empty">还没有群发消息。<br>店员提交盘点并经老板批准后，促销通知会实时推送到这里。</div>';
+  renderAll();
+  toast('↺ 已重置所有演示数据与后台设置');
+});
+
+function renderAll() {
+  renderSteps();
+  renderPOS();
+  renderKPI(false);
+  renderBI();
+  renderDraft();
+  renderAdmin();
+  renderLog();
+  renderTabs();
+}
+
+initThemeAndSidebar();
+renderAll();
+initWizard();
+</script>
+</body>
+</html>
