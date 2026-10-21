@@ -1,0 +1,47 @@
+{
+  "dataset": "synthetic_demo_only",
+  "program_id": "save-food-earn-points",
+  "events": [
+    {
+      "id": "led-demo-001",
+      "customer_id": "c002",
+      "type": "opening_balance",
+      "order_id": null,
+      "points_delta": 40,
+      "avoided_co2e_kg": 0,
+      "note": "Illustrative imported demo balance",
+      "created_at": "2026-10-01T09:00:00+08:00"
+    },
+    {
+      "id": "led-demo-002",
+      "customer_id": "c002",
+      "type": "redeem",
+      "order_id": "red-demo-001",
+      "points_delta": -15,
+      "reward_id": "reward-croissant",
+      "avoided_co2e_kg": 0,
+      "note": "Redeemed one croissant reward",
+      "created_at": "2026-10-19T18:30:00+08:00"
+    },
+    {
+      "id": "led-demo-003",
+      "customer_id": "c001",
+      "type": "earn",
+      "order_id": "ord-demo-completed-001",
+      "points_delta": 7,
+      "avoided_co2e_kg": 0.7,
+      "note": "Awarded after fulfilled surplus order",
+      "created_at": "2026-10-21T19:10:00+08:00"
+    },
+    {
+      "id": "led-demo-004",
+      "customer_id": "c003",
+      "type": "earn",
+      "order_id": "ord-demo-completed-002",
+      "points_delta": 12,
+      "avoided_co2e_kg": 1.2,
+      "note": "Awarded after fulfilled surplus order",
+      "created_at": "2026-10-21T19:10:00+08:00"
+    }
+  ]
+}
