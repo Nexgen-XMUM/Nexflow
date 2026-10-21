@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nexflow · 后端演示台</title>
+  <style>
+    :root { color-scheme: light; --ink:#183931; --green:#15785c; --muted:#65776e; --line:#dce6df; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f3f6f1; color:var(--ink); font:15px/1.65 system-ui,-apple-system,"PingFang SC",sans-serif; }
+    main { max-width:1100px; margin:auto; padding:38px 24px 54px; }
+    header { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:24px; }
+    .brand { font-size:13px; letter-spacing:2px; color:var(--green); font-weight:750; }
+    h1 { margin:8px 0; font-size:34px; line-height:1.25; letter-spacing:-1px; }
+    h2 { font-size:19px; margin:0 0 14px; }
+    p { margin:8px 0; }
+    .muted { color:var(--muted); }
+    .badge { display:inline-block; padding:6px 12px; border-radius:20px; background:#e1eee3; color:#276544; font-size:12px; white-space:nowrap; }
+    .notice { padding:12px 16px; background:#fff6df; border:1px solid #ecddb4; border-radius:12px; color:#73511c; margin-bottom:22px; }
+    .layout { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr); gap:22px; align-items:start; }
+    .panel { background:white; border:1px solid var(--line); border-radius:18px; padding:24px; }
+    .step { display:inline-grid; place-items:center; background:#eaf4ed; color:var(--green); width:26px; height:26px; border-radius:50%; margin-right:8px; font-size:14px; }
+    .product { display:flex; justify-content:space-between; align-items:center; gap:14px; padding:16px 0; border-bottom:1px solid var(--line); }
+    .product label { display:block; font-weight:650; }
+    .stock { color:var(--muted); font-size:12px; }
+    input { width:90px; min-height:44px; border:1px solid #bfd1c4; border-radius:9px; padding:9px 12px; color:var(--ink); background:#fbfdf9; font:inherit; }
+    button { min-height:42px; padding:9px 13px; border-radius:9px; border:1px solid #ccdbd0; color:var(--ink); background:#f6f9f4; font:inherit; cursor:pointer; }
+    button:hover { background:#e7f0e6; }
+    button:disabled { opacity:.5; cursor:wait; }
+    button.primary { width:100%; background:var(--green); color:white; border-color:var(--green); font-weight:650; margin-top:18px; }
+    button.primary:hover { background:#106247; }
+    button:focus-visible, input:focus-visible, a:focus-visible, summary:focus-visible { outline:3px solid #4a9dba; outline-offset:3px; }
+    .scenarios { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .scenarios button { font-size:13px; }
+    .guide { margin-top:24px; font-size:13px; }
+    .guide p { margin:5px 0; }
+    .status { margin-bottom:16px; padding:10px 13px; border-radius:9px; background:#eef4ed; font-size:13px; }
+    .status.error { background:#fff0e9; color:#a13c28; }
+    .empty { padding:42px 12px; text-align:center; }
+    .empty .icon { font-size:38px; }
+    .metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .metric { background:#f5f8f2; border-radius:11px; padding:13px 12px; }
+    .metric span { display:block; font-size:12px; color:var(--muted); }
+    .metric strong { display:block; font-size:21px; margin-top:4px; overflow-wrap:anywhere; }
+    .metric.feature { background:#e5f3e9; }
+    .copy { padding:16px; background:#eff6ee; border-left:3px solid #64a37b; border-radius:8px; margin:12px 0; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .small { font-size:12px; }
+    .result-title { margin:22px 0 8px; font-size:15px; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th,td { text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+    th { color:var(--muted); font-weight:500; }
+    .warning { font-size:13px; color:#975114; margin-top:12px; }
+    details { margin-top:20px; font-size:13px; }
+    summary { cursor:pointer; color:var(--green); }
+    pre { padding:14px; border-radius:9px; background:#f1f4f0; overflow:auto; max-height:350px; font-size:12px; line-height:1.6; }
+    footer { margin-top:22px; color:var(--muted); font-size:12px; display:flex; gap:14px; justify-content:space-between; flex-wrap:wrap; }
+    a { color:var(--green); }
+    [hidden] { display:none !important; }
+    @media(max-width:780px) { .layout { grid-template-columns:1fr; } h1 { font-size:27px; } main { padding:24px 16px; } .panel { padding:20px; } header { flex-direction:column; gap:10px; } }
+    @media(max-width:420px) { .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <div class="brand">NEXFLOW / BACKEND DEMO</div>
+      <h1>剩余面包，算清楚再促销。</h1>
+      <p class="muted">选数量 → 点生成 → 展示真实后端结果。无需填写接口或编写请求。</p>
+    </div>
+    <span class="badge">后端演示台 · 非正式前端</span>
+  </header>
+  <div class="notice">🧪 文案使用本地演示模板，尚未连接 AI。生成只做计算，不扣库存、不发送 WhatsApp。</div>
+  <div class="layout">
+    <section class="panel" aria-labelledby="input-title">
+      <h2 id="input-title"><span class="step">1</span>今天还剩多少？</h2>
+      <p class="muted small">商品与库存读取项目现有数据。不参与促销的商品填 0。</p>
+      <form id="promo-form" novalidate>
+        <div id="products">正在读取商品…</div>
+        <button class="primary" type="submit" id="generate" disabled>生成促销，看看结果 →</button>
+      </form>
+      <div class="guide">
+        <strong>给队员演示时，可以依次点：</strong>
+        <div class="scenarios">
+          <button type="button" data-scenario="normal" disabled>① 10 个牛角包</button>
+          <button type="button" data-scenario="multiple" disabled>② 三种商品</button>
+          <button type="button" data-scenario="stock" disabled>③ 超过库存</button>
+          <button type="button" data-scenario="duplicate" disabled>④ 重复商品</button>
+          <button type="button" data-scenario="quantity" disabled>⑤ 数量填错</button>
+        </div>
+        <p class="muted">前两个展示计算结果；后三个展示后端怎样挡住错误输入。</p>
+        <p class="muted">可以重复点正常生成，库存不会被扣减。</p>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="result-title">
+      <h2 id="result-title"><span class="step">2</span>后端算出了什么？</h2>
+      <div id="status" class="status" role="status" aria-live="polite">正在连接本机后端…</div>
+      <div id="empty" class="empty">
+        <div class="icon">🥐</div>
+        <p>已预填 10 个牛角包。</p>
+        <p class="muted">点左边的绿色按钮，就能看到真实结果。</p>
+      </div>
+      <div id="result" hidden>
+        <div class="metrics">
+          <div class="metric"><span>原价总额</span><strong id="retail"></strong></div>
+          <div class="metric"><span>商品成本</span><strong id="cost"></strong></div>
+          <div class="metric feature"><span>五折后收多少钱</span><strong id="clearance"></strong></div>
+          <div class="metric"><span>毛利（售价减商品成本）</span><strong id="profit"></strong></div>
+          <div class="metric"><span>亏损商品的亏损合计</span><strong id="loss"></strong></div>
+          <div class="metric"><span>CO₂e 估算</span><strong id="carbon"></strong></div>
+        </div>
+        <p class="small muted">毛利未扣房租、人力等费用；亏损合计不会被其他商品的盈利抵消。</p>
+        <p class="small muted">CO₂e 按商品重量和现有系数估算，不是认证减排量，也不是碳积分。</p>
+        <h3 class="result-title">促销文案 <span class="badge">本地演示 · 尚未接 AI</span></h3>
+        <div id="copy" class="copy"></div>
+        <h3 class="result-title">每种商品的明细</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>商品</th><th>数量</th><th>清仓单价</th><th>清仓总价</th><th>毛利</th><th>亏损</th></tr></thead>
+            <tbody id="breakdown"></tbody>
+          </table>
+        </div>
+        <div id="warnings" class="warning"></div>
+      </div>
+      <details id="raw-details" hidden>
+        <summary>给前端队员看：原始请求与响应</summary>
+        <pre id="raw"></pre>
+      </details>
+    </section>
+  </div>
+  <footer>
+    <span>已完成：金额计算 · 库存与数量校验 · 盈亏明细 · CO₂e 估算 · 只读生成</span>
+    <a href="/docs" target="_blank" rel="noopener">查看接口文档 ↗</a>
+  </footer>
+</main>
+<script>
+  const byId = id => document.getElementById(id);
+  let products = [];
+  const inputs = new Map();
+  const messages = {
+    INVALID_REQUEST: '数量填写不正确：只能填写正整数，不能填文字、小数或 true。',
+    UNKNOWN_ITEM: '这个商品不在库存清单里，请检查商品名称。',
+    DUPLICATE_ITEM: '同一个商品重复提交了，后端已拒绝这次请求。',
+    INSUFFICIENT_STOCK: '数量超过现有库存，后端已拒绝这次请求。',
+    INVENTORY_UNAVAILABLE: '库存文件暂时无法读取，请查看启动窗口的提示。'
+  };
+
+  function setStatus(text, error = false) {
+    byId('status').textContent = text;
+    byId('status').classList.toggle('error', error);
+  }
+
+  function setBusy(busy) {
+    document.querySelectorAll('button').forEach(button => { button.disabled = busy; });
+    inputs.forEach(input => { input.disabled = busy; });
+    byId('generate').textContent = busy ? '后端正在计算…' : '生成促销，看看结果 →';
+  }
+
+  function showResult(data) {
+    const totals = data.totals;
+    byId('retail').textContent = `RM${totals.retail_total}`;
+    byId('cost').textContent = `RM${totals.cost_total}`;
+    byId('clearance').textContent = `RM${totals.clearance_total}`;
+    byId('profit').textContent = `RM${totals.gross_profit_total}`;
+    byId('loss').textContent = `RM${totals.loss_total}`;
+    byId('carbon').textContent = `${totals.estimated_co2e_kg} kg`;
+    byId('copy').textContent = data.promo.text;
+    byId('breakdown').replaceChildren();
+    for (const item of data.items) {
+      const row = document.createElement('tr');
+      for (const value of [item.name, item.qty, `RM${item.unit_clearance_price}`,
+        `RM${item.clearance_total}`, `RM${item.gross_profit_total}`, `RM${item.loss_total}`]) {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.append(cell);
+      }
+      byId('breakdown').append(row);
+    }
+    byId('warnings').textContent = data.warnings.some(warning => warning.code === 'BELOW_COST')
+      ? '注意：有商品低于成本销售，亏损金额已在上方列出，后端没有擅自提价。' : '';
+    byId('result').hidden = false;
+  }
+
+  async function generate(payload, title) {
+    setBusy(true);
+    byId('result').hidden = true;
+    byId('empty').hidden = true;
+    byId('raw-details').hidden = true;
+    setStatus(`${title} · 正在请求真实后端…`);
+    try {
+      const response = await fetch('/api/generate-promo', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      byId('raw').textContent = `请求：\n${JSON.stringify(payload, null, 2)}\n\nHTTP ${response.status}\n响应：\n${JSON.stringify(data, null, 2)}`;
+      byId('raw-details').hidden = false;
+      if (!response.ok) {
+        const code = data.error?.code;
+        setStatus(`HTTP ${response.status} · ${messages[code] || '请求没有成功，可展开下方响应查看原因。'}`, true);
+        return;
+      }
+      showResult(data);
+      setStatus(`HTTP 200 · ${title}已完成。结果来自真实后端，库存没有改变。`);
+    } catch (error) {
+      setStatus('暂时连接不上后端。请确认启动窗口仍在运行，然后重新点击。', true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function fill(values) {
+    inputs.forEach((input, item) => { input.value = values[item] ?? 0; });
+  }
+
+  function runScenario(name) {
+    const croissant = products.find(product => product.item === 'croissant') || products[0];
+    let payload;
+    let title;
+    if (name === 'normal') {
+      payload = [{item: croissant.item, qty: 10}];
+      title = '10 个牛角包示例';
+    } else if (name === 'multiple') {
+      const values = {croissant: 10, chocolate_slice: 2, sourdough: 1};
+      payload = products.map(product => ({item: product.item, qty: values[product.item] ?? 1}));
+      title = '多商品示例';
+    } else if (name === 'stock') {
+      payload = [{item: croissant.item, qty: croissant.on_hand + 1}];
+      title = '超库存测试';
+    } else if (name === 'duplicate') {
+      payload = [{item: croissant.item, qty: 1}, {item: croissant.item, qty: 1}];
+      title = '重复商品测试';
+    } else {
+      payload = [{item: croissant.item, qty: true}];
+      title = '错误数量测试（故意传入 true）';
+    }
+    fill(Object.fromEntries(payload.map(row => [row.item, row.qty])));
+    generate(payload, title);
+  }
+
+  byId('promo-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const payload = [];
+    inputs.forEach((input, item) => {
+      if (input.value.trim() !== '' && Number(input.value) !== 0) {
+        payload.push({item, qty: Number(input.value)});
+      }
+    });
+    generate(payload, '自选商品计算');
+  });
+  document.querySelectorAll('[data-scenario]').forEach(button => {
+    button.addEventListener('click', () => runScenario(button.dataset.scenario));
+  });
+
+  async function init() {
+    try {
+      const response = await fetch('/demo/products');
+      if (!response.ok) throw new Error('Products unavailable');
+      products = await response.json();
+      if (!products.length) throw new Error('No products');
+      byId('products').replaceChildren();
+      for (const [index, product] of products.entries()) {
+        const row = document.createElement('div');
+        row.className = 'product';
+        const description = document.createElement('div');
+        const label = document.createElement('label');
+        label.htmlFor = `qty-${index}`;
+        label.textContent = product.name;
+        const stock = document.createElement('div');
+        stock.className = 'stock';
+        stock.textContent = `当前库存 ${product.on_hand} 件`;
+        description.append(label, stock);
+        const input = document.createElement('input');
+        input.id = label.htmlFor;
+        input.type = 'number';
+        input.step = '1';
+        input.value = product.item === 'croissant' ? '10' : '0';
+        input.setAttribute('aria-label', `${product.name} 促销数量`);
+        inputs.set(product.item, input);
+        row.append(description, input);
+        byId('products').append(row);
+      }
+      setBusy(false);
+      setStatus('本机后端已连接。点绿色按钮开始演示。');
+    } catch (error) {
+      byId('products').textContent = '商品读取失败。';
+      setStatus('无法读取库存，请检查启动窗口和 data/inventory.json，再刷新页面。', true);
+    }
+  }
+  init();
+</script>
+</body>
+</html>
