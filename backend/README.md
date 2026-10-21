@@ -48,6 +48,8 @@ python3.13 -m venv .venv
 .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
+正式前端联调页面：<http://127.0.0.1:8000/app>，与 API 同源，无需配置跨域。
+
 接口文档：<http://127.0.0.1:8000/docs>；JSON 规范：<http://127.0.0.1:8000/openapi.json>。
 库存路径按入口文件定位，从其他工作目录启动时也不依赖当前目录。
 
@@ -68,11 +70,17 @@ set +a
 ```
 
 前端地址尚未提供，当前未配置任何联调来源。
-只允许跨域 `POST` 和 `Content-Type`，不使用凭据。非法来源配置在启动时失败。
+只允许跨域 `GET`、`POST` 和 `Content-Type`，不使用凭据。非法来源配置在启动时失败。
 CORS 是浏览器规则，不是认证；直接 HTTP 客户端仍可调用接口。
 
 本阶段没有模型密钥或供应商配置。后续先测试个人 DeepSeek API，再连接比赛云 GPU 上的 DeepSeek。
 实际接入前核对对应服务的官方文档，再补密钥环境变量与调用失败测试。
+
+## 商品选项
+
+`GET /api/products` 返回 `{ "products": [{ "id", "name", "aliases", "on_hand" }] }`（字段示意）。
+数据每次从共享库存读取，不公开价格、成本、重量、客户或完整 JSON 文件。
+库存不可用时返回与生成接口一致的 503 错误。
 
 ## 请求
 

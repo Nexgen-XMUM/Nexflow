@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, StringConstraints
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -53,6 +53,17 @@ class PromoItem(BaseModel):
 
     item: NonemptyText
     qty: int = Field(strict=True, gt=0)
+
+
+class ProductOption(BaseModel):
+    id: str
+    name: str
+    aliases: list[str]
+    on_hand: int
+
+
+class ProductOptions(BaseModel):
+    products: list[ProductOption]
 
 
 class ApiError(BaseModel):
@@ -243,6 +254,14 @@ def generate_promo(
     )
 
 
+def product_options() -> ProductOptions:
+    products = {product.id: product for product in load_products().values()}
+    return ProductOptions(products=[
+        ProductOption(**product.model_dump(include={"id", "name", "aliases", "on_hand"}))
+        for product in products.values()
+    ])
+
+
 def create_app() -> FastAPI:
     origins = [
         value.strip()
@@ -272,11 +291,20 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=False,
-        allow_methods=["POST"],
+        allow_methods=["GET", "POST"],
         allow_headers=["Content-Type"],
     )
     application.add_exception_handler(RequestValidationError, invalid_request)
     application.add_exception_handler(StarletteHTTPException, http_error)
+    application.get(
+        "/api/products", response_model=ProductOptions,
+        responses={503: {"model": ErrorResponse}},
+    )(product_options)
+
+    @application.get("/app", include_in_schema=False)
+    def frontend():
+        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "indexnew.html")
+
     application.post(
         "/api/generate-promo",
         response_model=PromoResponse,

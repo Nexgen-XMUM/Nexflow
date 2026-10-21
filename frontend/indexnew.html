@@ -248,13 +248,13 @@ details ul{margin:8px 0 0;padding-left:20px;color:var(--muted)} /* 展开后的�
       <section class="panel" id="tab-dash" hidden> <!-- 第二个页面，默认隐藏 -->
         <div class="panel-head"> <!-- 页面标题区 -->
           <h2>老板看板</h2> <!-- 页面大标题 -->
-          <p>看一眼，点一下。所有群发都要经过你批准。</p> <!-- 页面说明 -->
+          <p>查看后端生成的草稿；批准和广播仅为本页模拟，不扣库存。</p> <!-- 页面说明 -->
         </div> <!-- 标题区结束 -->
-        <div class="kpis" aria-label="累计成果"> <!-- 四个累计成果数字 -->
-          <div><span class="v" id="kRec">RM0.00</span><span class="l">本月挽回营收</span></div> <!-- 数字 1：挽回营收 -->
-          <div><span class="v" id="kCo2">0.0</span><span class="l">累计减碳 kg CO₂e</span></div> <!-- 数字 2：累计减碳 -->
-          <div><span class="v" id="kFood">0.0</span><span class="l">避免浪费 kg</span></div> <!-- 数字 3：避免浪费的食物重量 -->
-          <div><span class="v" id="kPromo">0</span><span class="l">已执行促销</span></div> <!-- 数字 4：已执行的促销次数 -->
+        <div class="kpis" aria-label="最近草稿与模拟次数"> <!-- 四个累计成果数字 -->
+          <div><span class="v" id="kRec">RM0.00</span><span class="l">最近草稿：全部售出金额</span></div> <!-- 数字 1：挽回营收 -->
+          <div><span class="v" id="kCo2">0.0</span><span class="l">最近草稿：估算 kg CO₂e</span></div> <!-- 数字 2：累计减碳 -->
+          <div><span class="v" id="kFood">0.0</span><span class="l">最近草稿：商品件数</span></div> <!-- 数字 3：避免浪费的食物重量 -->
+          <div><span class="v" id="kPromo">0</span><span class="l">本页模拟批准次数</span></div> <!-- 数字 4：已执行的促销次数 -->
         </div> <!-- 成果数字结束 -->
         <div id="draftBox"></div> <!-- 待审批草稿放这里，由 JS 生成 -->
       </section> <!-- 第二个页面结束 -->
@@ -263,12 +263,12 @@ details ul{margin:8px 0 0;padding-left:20px;color:var(--muted)} /* 展开后的�
       <section class="panel" id="tab-log" hidden> <!-- 第三个页面，默认隐藏 -->
         <div class="panel-head"> <!-- 页面标题区 -->
           <h2>活动日志</h2> <!-- 页面大标题 -->
-          <p>谁在什么时候做了什么，一条不漏。</p> <!-- 页面说明 -->
+          <p>本页模拟日志，刷新后清空；不是持久审批记录。</p> <!-- 页面说明 -->
         </div> <!-- 标题区结束 -->
         <div class="card"><ul class="log" id="logList" aria-live="polite"></ul></div> <!-- 日志列表，由 JS 生成 -->
       </section> <!-- 第三个页面结束 -->
 
-      <p class="foot">所有商品、客户和历史数据均为合成数据。价格全部由代码规则计算，AI 只负责润色文案。第一版的文案为模板模式，下一版可接入 LLM。</p> <!-- 页面底部的诚实说明 -->
+      <p class="foot">商品来自共享库存。价格和 CO₂e 由后端代码计算，文案使用本地模板。角色切换、审批与广播均为模拟，未实现身份认证。</p> <!-- 页面底部的诚实说明 -->
     </main> <!-- 左边内容区结束 -->
 
     <aside class="side" id="phoneWrap"> <!-- 右边：手机模拟器 -->
@@ -282,7 +282,7 @@ details ul{margin:8px 0 0;padding-left:20px;color:var(--muted)} /* 展开后的�
           <div class="wa-foot"><div class="fi">Message</div><div class="sd" aria-hidden="true">➤</div></div> <!-- 假的输入栏 -->
         </div> <!-- 屏幕结束 -->
       </div> <!-- 手机外壳结束 -->
-      <p class="phone-cap">WhatsApp 模拟器（熟客视角）。回复为模拟数据。</p> <!-- 手机下方说明 -->
+      <p class="phone-cap">WhatsApp 模拟器：没有真实发送；送达、已读与回复均为模拟。</p> <!-- 手机下方说明 -->
     </aside> <!-- 手机区结束 -->
   </div> <!-- 主布局结束 -->
 </div> <!-- 最外层容器结束 -->
@@ -291,15 +291,22 @@ details ul{margin:8px 0 0;padding-left:20px;color:var(--muted)} /* 展开后的�
 <script> /* script 标签里写 JavaScript：让网页“动起来” */
 
 /* =====================================================
-   所有数据都来自 backend（main.py），前端不存任何商品数据、不做任何计算
+   商品、金额、CO₂e 和初始文案来自后端；审批、日志与广播仅在本页模拟
    ===================================================== */
 const API = ''; // 后端地址：空字符串 = 和网页同源（由 main.py 的 GET / 提供这个网页）
-async function api(path, body){ // 函数：调用后端；有 body 就用 POST，否则 GET
-  const res = await fetch(API + path, body === undefined ? {} : {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}); // 发请求
-  const data = await res.json().catch(() => null); // 解析 JSON（失败就当 null）
-  if(!res.ok) throw new Error((data && data.error && data.error.message) || ('后端错误 ' + res.status)); // 后端返回错误：抛出后端的 message
-  return data; // 返回后端数据
-} // api 函数结束
+async function api(path, body){
+  const res = await fetch(API + path, {
+    signal: AbortSignal.timeout(15000),
+    ...(body === undefined ? {cache:'no-store'} : {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+    })
+  });
+  const data = await res.json().catch(() => null);
+  if(!res.ok) throw new Error((data && data.error && data.error.message) || ('后端错误 ' + res.status));
+  if(!data) throw new Error('后端返回了无法识别的响应');
+  return data;
+}
+
 let products = []; // 商品列表：由 loadProducts() 从 GET /api/products 填入
 const STEPS = [ // 五步旅程的名称（英文, 中文）
   ['Trigger','触发'], ['Connected data','关联数据'], ['Decision logic','决策逻辑'], // 第 1~3 步
@@ -313,14 +320,13 @@ const sleep = ms => new Promise(r => setTimeout(r, ms)); // 暂停 ms 毫秒（�
 const money = n => (Number(n) < 0 ? '-RM' : 'RM') + Math.abs(Number(n)).toFixed(2); // 把数字（或后端的金额字符串）变成金额，例如 48 → “RM48.00”，-1 → “-RM1.00”
 const clock = () => new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}); // 取得现在的时间，格式如 “19:05”
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); // 把特殊符号转义，防止用户输入的内容破坏网页
-const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; // 用户是否在系统里关闭了动画
 
 function fresh(){ // 函数：生成一份“全新的初始状态”
   return { // 返回一个对象，记录整个 demo 现在的状态
     role:'owner', tab:'pos', step:1, busy:false, // 当前角色、当前页面、当前第几步、是否正在处理中
     qty:{}, // 店员输入的剩余数量（按商品 id 记录，没填就是 0）
     draft:null, result:null, // 待审批的草稿、审批后的结果（一开始都没有）
-    kpi:{recovered:0, co2:0, food:0, promos:0}, // 看板数字从 0 开始
+    kpi:{recovered:'0.00', co2:'0', qty:0, promos:0}, // 看板数字从 0 开始
     log:[] // 活动日志从空开始
   }; // 对象结束
 } // fresh 函数结束
@@ -333,33 +339,41 @@ function toast(msg){ // 函数：在屏幕底部弹出一条短提示
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 2600); // 2.6 秒后自动隐藏
 } // toast 函数结束
 
-function countTo(el, from, to, dec, prefix){ // 函数：让数字从 from 平滑“跳动”到 to（dec 是小数位数）
-  prefix = prefix || ''; // 前缀默认为空（金额会传 'RM'）
-  if(reduced){ el.textContent = prefix + to.toFixed(dec); return; } // 如果用户关闭了动画，直接显示最终数字
-  const dur = 900, t0 = performance.now(); // 动画时长 900 毫秒，记录开始时间
-  (function frame(t){ // 每一帧执行一次的函数
-    const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); // k 是进度 0~1，e 是“先快后慢”的缓动进度
-    el.textContent = prefix + (from + (to - from) * e).toFixed(dec); // 按进度算出当前数字并显示
-    if(k < 1) requestAnimationFrame(frame); // 还没到终点就继续下一帧
-  })(t0); // 立刻开始第一帧
-} // countTo 函数结束
+function setBusy(busy){
+  state.busy = busy;
+  document.querySelectorAll('button:not([data-tab]), input, textarea').forEach(el => { el.disabled = busy; });
+  $('#submitBtn').disabled = busy || !products.length;
+  if(!busy && state.draft) renderDraft();
+}
+
+function quantity(value){
+  const raw = String(value ?? 0).trim();
+  const n = Number(raw);
+  return /^\d+$/.test(raw) && Number.isSafeInteger(n) ? n : null;
+}
 
 /* ================== 后端数据 ================== */
-async function loadProducts(){ // 函数：从后端取商品列表，取完画出 POS 页
-  try { // 尝试调用后端
-    products = (await api('/api/products')).products; // 保存商品列表
-    renderPOS(); // 画出商品列表
-  } catch(err){ // 后端没开或出错
-    $('#posRows').innerHTML = ''; // 清空商品列表
-    $('#posHint').textContent = '无法连接后端：' + err.message; // 提示错误
-  } // try 结束
-} // loadProducts 结束
+async function loadProducts(){
+  setBusy(true);
+  try {
+    products = (await api('/api/products')).products;
+    renderPOS();
+    $('#posHint').textContent = '';
+  } catch(err){
+    products = [];
+    $('#posRows').innerHTML = '';
+    $('#posHint').textContent = '商品加载失败，请检查服务后点击“重置演示”重试：' + err.message;
+  } finally {
+    setBusy(false);
+  }
+}
 
-function toDraft(res){ // 函数：把后端 POST /api/generate-promo 的结果变成看板要用的草稿（只搬数据，不计算）
-  const t = res.totals; // 后端算好的总数
-  const items = res.items.map(i => Object.assign({}, i, {emoji: (products.find(p => p.id === i.item) || {}).emoji || ''})); // 每个商品补上 emoji（同样来自后端）
-  return {items, totals:t, rev:Number(t.clearance_total), profit:Number(t.gross_profit_total), co2:Number(t.estimated_co2e_kg), kg:Number(t.estimated_food_kg), text:res.promo.text, warnings:res.warnings, edited:false}; // 返回草稿
-} // toDraft 结束
+function toDraft(res){
+  const t = res.totals;
+  return {items:res.items, totals:t, rev:t.clearance_total, profit:t.gross_profit_total,
+    co2:t.estimated_co2e_kg, text:res.promo.text, source:res.promo.source,
+    carbon:res.carbon, warnings:res.warnings, edited:false};
+}
 
 /* ================== 渲染（把 state 画到网页上） ================== */
 function renderSteps(){ // 函数：画出顶部的五步旅程条
@@ -383,36 +397,29 @@ function renderRole(){ // 函数：刷新角色切换器的选中状态
 
 function renderPOS(){ // 函数：画出 POS 页的商品列表
   $('#posRows').innerHTML = products.map(p => // 每个商品生成一行（商品来自后端）
-    '<div class="prow"><div class="emo" aria-hidden="true">' + esc(p.emoji) + '</div>' + // 行开头：商品 emoji
-    '<div class="grow"><div class="nm">' + esc(p.name) + '<span>' + esc(p.zh) + '</span></div>' + // 商品英文名 + 中文名
-    '<div class="meta">成本 ' + money(p.cost_price) + '，原价 ' + money(p.retail_price) + '，库存 ' + p.on_hand + '</div></div>' + // 小字：成本价、原价、库存
+    '<div class="prow"><div class="emo" aria-hidden="true">🥐</div>' + // 行开头：商品 emoji
+    '<div class="grow"><div class="nm">' + esc(p.name) + '</div>' + // 商品英文名 + 中文名
+    '<div class="meta">可用库存 ' + esc(p.on_hand) + '</div></div>' + // 小字：成本价、原价、库存
     '<div class="stepper"><button type="button" data-dec="' + esc(p.id) + '" aria-label="减少 ' + esc(p.name) + '">−</button>' + // 减号按钮（data-dec 记录要减哪个商品）
-    '<input type="text" inputmode="numeric" data-q="' + esc(p.id) + '" value="' + (state.qty[p.id] || 0) + '" aria-label="' + esc(p.name) + ' 剩余数量">' + // 数量输入框（显示当前数量）
+    '<input type="text" inputmode="numeric" data-q="' + esc(p.id) + '" value="' + esc(state.qty[p.id] ?? 0) + '" aria-label="' + esc(p.name) + ' 剩余数量">' + // 数量输入框（显示当前数量）
     '<button type="button" data-inc="' + esc(p.id) + '" aria-label="增加 ' + esc(p.name) + '">+</button></div></div>' // 加号按钮
   ).join(''); // 把所有行拼起来放进页面
 } // renderPOS 结束
 
-function renderKPI(animate, prev){ // 函数：刷新看板顶部四个数字（animate 为 true 时让数字跳动）
-  const k = state.kpi; // 当前数字
-  if(animate && prev){ // 需要动画，并且有“之前的数字”
-    countTo($('#kRec'), prev.recovered, k.recovered, 2, 'RM'); // 挽回营收：从旧值跳到新值
-    countTo($('#kCo2'), prev.co2, k.co2, 1); // 累计减碳
-    countTo($('#kFood'), prev.food, k.food, 1); // 避免浪费
-    countTo($('#kPromo'), prev.promos, k.promos, 0); // 促销次数
-  } else { // 不需要动画时直接显示
-    $('#kRec').textContent = money(k.recovered); // 直接显示挽回营收
-    $('#kCo2').textContent = k.co2.toFixed(1); // 直接显示减碳
-    $('#kFood').textContent = k.food.toFixed(1); // 直接显示避免浪费
-    $('#kPromo').textContent = String(k.promos); // 直接显示促销次数
-  } // if 结束
-} // renderKPI 结束
+function renderKPI(){
+  const k = state.kpi;
+  $('#kRec').textContent = money(k.recovered);
+  $('#kCo2').textContent = k.co2;
+  $('#kFood').textContent = String(k.qty);
+  $('#kPromo').textContent = String(k.promos);
+}
 
 function renderDraft(){ // 函数：画出看板页的“待审批草稿”区域（有三种情况：已有结果 / 没有草稿 / 有草稿）
   const box = $('#draftBox'), d = state.draft, r = state.result; // box：放内容的位置；d：草稿；r：审批结果
   if(r){ // 情况一：已经批准或拒绝了，显示结果卡片
     box.innerHTML = r.rejected // 如果是被拒绝的
-      ? '<div class="card done-card"><div class="big" aria-hidden="true">🛑</div><div><span class="badge">已拒绝</span><h3>这份促销没有发送</h3><p class="muted" style="margin:6px 0 0">拒绝已写入活动日志。需要的话，可以回到“打烊盘点”重新提交。</p></div></div>' // 显示“已拒绝”卡片
-      : '<div class="card done-card"><div class="big" aria-hidden="true">✅</div><div><span class="badge ok">已发送</span><h3>已批准并群发到熟客群组</h3><p class="muted" style="margin:6px 0 0">清仓 ' + r.units + ' 件，预计挽回 ' + money(r.rev) + '，减少 ' + r.co2.toFixed(2) + ' kg CO₂e。右边手机可以看到熟客收到的消息。</p></div></div>'; // 否则显示“已发送”卡片
+      ? '<div class="card done-card"><div class="big" aria-hidden="true">🛑</div><div><span class="badge">已拒绝</span><h3>这份促销没有发送</h3><p class="muted" style="margin:6px 0 0">草稿已在本页丢弃。需要的话，可以回到“打烊盘点”重新提交。</p></div></div>' // 显示“已拒绝”卡片
+      : '<div class="card done-card"><div class="big" aria-hidden="true">✅</div><div><span class="badge ok">模拟已发送</span><h3>模拟广播已完成</h3><p class="muted" style="margin:6px 0 0">草稿数量 ' + r.units + ' 件，全部售出情景金额 ' + money(r.rev) + '，估算 ' + esc(r.co2) + ' kg CO₂e。未扣库存、未实际发送；右侧为模拟消息。</p></div></div>'; // 否则显示“已发送”卡片
     return; // 画完就结束
   } // if 结束
   if(!d){ // 情况二：没有草稿，显示空状态
@@ -420,32 +427,33 @@ function renderDraft(){ // 函数：画出看板页的“待审批草稿”区�
     return; // 画完就结束
   } // if 结束
   const rows = d.items.map(i => { // 情况三：有草稿。先生成价格表的每一行（全部是后端给的数字）
-    const unitProfit = Number(i.gross_profit_total) / i.qty; // 单件毛利 = 后端的毛利总额 ÷ 件数（只是换算显示）
-    return '<tr><td>' + esc(i.emoji) + ' ' + esc(i.name) + '</td><td class="num">' + i.qty + '</td><td class="num">' + money(i.unit_cost_price) + // 商品名、剩余数量、成本价
+    const profit = i.gross_profit_total; // 毛利合计 = 后端的毛利总额 ÷ 件数（只是换算显示）
+    return '<tr><td>🥐 ' + esc(i.name) + '</td><td class="num">' + i.qty + '</td><td class="num">' + money(i.unit_cost_price) + // 商品名、剩余数量、成本价
     '</td><td class="num">' + money(i.unit_retail_price) + '</td><td class="num strong">' + money(i.unit_clearance_price) + // 原价、清仓价（加粗绿色）
-    '</td><td class="num">' + (unitProfit >= 0 ? '+' : '') + money(unitProfit) + '</td></tr>'; // 单件毛利（亏本时显示负数）
+    '</td><td class="num">' + money(profit) + '</td></tr>'; // 毛利合计（亏本时显示负数）
   }).join(''); // 拼起来
   const warns = d.warnings.length ? '<p class="lock">⚠️ ' + d.warnings.map(w => esc(w.message)).join('<br>⚠️ ') + '</p>' : ''; // 后端的警告（例如低于成本价）
-  const owner = state.role === 'owner'; // 当前是不是老板（只有老板能点批准）
+  const owner = state.role === 'owner' && !state.busy; // 当前是不是老板（只有老板能点批准）
   box.innerHTML = // 把整张草稿卡片放进页面
     '<div class="card">' + // 卡片开始
     '<div class="draft-head"><div><span class="badge">待审批</span><h3>今晚的临期促销草稿</h3>' + // 标题区：“待审批”标签
-    '<p class="muted" style="margin:4px 0 0">Siti 提交盘点后，系统自动生成。</p></div></div>' + // 说明文字
-    '<div class="tblwrap"><table><thead><tr><th>商品</th><th class="num">剩余</th><th class="num">成本</th><th class="num">原价</th><th class="num">清仓价</th><th class="num">单件毛利</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + warns + // 价格表：表头 + 上面生成的每一行
+    '<p class="muted" style="margin:4px 0 0">根据本次盘点生成；审批状态仅保存在本页。</p></div></div>' + // 说明文字
+    '<div class="tblwrap"><table><thead><tr><th>商品</th><th class="num">剩余</th><th class="num">成本</th><th class="num">原价</th><th class="num">清仓价</th><th class="num">毛利合计</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + warns + // 价格表：表头 + 上面生成的每一行
     '<div class="metrics">' + // 四个小指标开始
-    '<div class="hl"><b>' + money(d.rev) + '</b><span>预计挽回营收</span></div>' + // 指标 1：预计挽回营收（黄色高亮）
-    '<div><b>' + money(d.profit) + '</b><span>其中净利润</span></div>' + // 指标 2：净利润
-    '<div><b>' + d.co2.toFixed(2) + ' kg</b><span>减少碳排 CO₂e</span></div>' + // 指标 3：减少的碳排放
-    '<div><b>' + d.kg.toFixed(2) + ' kg</b><span>避免浪费食物</span></div></div>' + // 指标 4：避免浪费的食物重量
+    '<div class="hl"><b>' + money(d.rev) + '</b><span>全部售出情景金额</span></div>' + // 指标 1：全部售出情景金额（黄色高亮）
+    '<div><b>' + money(d.profit) + '</b><span>毛利（未扣运营费用）</span></div>' + // 指标 2：净利润
+    '<div><b>' + esc(d.co2) + ' kg</b><span>CO₂e 估算</span></div>' + // 指标 3：减少的碳排放
+    '<div><b>' + money(d.totals.loss_total) + '</b><span>亏损合计</span></div></div>' + // 指标 4：避免浪费的食物重量
     '<label class="f" for="copyBox">WhatsApp 文案（可以直接修改）</label>' + // 文案输入框的标签
     '<textarea id="copyBox" rows="10">' + esc(d.text) + '</textarea>' + // 文案输入框，里面放着系统生成的文案
-    '<div class="tools"><span class="safe">价格和文案都由后端生成</span></div>' + // 说明
+    '<div class="tools"><span class="safe">' + (d.source === 'local_demo' ? '本地演示文案（未调用 AI）' : esc(d.source)) + '</span></div>' +
+    '<p class="muted">CO₂e 为估算，不是经认证减排量或碳积分。' + esc(d.carbon.note) + '</p>' + // 说明
     '<details><summary>这些数字是怎么算的？</summary><ul>' + // 可展开的公式说明
     '<li>清仓价 = 原价 × 50%（后端计算，取到 RM0.01）。低于成本时后端会给出警告。</li>' + // 公式 1：清仓价
-    '<li>预计挽回 = 剩余数量 × 清仓价；减碳 = 商品重量 × 该商品的 CO₂e 系数（估算值，不是碳信用）。</li>' + // 公式 2：挽回金额和减碳
-    '<li>以上全部在后端 main.py 计算，前端只负责显示。</li></ul></details>' + // 声明：前端不计算
+    '<li>清仓金额 = 本次数量 × 清仓单价；CO₂e = 本次数量 × 单件重量 × 商品系数。尚未发生实际销售。</li>' + // 公式 2：挽回金额和减碳
+    '<li>金额和 CO₂e 由后端计算；生成草稿不扣库存、不发送消息。</li></ul></details>' + // 声明：前端不计算
     '<div class="approve-bar">' + // 按钮区开始
-    '<button type="button" class="btn btn-approve" data-act="approve"' + (owner ? '' : ' disabled') + '>批准并群发</button>' + // 大“批准”按钮（不是老板就加上 disabled 禁用）
+    '<button type="button" class="btn btn-approve" data-act="approve"' + (owner ? '' : ' disabled') + '>模拟批准并群发</button>' + // 大“批准”按钮（不是老板就加上 disabled 禁用）
     '<button type="button" class="btn btn-reject" data-act="reject"' + (owner ? '' : ' disabled') + '>拒绝</button></div>' + // “拒绝”按钮（同样的权限规则）
     (owner ? '' : '<div class="lock">🔒 只有老板可以批准群发。请在右上角切换到 Uncle Wong。</div>') + // 不是老板时显示锁定提示
     '</div>'; // 卡片结束
@@ -464,66 +472,56 @@ function addLog(who, act, detail, sdg, type){ // 函数：新增一条日志（�
 } // addLog 结束
 
 /* ================== 流程：提交盘点 → 审批 → 群发 ================== */
-async function submitEOD(){ // 函数：店员点“提交盘点”后执行（五步旅程的第 1~4 步）
-  if(state.busy) return; // 正在处理中就不要重复提交
-  const items = products.filter(p => state.qty[p.id] > 0); // 找出数量大于 0 的商品
-  if(!items.length){ $('#posHint').textContent = '请至少输入一件剩余商品。'; return; } // 一件都没填就提示并结束
-  $('#posHint').textContent = ''; // 清掉旧提示
-  state.busy = true; state.result = null; state.draft = null; // 标记“处理中”，清掉上一次的结果和草稿
-  $('#submitBtn').disabled = true; // 处理期间禁用提交按钮
-  const pipe = $('#pipe'); pipe.innerHTML = ''; pipe.classList.add('on'); // 清空并显示进度框
-  const push = t => { const li = document.createElement('li'); li.textContent = t; pipe.appendChild(li); }; // 小函数：往进度框里加一行文字
+async function submitEOD(){
+  if(state.busy || !products.length) return;
+  const body = products.map(p => ({item:p.id, qty:quantity(state.qty[p.id])}));
+  if(body.some(row => row.qty === null)){
+    $('#posHint').textContent = '数量必须是非负整数，不能填写小数、负数或其他文字。'; return;
+  }
+  const items = body.filter(row => row.qty > 0);
+  if(!items.length){ $('#posHint').textContent = '请至少输入一件剩余商品。'; return; }
+  $('#posHint').textContent = '';
+  state.result = null; state.draft = null;
+  renderDraft(); renderTabs(); setBusy(true);
+  const pipe = $('#pipe'); pipe.innerHTML = ''; pipe.classList.add('on');
+  setStep(2);
+  try {
+    const d = toDraft(await api('/api/generate-promo', items));
+    state.draft = d;
+    state.kpi.recovered = d.rev; state.kpi.co2 = d.co2; state.kpi.qty = d.totals.qty;
+    pipe.textContent = '已读取共享库存并完成计算；草稿已就绪，下一步为本页模拟审批。';
+    addLog(roleName(), '生成促销草稿', d.items.map(i => i.name + ' ×' + i.qty).join('、'), '', 'info');
+    setStep(4); renderDraft(); renderKPI(); switchTab('dash');
+    toast('草稿已生成，未扣库存、未发送消息');
+  } catch(err){
+    $('#posHint').textContent = '生成失败，可修正后重试：' + err.message;
+    pipe.classList.remove('on'); setStep(1);
+  } finally {
+    setBusy(false);
+  }
+}
 
-  addLog(roleName(), '提交打烊盘点', items.map(p => p.name + ' ' + state.qty[p.id]).join('、'), '', 'info'); // 写日志：谁提交了什么
-  setStep(2); // 进入第 2 步：关联数据
-  let d; // 草稿
-  try { // 调用后端
-    d = toDraft(await api('/api/generate-promo', items.map(p => ({item:p.id, qty:state.qty[p.id]})))); // 后端算价格、碳排、写文案
-  } catch(err){ // 后端拒绝（例如超过库存）或连不上
-    $('#posHint').textContent = err.message; // 显示后端的错误信息
-    pipe.classList.remove('on'); state.busy = false; $('#submitBtn').disabled = false; setStep(1); // 恢复到可以重新提交
-    return; // 结束
-  } // try 结束
-  push('已调取后端库存数据：' + items.length + ' 个商品的成本价、重量和碳排系数'); // 显示：已调取数据
-  setStep(3); // 进入第 3 步：决策逻辑
-  await sleep(650); // 等 0.65 秒
-  push('后端定价引擎：清仓价 = 原价 × 50%' + (d.warnings.length ? '（有 ' + d.warnings.length + ' 项低于成本）' : '')); // 显示：定价规则
-  await sleep(650); // 等 0.65 秒
-  state.draft = d; // 把草稿存进状态
-  push('文案引擎：已生成 WhatsApp 促销文案'); // 显示：文案已生成
-  setStep(4); // 进入第 4 步：人工审批
-  await sleep(600); // 等 0.6 秒
-  push('已送交老板审批，等待确认'); // 显示：已送交审批
-  await sleep(500); // 等 0.5 秒
-  state.busy = false; // 处理完毕
-  $('#submitBtn').disabled = false; // 重新启用提交按钮
-  renderDraft(); // 画出草稿卡片
-  switchTab('dash'); // 自动跳到老板看板页
-  toast('草稿已生成，等待老板批准'); // 弹出提示
-} // submitEOD 结束
-
-async function approve(){ // 函数：老板点“批准并群发”后执行（第 4~5 步）
+async function approve(){ // 函数：老板点“模拟批准并群发”后执行（第 4~5 步）
   const d = state.draft; // 取出当前草稿
   if(!d || state.busy) return; // 没有草稿或正在处理中就结束
   if(state.role !== 'owner'){ toast('只有老板可以批准群发'); return; } // 权限检查：不是老板不能批准
-  const text = (($('#copyBox') || {}).value || d.text).trim(); // 取出文案框里的内容（可能被老板改过），去掉首尾空格
+  const text = ($('#copyBox') ? $('#copyBox').value : d.text).trim(); // 取出文案框里的内容（可能被老板改过），去掉首尾空格
   if(!text){ toast('文案不能为空'); return; } // 文案是空的就提示并结束
-  state.busy = true; // 标记“处理中”
+  setBusy(true);
   const units = d.totals.qty; // 清仓件数（后端给的总数）
-  const prev = Object.assign({}, state.kpi); // 先备份旧的数字，用来做跳动动画
-  state.kpi.recovered += d.rev; state.kpi.co2 += d.co2; state.kpi.food += d.kg; state.kpi.promos += 1; // 把这次的成果累加到看板数字上
-  addLog('Uncle Wong', d.edited ? '修改文案后批准并群发' : '批准并群发促销', // 写日志：如果老板改过文案，会特别注明
-    d.items.map(i => i.name + ' ×' + i.qty).join('、') + '，发到熟客群组，清仓 ' + units + ' 件，预计挽回 ' + money(d.rev), // 日志详情
-    '减少 ' + d.co2.toFixed(2) + ' kg CO₂e（SDG 12.3）', 'ok'); // 日志里的 SDG 说明
+  state.kpi.promos += 1; // 仅统计本页模拟次数，不累计营收或减排。
+  addLog('Uncle Wong', d.edited ? '修改文案后模拟批准并群发' : '模拟批准并群发促销', // 写日志：如果老板改过文案，会特别注明
+    d.items.map(i => i.name + ' ×' + i.qty).join('、') + '，模拟广播，草稿数量 ' + units + ' 件，全部售出情景金额 ' + money(d.rev), // 日志详情
+    '估算 ' + esc(d.co2) + ' kg CO₂e（SDG 12.3）', 'ok'); // 日志里的 SDG 说明
   state.result = {units, rev:d.rev, co2:d.co2}; // 记录结果，用来显示“已发送”卡片
   const items = d.items; // 先把商品列表存下来（下一行会清掉草稿）
   state.draft = null; // 草稿已处理，清掉
   setStep(6); // 设为第 6 步：五步全部显示为完成
-  renderDraft(); renderTabs(); renderKPI(true, prev); // 刷新草稿区、标签红点，并让看板数字跳动
-  toast('已批准并群发，已记录到活动日志'); // 弹出提示
+  renderDraft(); renderTabs(); renderKPI(); // 刷新草稿区、标签红点，并让看板数字跳动
+  toast('已模拟批准并群发，已记录到活动日志'); // 弹出提示
   if(window.innerWidth < 960) $('#phoneWrap').scrollIntoView({behavior:'smooth', block:'center'}); // 手机屏幕上，自动滚动到 WhatsApp 模拟器
-  await broadcast(text, items); // 播放“群发”动画
-  state.busy = false; // 处理完毕
+  setBusy(true);
+  try { await broadcast(text, items); } finally { setBusy(false); }
 } // approve 结束
 
 function reject(){ // 函数：老板点“拒绝”后执行
@@ -534,7 +532,7 @@ function reject(){ // 函数：老板点“拒绝”后执行
   state.draft = null; // 清掉草稿
   setStep(6); // 流程结束
   renderDraft(); renderTabs(); // 刷新草稿区和标签红点
-  toast('已拒绝，已记录到活动日志'); // 弹出提示
+  toast('已在本页模拟拒绝'); // 弹出提示
 } // reject 结束
 
 async function broadcast(text, items){ // 函数：在手机里模拟 WhatsApp 群发和熟客回复
@@ -548,13 +546,13 @@ async function broadcast(text, items){ // 函数：在手机里模拟 WhatsApp �
   meta.append(time, tick); out.append(txt, meta); body.appendChild(out); // 把时间、勾勾、文字依次组装进气泡并放到聊天区
   body.scrollTop = body.scrollHeight; // 聊天区滚到最底部
   const sub = $('#waSub'); // 手机顶栏的小字（显示送达状态）
-  sub.textContent = '正在发送…'; // 先显示“正在发送…”
+  sub.textContent = '模拟发送中…'; // 先显示“正在发送…”
   await sleep(900); // 等 0.9 秒
   tick.textContent = '✓✓'; // 变成双勾（已送达）
-  sub.textContent = '已送达'; // 顶栏显示已送达
+  sub.textContent = '模拟已送达'; // 顶栏显示已送达
   await sleep(900); // 等 0.9 秒
   tick.classList.add('read'); // 双勾变蓝（已读）
-  sub.textContent = '已送达，已读'; // 顶栏显示已读
+  sub.textContent = '模拟已送达、已读'; // 顶栏显示已读
   await sleep(1500); // 等 1.5 秒，再出现熟客回复
   const a = items[0].name.toLowerCase(), b = (items[1] || items[0]).name.toLowerCase(); // 取前两个商品名用在回复里（只有一个商品时就重复用第一个）
   const replies = [ // 三条模拟的熟客回复（名字, 内容）
@@ -573,55 +571,59 @@ async function broadcast(text, items){ // 函数：在手机里模拟 WhatsApp �
 } // broadcast 结束
 
 /* ================== POS：快速输入解析 ================== */
-function parseQuick(){ // 函数：把“12 croissants, 5 chocolate slices”这样的文字，解析成数量
-  const s = $('#quickText').value; // 取出输入框里的文字
-  const found = {}; // 用来存识别到的结果，例如 {croissant: 12, choc: 5}
-  s.split(/[,，;；\n]|\band\b|和/i).forEach(part => { // 按逗号、分号、换行、and、“和”把文字切成几段，逐段处理
-    const m = part.match(/(\d+)/); if(!m) return; // 找这一段里的数字，没有数字就跳过
-    const low = part.toLowerCase(); // 转成小写方便比对
-    products.forEach(p => { if([p.id, ...p.aliases].some(a => low.includes(a.toLowerCase()))) found[p.id] = parseInt(m[1], 10); }); // 这一段里出现了某个商品的关键词（来自后端），就记下这个商品的数量
-  }); // 所有段落处理完毕
-  if(!Object.keys(found).length){ $('#posHint').textContent = '没识别到商品。试试：12 croissants, 5 chocolate slices'; return; } // 一个都没识别到就提示示例
-  products.forEach(p => { state.qty[p.id] = found[p.id] || 0; }); // 识别到的商品填入数量，没提到的归零
-  $('#posHint').textContent = ''; // 清掉提示
-  renderPOS(); // 刷新商品列表，让数字显示出来
-} // parseQuick 结束
+function parseQuick(){
+  if(state.busy) return;
+  const found = {};
+  for(const part of $('#quickText').value.split(/[,，;；\n]|\band\b|和/i)){
+    const match = part.trim().match(/^(\d+)\s+(.+)$/);
+    const name = match && match[2].toLowerCase();
+    const matches = products.filter(p => [p.id, p.name, ...p.aliases].some(a => a.toLowerCase() === name));
+    if(!match || quantity(match[1]) === null || matches.length !== 1 || matches[0].id in found){
+      $('#posHint').textContent = '请按“12 croissants, 5 chocolate slices”填写；数量须为非负整数，商品不能重复。'; return;
+    }
+    found[matches[0].id] = quantity(match[1]);
+  }
+  products.forEach(p => { state.qty[p.id] = found[p.id] ?? 0; });
+  $('#posHint').textContent = ''; renderPOS();
+}
 
 /* ================== 事件（用户点击、输入时触发） ================== */
 document.addEventListener('click', e => { // 监听整个页面的点击（这种写法叫“事件委托”，动态生成的按钮也能响应）
   const t = e.target.closest('button'); if(!t) return; // 找到被点的按钮，如果点的不是按钮就结束
   if(t.dataset.tab){ switchTab(t.dataset.tab); return; } // 点的是标签按钮：切换页面
+  if(state.busy) return;
   if(t.dataset.role){ state.role = t.dataset.role; renderRole(); if(state.draft) renderDraft(); return; } // 点的是角色按钮：切换角色，并刷新按钮权限
-  if(t.dataset.inc){ state.qty[t.dataset.inc] = Math.min(999, (state.qty[t.dataset.inc] || 0) + 1); renderPOS(); return; } // 点的是“+”：数量加 1（最大 999）
-  if(t.dataset.dec){ state.qty[t.dataset.dec] = Math.max(0, (state.qty[t.dataset.dec] || 0) - 1); renderPOS(); return; } // 点的是“−”：数量减 1（最小 0）
+  if(t.dataset.inc){ state.qty[t.dataset.inc] = Math.min(Number.MAX_SAFE_INTEGER, (quantity(state.qty[t.dataset.inc]) ?? 0) + 1); renderPOS(); return; } // 点的是“+”：数量加 1
+  if(t.dataset.dec){ state.qty[t.dataset.dec] = Math.max(0, (quantity(state.qty[t.dataset.dec]) ?? 0) - 1); renderPOS(); return; } // 点的是“−”：数量减 1（最小 0）
   switch(t.dataset.act){ // 根据按钮的 data-act 决定做什么
     case 'parse': parseQuick(); break; // “识别”按钮
     case 'submit': submitEOD(); break; // “提交盘点”按钮
-    case 'approve': approve(); break; // “批准并群发”按钮
+    case 'approve': approve(); break; // “模拟批准并群发”按钮
     case 'reject': reject(); break; // “拒绝”按钮
     case 'gopos': switchTab('pos'); break; // 空状态里的“去打烊盘点”按钮
   } // switch 结束
 }); // 点击监听结束
 document.addEventListener('input', e => { // 监听整个页面的输入事件（打字时触发）
   if(e.target.dataset && e.target.dataset.q){ // 如果是在商品数量输入框里打字
-    const v = parseInt(e.target.value.replace(/\D/g, ''), 10); // 去掉非数字字符，转成整数
-    state.qty[e.target.dataset.q] = isNaN(v) ? 0 : Math.min(999, v); // 保存数量（不是数字就当 0，最大 999）
+    state.qty[e.target.dataset.q] = e.target.value;
   } // if 结束
   if(e.target.id === 'copyBox' && state.draft){ state.draft.text = e.target.value; state.draft.edited = true; } // 在文案框里打字：保存新文案，并标记“老板修改过”
   if(e.target.id === 'quickText'){ $('#posHint').textContent = ''; } // 在快速输入框打字时，清掉红色提示
 }); // 输入监听结束
 $('#quickText').addEventListener('keydown', e => { if(e.key === 'Enter') parseQuick(); }); // 在快速输入框按回车，等同于点“识别”
-$('#resetBtn').addEventListener('click', () => { // 点“重置演示”按钮
+$('#resetBtn').addEventListener('click', () => {
+  if(state.busy) return; // 点“重置演示”按钮
   state = fresh(); // 状态恢复到最初
   $('#pipe').classList.remove('on'); $('#pipe').innerHTML = ''; // 隐藏并清空进度框
   $('#quickText').value = ''; $('#posHint').textContent = ''; // 清空快速输入框和提示
   $('#submitBtn').disabled = false; // 确保提交按钮可用
   $('#waSub').textContent = '熟客群组'; // 手机顶栏小字恢复
   $('#waBody').innerHTML = '<div class="wa-empty">还没有消息。<br>老板批准后，促销会出现在这里。</div>'; // 手机聊天区恢复为空
-  renderAll(); // 重新画出整个页面
+  renderAll();
+  loadProducts();
 }); // 重置监听结束
 
-function renderAll(){ renderSteps(); renderRole(); renderPOS(); renderKPI(false); renderDraft(); renderLog(); renderTabs(); } // 函数：一次性画出页面所有部分
+function renderAll(){ renderSteps(); renderRole(); renderPOS(); renderKPI(); renderDraft(); renderLog(); renderTabs(); } // 函数：一次性画出页面所有部分
 renderAll(); // 网页打开时，立刻画出初始页面
 loadProducts(); // 再从后端取商品列表
 </script> <!-- JavaScript 结束 -->
