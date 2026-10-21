@@ -1,0 +1,6 @@
+{
+  "users": [
+    {"id": "uncle-wong", "name": "Uncle Wong", "role": "owner", "permissions": ["inventory:read", "campaign:create", "campaign:approve", "activity:read"]},
+    {"id": "mei-ling", "name": "Mei Ling", "role": "staff", "permissions": ["inventory:read", "campaign:create"]}
+  ]
+}

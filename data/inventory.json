@@ -1,0 +1,9 @@
+{
+  "currency": "MYR",
+  "carbon_unit": "kg CO2e",
+  "products": [
+    {"id": "croissant", "name": "Butter Croissant", "aliases": ["croissant", "croissants"], "retail_price": 6.0, "cost_price": 2.0, "weight_kg": 0.08, "co2e_per_kg": 2.5, "on_hand": 18},
+    {"id": "chocolate_slice", "name": "Chocolate Cake Slice", "aliases": ["chocolate slice", "chocolate slices", "cake slice"], "retail_price": 8.0, "cost_price": 3.0, "weight_kg": 0.12, "co2e_per_kg": 2.5, "on_hand": 8},
+    {"id": "sourdough", "name": "Sourdough Loaf", "aliases": ["sourdough", "loaf"], "retail_price": 14.0, "cost_price": 6.0, "weight_kg": 0.45, "co2e_per_kg": 2.5, "on_hand": 6}
+  ]
+}
