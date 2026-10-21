@@ -1,1 +1,9 @@
+# Runtime (tested with Python 3.13)
+fastapi==0.156.4
+pydantic==2.14.1
+starlette==1.9.0
+uvicorn==0.54.0
 
+# HTTP tests
+pytest==9.1.1
+httpx==0.28.1
