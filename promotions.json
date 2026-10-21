@@ -1,0 +1,70 @@
+{
+  "business_id": "uncle-wong-bakery",
+  "currency": "MYR",
+  "timezone": "Asia/Kuala_Lumpur",
+  "dataset": "synthetic_demo_only",
+  "promotions": [
+    {
+      "id": "promo-demo-001",
+      "date": "2026-10-21",
+      "title": "Evening Croissant Duo",
+      "product_ids": [
+        "croissant"
+      ],
+      "bundle_qty": 2,
+      "bundle_price_myr": 5.0,
+      "valid_until": "2026-10-21T20:00:00+08:00",
+      "stock_limit": 8,
+      "targeting": {
+        "favorite_products": [
+          "croissant"
+        ],
+        "max_offer_budget_myr_min": 5,
+        "whatsapp_opt_in": true
+      },
+      "languages": [
+        "ms-en",
+        "en"
+      ],
+      "message_draft": {
+        "ms-en": "Bossku! Fresh croissant petang ni 🥐 2 for RM5, sampai 8 PM sahaja. Reply NAK to reserve! Jom save food 🌍",
+        "en": "Fresh croissants before 8 PM 🥐 Two for RM5. Reply NAK to reserve and help us save good food 🌍"
+      },
+      "status": "draft_for_owner_approval",
+      "demo_data": true
+    },
+    {
+      "id": "promo-demo-002",
+      "date": "2026-10-21",
+      "title": "Chocolate Slice Happy Hour",
+      "product_ids": [
+        "chocolate_slice"
+      ],
+      "bundle_qty": 1,
+      "bundle_price_myr": 4.0,
+      "valid_until": "2026-10-21T20:00:00+08:00",
+      "stock_limit": 5,
+      "targeting": {
+        "favorite_products": [
+          "chocolate_slice"
+        ],
+        "interested_categories": [
+          "cake",
+          "dessert"
+        ],
+        "max_offer_budget_myr_min": 4,
+        "whatsapp_opt_in": true
+      },
+      "languages": [
+        "en",
+        "ms-en"
+      ],
+      "message_draft": {
+        "en": "Chocolate cake slice at RM4 until 8 PM 🍫 Reply NAK to save yours. First come, first served!",
+        "ms-en": "Chocolate cake slice RM4 sampai 8 PM 🍫 Reply NAK kalau nak reserve. First come, first served!"
+      },
+      "status": "draft_for_owner_approval",
+      "demo_data": true
+    }
+  ]
+}
