@@ -5,7 +5,7 @@ Automate the Routine. Empower the People.
 
 ## 当前状态
 
-本仓库目前只有目录骨架和队友提供的演示数据，尚未实现前端、服务器或 API。根目录现有的依赖清单及锁文件仍为空占位文件，不代表已选定技术栈，暂不能用于安装或启动项目。正式开发时，应在对应前后端目录初始化依赖，并只保留选定包管理器的锁文件。
+已实现 FastAPI 后端、商品查询 `GET /api/inventory`、促销计算 `POST /api/generate-promo` 及自动化测试。根目录 `requirements.txt` 包含 Python 依赖，启动和接口说明见 [后端 README](backend/README.md)。支持可选 DeepSeek 文案及失败时本地模板回退，真实连接需配置本地密钥后验证；审批和模拟广播的后端流程尚未实现，前端联调尚未完成。
 
 ## 目录与分工
 
@@ -25,15 +25,15 @@ docs/
 - 成员 3：维护共享 JSON、API 边界测试及项目文档。
 - 成员 4：提供业务公式和 UI 素材；碳排放系数依据、碳积分换算规则待确认。
 
-## 后端接口方向（待实现）
+## 后端接口
 
-核心接口为 `POST /api/generate-promo`，按当前分工接收：
+前端先通过 `GET /api/inventory` 获取商品编号、名称、原价和库存，再向 `POST /api/generate-promo` 提交：
 
 ```json
 [{"item":"croissant","qty":10}]
 ```
 
-后端从 `data/inventory.json` 的 `products` 数组读取商品（分工中的 `products.json` 对应这份文件，无需维护两份）。价格和碳排放由代码计算，AI 只生成文案；响应字段将在实现接口时确定。
+后端从 `data/inventory.json` 的 `products` 数组读取商品（分工中的 `products.json` 对应这份文件，无需维护两份）。价格和碳排放由代码计算，文案由本地模板或可选 DeepSeek 开头、结尾与程序插入的商品事实组成；请求、响应和错误格式见后端 README。
 
 以现有数据和分工中的五折示例计算，10 个牛角包原价 RM60、成本 RM20、清仓价 RM30。数据中的 `weight_kg` 是商品重量，不是面粉重量；按 `qty × weight_kg × co2e_per_kg` 得到的示例估算为 2 kg CO₂e。该数值不是已验证的减排量，也不是碳积分，业务规则确认后再用于正式展示。
 

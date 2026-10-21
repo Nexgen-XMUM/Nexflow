@@ -1,6 +1,65 @@
 # Nexflow Backend
 
-FastAPI 后端，提供 `POST /api/generate-promo`。当前为本地演示文案，无外部模型调用。
+FastAPI 后端，提供 `GET /api/inventory` 和 `POST /api/generate-promo`。默认使用本地演示文案，可配置 DeepSeek 生成文案开头和结尾；商品、数量、价格和总额由 Python 插入。
+
+## Windows 本地配置与启动
+
+项目已建立 `.venv` 时，在项目根目录的 PowerShell 中运行：
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
+
+将 `backend/.env.example` 复制为 `backend/.env`，只在本地填写：
+
+```dotenv
+AI_PROVIDER=deepseek
+DEEPSEEK_API_KEY=your_key_here
+DEEPSEEK_MODEL=deepseek-flash
+CORS_ALLOWED_ORIGINS=
+```
+
+不要把真实密钥写进 `.env.example`、源代码、截图或 Git 提交。`.env` 已被忽略。
+程序启动时自动读取 `backend/.env`，已有进程环境变量优先；修改配置后重启服务。
+`AI_PROVIDER=local_demo` 时不调用模型。DeepSeek 模式会产生供应商 API 用量。
+只向官方 `https://api.deepseek.com/chat/completions` 发送商品名称、数量和清仓单价；不发送成本、毛利、客户或电话。
+模型默认 `deepseek-flash`，使用非思考模式和 JSON 输出，参考 [DeepSeek 官方文档](https://api-docs.deepseek.com/api/create-chat-completion/)。
+
+连接超时 4 秒，读写等阶段超时 12 秒，不自动重试；这不是整个请求的严格总时限。
+密钥缺失、HTTP 错误、网络错误、超时、回复结构错误或文案过长时，促销接口仍返回计算结果和本地模板。
+AI 只生成不含金额的开头和结尾，程序检查基本格式、长度和数字等限制；自然语言仍需老板审核，不能保证不存在任何语义错误。
+
+| `promo` 字段 | 含义 |
+|---|---|
+| `source: "deepseek"`，`is_fallback: false` | 模型调用成功且内容通过检查 |
+| `source: "local_demo"`，`is_fallback: false` | 主动选择本地模式，没有调用模型 |
+| `source: "local_demo"`，`is_fallback: true` | AI 配置或调用有问题，已回退 |
+| `fallback_reason` | 成功或本地模式为 null，失败为不含密钥的类别代码 |
+
+失败类别：`MISSING_API_KEY`、`INVALID_AI_PROVIDER`、`AI_TIMEOUT`、`AI_HTTP_ERROR`、`AI_NETWORK_ERROR`、`INVALID_AI_COPY`。
+不会把供应商原始错误响应或密钥返回给前端。
+测试通过模拟供应商响应验证，不消耗真实额度；真实连接必须在用户本地填写密钥后另行验证。
+
+## 商品查询
+
+`GET /api/inventory` 从共享库存读取商品，每个商品只返回一次，保持文件中的顺序。
+
+```json
+{
+  "currency": "MYR",
+  "products": [
+    {"id": "croissant", "name": "Butter Croissant", "retail_price": "6.00", "on_hand": 18},
+    {"id": "chocolate_slice", "name": "Chocolate Cake Slice", "retail_price": "8.00", "on_hand": 8},
+    {"id": "sourdough", "name": "Sourdough Loaf", "retail_price": "14.00", "on_hand": 6}
+  ]
+}
+```
+
+前端用 `id` 作为生成促销请求中的 `item`；`retail_price` 为两位小数字符串，`on_hand` 为整数。
+库存为零的商品仍返回，前端可禁用其输入。每次请求重新读取库存，不写文件、不扣库存。
+库存无效或不可读取时返回 HTTP 503，错误结构与促销接口的 `INVENTORY_UNAVAILABLE` 相同。
+查询响应不包含成本价、别名、客户资料或内部文件路径；促销响应仍包含成本，仅用于本地演示。
 
 ## 环境与启动
 
@@ -26,12 +85,12 @@ python3.13 -m venv .venv
 
 ## 环境变量与跨域
 
-只有 `CORS_ALLOWED_ORIGINS`：精确的浏览器来源，以逗号分隔。默认空，不放行跨域来源。
+跨域使用 `CORS_ALLOWED_ORIGINS`：精确的浏览器来源，以逗号分隔。默认空，不放行跨域来源。AI 环境变量见上文。
 格式是协议、主机和可选端口，不带路径、尾部斜线、查询参数或通配符。
 `localhost` 与 `127.0.0.1` 是不同来源，不同端口和协议也分别配置。
 
 `backend/.env.example` 可复制为 `backend/.env` 后填写真实联调地址。
-程序从进程环境读取变量，不自动加载 `.env`；在项目根目录执行：
+程序启动时自动加载 `backend/.env`，已有进程环境变量优先；下面是 Bash 下手动导入环境变量的可选方式（PowerShell 使用上面的 Windows 命令）：
 
 ```bash
 set -a
@@ -41,11 +100,10 @@ set +a
 ```
 
 前端地址尚未提供，当前未配置任何联调来源。
-只允许跨域 `POST` 和 `Content-Type`，不使用凭据。非法来源配置在启动时失败。
+只允许跨域 `GET`、`POST` 和 `Content-Type`，不使用凭据。非法来源配置在启动时失败。
 CORS 是浏览器规则，不是认证；直接 HTTP 客户端仍可调用接口。
 
-本阶段没有模型密钥或供应商配置。后续先测试个人 DeepSeek API，再连接比赛云 GPU 上的 DeepSeek。
-实际接入前核对对应服务的官方文档，再补密钥环境变量与调用失败测试。
+已实现个人 DeepSeek API 的可选调用及失败回退；比赛云 GPU 的接入尚未实现。
 
 ## 请求
 
@@ -99,7 +157,8 @@ curl -sS http://127.0.0.1:8000/api/generate-promo \
   "promo": {
     "text": "🥐 Eh, bakery deals lah! 10 Butter Croissant at RM3.00 each. All 10 for RM30.00 (50% off). 😊",
     "source": "local_demo",
-    "is_fallback": false
+    "is_fallback": false,
+    "fallback_reason": null
   },
   "warnings": []
 }
@@ -142,8 +201,8 @@ curl -sS http://127.0.0.1:8000/api/generate-promo \
 按现有系数估算：牛角包 10 个是 2 kg CO₂e；再加蛋糕 2 份和酸面包 1 个，合计 3.725 kg CO₂e。
 商品重量不是面粉重量。该估算不是经认证的减排量，也不等于碳积分。
 
-`promo.source` 当前固定为 `local_demo`，前端应据此标识“本地演示文案”。
-`is_fallback` 为 false，表示主动使用演示模式，没有尝试真实模型。
+`promo.source` 为 `local_demo` 时，前端应标识“本地演示文案”；为 `deepseek` 时，标识 AI 辅助文案。
+`is_fallback` 区分主动本地模式和 AI 失败回退，含义见上方表格。
 本地模板只使用代码返回的名称、数量、清仓单价和清仓总价，不包含成本、亏损或客户资料。
 对当前三个商品的所有非空组合，文案包含 Emoji 和 Manglish，按空白分词不超过 50 词。
 未来商品目录扩大或名称变长时，再调整本地模板的长度策略。
@@ -193,7 +252,7 @@ CORS 预检错误由标准中间件返回 HTTP 400，不使用上述业务错误
 ## 边界与测试
 
 生成操作不扣库存、不写文件、不发消息；同一请求可以重复执行。
-不提供审批、广播、活动、客户或用户接口，也不公开静态数据目录。
+商品查询同样只读；不提供审批、广播、活动、客户或用户接口，也不公开静态数据目录。
 `users.json` 仅为演示角色数据；没有登录认证或安全 RBAC。
 接口包含成本数据，只用于受控的本地演示，不作为公开客户接口部署。
 
@@ -206,7 +265,7 @@ CORS 预检错误由标准中间件返回 HTTP 400，不使用上述业务错误
 
 测试覆盖已知金额、数量类型、别名重复、库存边界、舍入、亏损混合汇总、CO₂e、文案、
 数据不变、非公开接口和精确跨域来源。临时库存样本不会改写共享文件。
-模型调用及失败测试随真实 DeepSeek 接入一起进行，本阶段未声称完成。
+`test_ai_copy.py` 使用模拟 HTTP 响应覆盖 AI 成功、密钥缺失、超时、网络失败、HTTP 错误和回复校验；测试默认禁用真实 AI 调用。
 
 当前固定的 Starlette TestClient 使用 httpx 会发出一条弃用提示；测试仍能执行。
 后续升级测试客户端时再切换其支持的新版客户端，不因此引入本阶段无关的库。
