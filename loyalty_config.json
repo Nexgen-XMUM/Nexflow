@@ -1,0 +1,67 @@
+{
+  "program_id": "save-food-earn-points",
+  "name": "Save Food, Earn Green Points",
+  "currency": "MYR",
+  "dataset": "synthetic_demo_only",
+  "carbon_calculation": {
+    "formula": "sum(qty * product.weight_kg * product.co2e_per_kg)",
+    "unit": "kg CO2e",
+    "factor_source": "inventory.json product records",
+    "factor_status": "illustrative_demo_assumption",
+    "rounding_decimals": 2
+  },
+  "earning_policy": {
+    "trigger": "order_fulfilled",
+    "points_per_kg_co2e": 10,
+    "rounding": "floor_after_order_total",
+    "formula": "floor(total_avoided_co2e_kg * points_per_kg_co2e)",
+    "award_only_once_per_order": true,
+    "cancelled_or_uncollected_orders_earn_points": false,
+    "example": {
+      "items": [
+        {
+          "product_id": "croissant",
+          "qty": 2
+        }
+      ],
+      "avoided_co2e_kg": 0.4,
+      "points_awarded": 4
+    }
+  },
+  "redemption_policy": {
+    "trigger": "owner_or_staff_confirms_fulfilled_redemption",
+    "allow_partial_points": false,
+    "points_are_not_cash": true
+  },
+  "rewards": [
+    {
+      "id": "reward-croissant",
+      "product_id": "croissant",
+      "name": "Butter Croissant",
+      "points_cost": 15,
+      "max_qty_per_redemption": 1,
+      "active": true
+    },
+    {
+      "id": "reward-chocolate-slice",
+      "product_id": "chocolate_slice",
+      "name": "Chocolate Cake Slice",
+      "points_cost": 25,
+      "max_qty_per_redemption": 1,
+      "active": true
+    },
+    {
+      "id": "reward-sourdough",
+      "product_id": "sourdough",
+      "name": "Sourdough Loaf",
+      "points_cost": 60,
+      "max_qty_per_redemption": 1,
+      "active": true
+    }
+  ],
+  "sdg_alignment": {
+    "sdg": 12,
+    "label": "Responsible Consumption and Production",
+    "claim": "Reward points are based on estimated food-waste emissions avoided when a discounted surplus order is fulfilled. They are not verified carbon credits."
+  }
+}
