@@ -143,3 +143,6 @@ service-account*.json
 # Uncomment if you have local-only reference files:
 # Conferences/
 # references/
+
+# Local backend plans, task briefs, and stage summaries.
+/backend/docs/
