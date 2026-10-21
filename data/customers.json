@@ -1,0 +1,355 @@
+{
+  "channel": "WhatsApp",
+  "customers": [
+    {
+      "id": "c001",
+      "name": "Aina",
+      "phone": "+60120000001",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c002",
+      "name": "Ravi",
+      "phone": "+60120000002",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c003",
+      "name": "Mei",
+      "phone": "+60120000003",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c004",
+      "name": "Daniel",
+      "phone": "+60120000004",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c005",
+      "name": "Farah",
+      "phone": "+60120000005",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c006",
+      "name": "Jason",
+      "phone": "+60120000006",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c007",
+      "name": "Siti",
+      "phone": "+60120000007",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c008",
+      "name": "Kumar",
+      "phone": "+60120000008",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c009",
+      "name": "Regular 09",
+      "phone": "+60120000009",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c010",
+      "name": "Regular 10",
+      "phone": "+60120000010",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c011",
+      "name": "Regular 11",
+      "phone": "+60120000011",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c012",
+      "name": "Regular 12",
+      "phone": "+60120000012",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c013",
+      "name": "Regular 13",
+      "phone": "+60120000013",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c014",
+      "name": "Regular 14",
+      "phone": "+60120000014",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c015",
+      "name": "Regular 15",
+      "phone": "+60120000015",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c016",
+      "name": "Regular 16",
+      "phone": "+60120000016",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c017",
+      "name": "Regular 17",
+      "phone": "+60120000017",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c018",
+      "name": "Regular 18",
+      "phone": "+60120000018",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c019",
+      "name": "Regular 19",
+      "phone": "+60120000019",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c020",
+      "name": "Regular 20",
+      "phone": "+60120000020",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c021",
+      "name": "Regular 21",
+      "phone": "+60120000021",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c022",
+      "name": "Regular 22",
+      "phone": "+60120000022",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c023",
+      "name": "Regular 23",
+      "phone": "+60120000023",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c024",
+      "name": "Regular 24",
+      "phone": "+60120000024",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c025",
+      "name": "Regular 25",
+      "phone": "+60120000025",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c026",
+      "name": "Regular 26",
+      "phone": "+60120000026",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c027",
+      "name": "Regular 27",
+      "phone": "+60120000027",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c028",
+      "name": "Regular 28",
+      "phone": "+60120000028",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c029",
+      "name": "Regular 29",
+      "phone": "+60120000029",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c030",
+      "name": "Regular 30",
+      "phone": "+60120000030",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c031",
+      "name": "Regular 31",
+      "phone": "+60120000031",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c032",
+      "name": "Regular 32",
+      "phone": "+60120000032",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c033",
+      "name": "Regular 33",
+      "phone": "+60120000033",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c034",
+      "name": "Regular 34",
+      "phone": "+60120000034",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c035",
+      "name": "Regular 35",
+      "phone": "+60120000035",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c036",
+      "name": "Regular 36",
+      "phone": "+60120000036",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c037",
+      "name": "Regular 37",
+      "phone": "+60120000037",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c038",
+      "name": "Regular 38",
+      "phone": "+60120000038",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c039",
+      "name": "Regular 39",
+      "phone": "+60120000039",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c040",
+      "name": "Regular 40",
+      "phone": "+60120000040",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c041",
+      "name": "Regular 41",
+      "phone": "+60120000041",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c042",
+      "name": "Regular 42",
+      "phone": "+60120000042",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c043",
+      "name": "Regular 43",
+      "phone": "+60120000043",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c044",
+      "name": "Regular 44",
+      "phone": "+60120000044",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c045",
+      "name": "Regular 45",
+      "phone": "+60120000045",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c046",
+      "name": "Regular 46",
+      "phone": "+60120000046",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c047",
+      "name": "Regular 47",
+      "phone": "+60120000047",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c048",
+      "name": "Regular 48",
+      "phone": "+60120000048",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c049",
+      "name": "Regular 49",
+      "phone": "+60120000049",
+      "member": true,
+      "opted_in": true
+    },
+    {
+      "id": "c050",
+      "name": "Regular 50",
+      "phone": "+60120000050",
+      "member": true,
+      "opted_in": true
+    }
+  ]
+}
