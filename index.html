@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbyte Smart Yield · 打烊促销自动化 Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ 设计变量：班兰绿 + 黄糖棕 + 奶油黄 ============ */
+:root{
+  --bg:#f0f4ec; --surface:#ffffff; --sunk:#e5ece0; --ink:#2b2218; --muted:#686a5c; --line:#d3dccd;
+  --brand:#2a6a49; --brand-ink:#ffffff; --butter:#f0c24b; --chili:#b53a2c; --ok:#1d7a47;
+  --display:"Bricolage Grotesque","Figtree",system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1913; --surface:#16251c; --sunk:#1c2f24; --ink:#e9efe5; --muted:#9bb0a0; --line:#29402f;
+    --brand:#5cc28c; --brand-ink:#08150d; --butter:#f0c24b; --chili:#ef7d6d; --ok:#5cc28c;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--butter);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.2;letter-spacing:-.01em}
+.muted{color:var(--muted)}
+.wrap{max-width:1240px;margin:0 auto;padding:18px 20px 48px}
+
+/* ============ 顶栏 ============ */
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:6px 0 16px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.logo{width:38px;height:38px;border-radius:50%;background:var(--brand);display:grid;place-items:center;position:relative}
+.logo::after{content:"";width:16px;height:16px;border-radius:50%;background:var(--butter);box-shadow:-6px 4px 0 -2px var(--bg)}
+.brand b{font-family:var(--display);font-size:20px}
+.brand small{display:block;color:var(--muted);font-size:13px;margin-top:-2px}
+.seg{display:inline-flex;background:var(--sunk);border-radius:12px;padding:3px}
+.seg button{border:0;background:transparent;padding:8px 14px;border-radius:9px;font-weight:600;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.ghost{border:1px solid var(--line);background:transparent;padding:8px 14px;border-radius:10px;font-weight:600;font-size:14px;color:var(--muted)}
+.ghost:hover{border-color:var(--muted);color:var(--ink)}
+
+/* ============ 五步旅程 ============ */
+.steps{list-style:none;margin:0 0 18px;padding:0;display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:8px;overflow-x:auto}
+.steps li{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--sunk);color:var(--muted);min-width:150px;transition:background .3s,color .3s}
+.steps .n{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid currentColor;display:grid;place-items:center;font-weight:700;font-size:13px}
+.steps .t{font-weight:600;font-size:14px;line-height:1.25}
+.steps .t small{display:block;font-weight:400;font-size:12px;opacity:.85}
+.steps li.now{background:var(--butter);color:#2b2218}
+.steps li.done{background:var(--brand);color:var(--brand-ink)}
+.steps li.done .n{background:var(--brand-ink);color:var(--brand);border-color:var(--brand-ink)}
+
+/* ============ 主布局 ============ */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:26px;align-items:start}
+.tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:18px}
+.tabs button{border:0;background:transparent;padding:10px 16px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;position:relative}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+.tabs .pip{display:none;position:absolute;top:8px;right:4px;width:9px;height:9px;border-radius:50%;background:var(--chili)}
+.tabs .pip.on{display:block}
+.panel[hidden]{display:none}
+.panel-head{margin-bottom:14px}
+.panel-head h2{font-size:26px}
+.panel-head p{margin:4px 0 0;color:var(--muted)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card + .card{margin-top:16px}
+
+/* ============ POS ============ */
+.quick{display:flex;gap:8px;margin-bottom:16px}
+.quick input{flex:1;min-width:0;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.btn{border:0;border-radius:10px;padding:11px 18px;font-weight:700;background:var(--sunk)}
+.btn:hover{filter:brightness(.96)}
+.btn-main{background:var(--brand);color:var(--brand-ink)}
+.rows{display:flex;flex-direction:column}
+.prow{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.prow:first-child{border-top:0}
+.prow .emo{font-size:30px;width:44px;text-align:center}
+.prow .grow{flex:1;min-width:0}
+.prow .nm{font-weight:700}
+.prow .nm span{font-weight:400;color:var(--muted);margin-left:6px}
+.prow .meta{font-size:13px;color:var(--muted)}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stepper button{border:0;background:var(--sunk);width:38px;height:40px;font-size:20px;font-weight:700}
+.stepper input{width:54px;height:40px;border:0;text-align:center;font:inherit;font-weight:700;background:var(--surface);color:var(--ink);-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+.submit-bar{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+.submit-bar .btn-main{padding:14px 26px;font-size:16px}
+.hint{color:var(--chili);font-weight:600;min-height:1.4em}
+.pipe{list-style:none;margin:18px 0 0;padding:14px 16px;background:var(--sunk);border-radius:12px;display:none}
+.pipe.on{display:block}
+.pipe li{display:flex;gap:10px;padding:5px 0;font-size:14px;animation:pop .25s ease}
+.pipe li::before{content:"✓";flex:none;width:20px;height:20px;border-radius:50%;background:var(--brand);color:var(--brand-ink);font-size:12px;font-weight:700;display:grid;place-items:center;margin-top:2px}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ============ 看板 ============ */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:16px}
+.kpis > div{padding:16px 18px;border-left:1px solid var(--line)}
+.kpis > div:first-child{border-left:0}
+.kpis .v{display:block;font-family:var(--display);font-weight:700;font-size:30px;color:var(--brand);line-height:1.1;font-variant-numeric:tabular-nums}
+.kpis .l{font-size:13px;color:var(--muted)}
+.draft-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.draft-head h3{font-size:21px}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--butter);color:#2b2218;margin-bottom:6px}
+.badge.ok{background:var(--brand);color:var(--brand-ink)}
+.tblwrap{overflow-x:auto;margin:0 -4px}
+table{border-collapse:collapse;width:100%;min-width:480px}
+th{font-size:12.5px;color:var(--muted);font-weight:600;text-align:left;padding:6px 8px;border-bottom:2px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid var(--line)}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.strong{font-weight:700;color:var(--brand)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.metrics div{background:var(--sunk);border-radius:10px;padding:10px 12px}
+.metrics b{display:block;font-family:var(--display);font-size:19px;font-variant-numeric:tabular-nums}
+.metrics span{font-size:12.5px;color:var(--muted)}
+.metrics .hl{background:var(--butter);color:#2b2218}
+.metrics .hl span{color:#4a3b25}
+label.f{display:block;font-weight:700;margin:6px 0}
+textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;line-height:1.5;resize:vertical}
+.tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0}
+.safe{font-size:13px;color:var(--ok);font-weight:600}
+details{margin:10px 0;font-size:14px}
+summary{cursor:pointer;font-weight:600;color:var(--brand)}
+details ul{margin:8px 0 0;padding-left:20px;color:var(--muted)}
+.approve-bar{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.btn-approve{flex:1 1 280px;padding:20px 28px;font-size:20px;font-family:var(--display);background:var(--brand);color:var(--brand-ink);border-radius:14px;box-shadow:0 6px 0 rgba(0,0,0,.18);transition:transform .08s,box-shadow .08s}
+.btn-approve:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.btn-approve:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn-reject{padding:20px 26px;font-size:16px;background:transparent;border:2px solid var(--chili);color:var(--chili);border-radius:14px}
+.btn-reject:disabled{opacity:.45;cursor:not-allowed}
+.lock{margin-top:10px;padding:10px 14px;border-radius:10px;background:var(--sunk);font-size:14px}
+.empty{text-align:center;padding:34px 16px}
+.empty h3{font-size:20px;margin-bottom:6px}
+.empty p{margin:0 0 16px;color:var(--muted)}
+.done-card{display:flex;gap:16px;align-items:flex-start}
+.done-card .big{font-size:38px;line-height:1}
+
+/* ============ 日志 ============ */
+.log{list-style:none;margin:0;padding:0}
+.log li{display:grid;grid-template-columns:14px 1fr auto;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.log li:first-child{border-top:0}
+.log .dot{width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--muted)}
+.log .ok .dot{background:var(--ok)}
+.log .no .dot{background:var(--chili)}
+.log .info .dot{background:var(--butter)}
+.log .l2{color:var(--muted);font-size:14px}
+.log .sdg{display:inline-block;margin-top:4px;font-size:13px;font-weight:600;color:var(--ok)}
+.log time{font-size:13px;color:var(--muted);white-space:nowrap}
+.log li.fresh{animation:flash 1.6s ease}
+@keyframes flash{from{background:var(--butter)}to{background:transparent}}
+
+/* ============ 手机 / WhatsApp 模拟 ============ */
+.side{position:sticky;top:16px}
+.phone{width:300px;height:590px;margin:0 auto;border-radius:42px;background:#14181a;padding:11px;box-shadow:0 18px 40px rgba(0,0,0,.28)}
+.screen{height:100%;border-radius:32px;overflow:hidden;display:flex;flex-direction:column;background:#ece5dd}
+.wa-head{background:#0b6b5c;color:#fff;padding:26px 14px 10px;display:flex;gap:10px;align-items:center}
+.wa-head .av{width:36px;height:36px;border-radius:50%;background:#d8eadf;display:grid;place-items:center;font-size:19px}
+.wa-head b{display:block;font-size:14px;line-height:1.2}
+.wa-head small{font-size:12px;opacity:.85}
+.wa-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px;background-color:#ece5dd;background-image:radial-gradient(rgba(0,0,0,.055) 1px,transparent 1px);background-size:14px 14px}
+.wa-empty{margin:auto;text-align:center;color:#667781;font-size:13px;padding:0 18px}
+.wa-day{align-self:center;background:#e1f2fb;color:#54656f;font-size:11.5px;padding:3px 10px;border-radius:8px}
+.msg{max-width:90%;padding:7px 9px 4px;border-radius:10px;font-size:13px;line-height:1.42;color:#111b21;box-shadow:0 1px 1px rgba(0,0,0,.13);animation:pop .3s ease}
+.msg.out{align-self:flex-end;background:#d9fdd3;border-top-right-radius:2px}
+.msg.in{align-self:flex-start;background:#fff;border-top-left-radius:2px}
+.msg .who{font-size:11.5px;font-weight:700;color:#0b6b5c}
+.msg .txt{white-space:pre-wrap;word-break:break-word}
+.msg .meta{display:flex;justify-content:flex-end;gap:4px;font-size:10.5px;color:#667781;margin-top:2px}
+.tick.read{color:#34b7f1}
+.wa-foot{background:#f0f2f5;padding:8px 10px;display:flex;gap:8px;align-items:center}
+.wa-foot .fi{flex:1;background:#fff;border-radius:18px;padding:7px 12px;color:#8696a0;font-size:13px}
+.wa-foot .sd{width:32px;height:32px;border-radius:50%;background:#0b6b5c;color:#fff;display:grid;place-items:center;font-size:13px}
+.phone-cap{text-align:center;font-size:13px;color:var(--muted);margin:12px 0 0}
+
+.foot{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90vw}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+@media (max-width:960px){
+  .layout{grid-template-columns:1fr}
+  .side{position:static}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .kpis > div:nth-child(3){border-left:0}
+  .kpis > div:nth-child(n+3){border-top:1px solid var(--line)}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:560px){
+  .wrap{padding:12px 12px 40px}
+  .panel-head h2{font-size:22px}
+  .btn-approve{font-size:18px;padding:18px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div><b>Orbyte Smart Yield</b><small>Uncle Wong’s Bakery</small></div>
+    </div>
+    <div class="seg" role="group" aria-label="切换登录角色">
+      <button type="button" data-role="staff" aria-pressed="false">🧑‍🍳 Siti（店员）</button>
+      <button type="button" data-role="owner" aria-pressed="true">👑 Uncle Wong（老板）</button>
+    </div>
+    <button type="button" class="ghost" id="resetBtn">重置演示</button>
+  </header>
+
+  <ol class="steps" id="steps" aria-label="自动化五步旅程"></ol>
+
+  <div class="layout">
+    <main>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="pos" aria-selected="true">打烊盘点</button>
+        <button type="button" role="tab" data-tab="dash" aria-selected="false">老板看板<span class="pip" id="pip"></span></button>
+        <button type="button" role="tab" data-tab="log" aria-selected="false">活动日志</button>
+      </div>
+
+      <!-- 页面 1：POS -->
+      <section class="panel" id="tab-pos">
+        <div class="panel-head">
+          <h2>今晚还剩什么？</h2>
+          <p>店员只需要报数量。定价、文案、碳排计算都交给系统。</p>
+        </div>
+        <div class="card">
+          <div class="quick">
+            <input id="quickText" type="text" placeholder="快速输入，例如：12 croissants, 5 chocolate slices" aria-label="快速输入剩余商品">
+            <button type="button" class="btn" data-act="parse">识别</button>
+          </div>
+          <div class="rows" id="posRows"></div>
+          <div class="submit-bar">
+            <button type="button" class="btn btn-main" data-act="submit" id="submitBtn">提交盘点</button>
+            <span class="hint" id="posHint" role="status"></span>
+          </div>
+          <ul class="pipe" id="pipe" aria-live="polite"></ul>
+        </div>
+      </section>
+
+      <!-- 页面 2：老板看板 -->
+      <section class="panel" id="tab-dash" hidden>
+        <div class="panel-head">
+          <h2>老板看板</h2>
+          <p>看一眼，点一下。所有群发都要经过你批准。</p>
+        </div>
+        <div class="kpis" aria-label="累计成果">
+          <div><span class="v" id="kRec">RM0.00</span><span class="l">本月挽回营收</span></div>
+          <div><span class="v" id="kCo2">0.0</span><span class="l">累计减碳 kg CO₂e</span></div>
+          <div><span class="v" id="kFood">0.0</span><span class="l">避免浪费 kg</span></div>
+          <div><span class="v" id="kPromo">0</span><span class="l">已执行促销</span></div>
+        </div>
+        <div id="draftBox"></div>
+      </section>
+
+      <!-- 页面 3：活动日志 -->
+      <section class="panel" id="tab-log" hidden>
+        <div class="panel-head">
+          <h2>活动日志</h2>
+          <p>谁在什么时候做了什么，一条不漏。</p>
+        </div>
+        <div class="card"><ul class="log" id="logList" aria-live="polite"></ul></div>
+      </section>
+
+      <p class="foot">所有商品、客户和历史数据均为合成数据。价格全部由代码规则计算，AI 只负责润色文案。第一版的文案为模板模式，下一版可接入 LLM。</p>
+    </main>
+
+    <aside class="side" id="phoneWrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="wa-head">
+            <div class="av" aria-hidden="true">🥐</div>
+            <div><b>Pelanggan Setia 🥐</b><small id="waSub">50 位成员</small></div>
+          </div>
+          <div class="wa-body" id="waBody"><div class="wa-empty">还没有消息。<br>老板批准后，促销会出现在这里。</div></div>
+          <div class="wa-foot"><div class="fi">Message</div><div class="sd" aria-hidden="true">➤</div></div>
+        </div>
+      </div>
+      <p class="phone-cap">WhatsApp 模拟器（熟客视角）。回复为模拟数据。</p>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =====================================================
+   模拟的 Orbyte 数据（以后换成 backend 的 products.json / customers.json）
+   ===================================================== */
+const DATA = {
+  carbonFactor: 2.5,   // 每浪费 1kg 食物约产生 2.5kg CO2e
+  sellThrough: 0.8,    // 假设促销后 80% 能卖出（假设值，评委问起要说明）
+  products: [
+    {id:'croissant', emoji:'🥐', name:'Croissant', zh:'牛角包', cost:2.0, original:6.0, kg:0.07, alias:['croissant','牛角']},
+    {id:'choc', emoji:'🍰', name:'Chocolate Cake Slice', zh:'巧克力蛋糕', cost:3.5, original:9.0, kg:0.12, alias:['chocolate','choc','cake','巧克力']},
+    {id:'kaya', emoji:'🍞', name:'Kaya Bun', zh:'咖椰包', cost:1.0, original:3.0, kg:0.08, alias:['kaya','咖椰']},
+    {id:'tart', emoji:'🥧', name:'Egg Tart', zh:'蛋挞', cost:1.3, original:3.8, kg:0.06, alias:['tart','egg','蛋挞']}
+  ],
+  customers: Array.from({length:50}, (_, i) => ({name:'Customer ' + (i+1), phone:'+60 12-000 ' + String(i+1).padStart(4,'0')}))
+};
+const SEED_KPI = {recovered:412.5, co2:18.4, food:7.4, promos:7};
+const SEED_LOG = [
+  {t:'昨天 19:12', who:'Uncle Wong', act:'批准并群发促销', detail:'Croissant ×9、Kaya Bun ×6，发给 50 位熟客，挽回 RM51.00', sdg:'减少 2.10 kg CO₂e（SDG 12.3）', type:'ok'},
+  {t:'昨天 19:05', who:'Siti', act:'提交打烊盘点', detail:'Croissant 11、Kaya Bun 8', sdg:'', type:'info'},
+  {t:'前天 19:20', who:'Uncle Wong', act:'拒绝促销草稿', detail:'原因：剩余库存已被预订，不需要清仓', sdg:'', type:'no'}
+];
+const STEPS = [
+  ['Trigger','触发'], ['Connected data','关联数据'], ['Decision logic','决策逻辑'],
+  ['Human approval','人工审批'], ['Visible outcome','可见结果']
+];
+
+/* ================== 工具函数 ================== */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const money = n => 'RM' + n.toFixed(2);
+const priceStr = n => Number.isInteger(n) ? 'RM' + n : 'RM' + n.toFixed(2);
+const clock = () => new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function fresh(){
+  return {
+    role:'owner', tab:'pos', step:1, busy:false,
+    qty:{croissant:12, choc:5, kaya:0, tart:0},
+    draft:null, result:null,
+    kpi:Object.assign({}, SEED_KPI),
+    log:SEED_LOG.map(e => Object.assign({}, e))
+  };
+}
+let state = fresh();
+const roleName = () => state.role === 'owner' ? 'Uncle Wong' : 'Siti';
+
+let toastTimer;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 2600);
+}
+
+function countTo(el, from, to, dec, prefix){
+  prefix = prefix || '';
+  if(reduced){ el.textContent = prefix + to.toFixed(dec); return; }
+  const dur = 900, t0 = performance.now();
+  (function frame(t){
+    const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = prefix + (from + (to - from) * e).toFixed(dec);
+    if(k < 1) requestAnimationFrame(frame);
+  })(t0);
+}
+
+/* ================== 核心逻辑（纯代码，没有 AI） ================== */
+function buildDraft(){
+  const items = DATA.products.filter(p => state.qty[p.id] > 0).map(p => {
+    const qty = state.qty[p.id];
+    const half  = Math.round(p.original * 5) / 10;              // 原价的 50%，取到 0.1
+    const floor = Math.ceil(Math.round(p.cost * 120) / 10) / 10; // 成本的 1.2 倍，向上取到 0.1
+    const price = Math.max(half, floor);                         // 清仓价：吸引人，但永远高于成本
+    const sold  = Math.round(qty * DATA.sellThrough);
+    return Object.assign({}, p, {qty, price, sold, rev: sold * price, costTotal: sold * p.cost, kgSold: sold * p.kg});
+  });
+  const rev = items.reduce((a, i) => a + i.rev, 0);
+  const cost = items.reduce((a, i) => a + i.costTotal, 0);
+  const kg = items.reduce((a, i) => a + i.kgSold, 0);
+  return {items, rev, profit: rev - cost, kg, co2: kg * DATA.carbonFactor, edited:false, variant:0, text:''};
+}
+
+/* 文案引擎：现在是模板，下一版把这个函数换成调用 LLM（例如 Runpod 上的 Llama） */
+function genCopy(items, variant){
+  const lines = items.map(i => i.emoji + ' ' + i.name + ' ' + priceStr(i.price) + ' (asal ' + priceStr(i.original) + ')').join('\n');
+  const first = items[0].name.toLowerCase();
+  const T = [
+`Bossku! 🌧️ Malam-malam macam ni makan ${first} memang best kan?
+
+Flash sale sebelum 8 PM:
+${lines}
+
+Balik modal je, save food, save earth! 🌍
+Reply “Nak” untuk tempah. Stok terhad! 🙌`,
+`Hi Kakak, Abang! 👋 Last call dari Uncle Wong’s Bakery!
+
+Hari ni stok lebih sikit, sayang nak buang:
+${lines}
+
+Promo sampai 8 PM je tau ⏰
+Jom habiskan sama-sama, reply “Nak” sekarang! 🌱`,
+`🔥 FLASH SALE 7–8 PM 🔥
+${lines}
+
+Save food, save earth, save your wallet! 🌍💸
+Reply “Nak” + berapa banyak. First come, first served!`
+  ];
+  return T[variant % T.length];
+}
+
+/* ================== 渲染 ================== */
+function renderSteps(){
+  $('#steps').innerHTML = STEPS.map((s, i) => {
+    const n = i + 1, cls = n < state.step ? 'done' : (n === state.step ? 'now' : '');
+    return '<li class="' + cls + '"><span class="n">' + (cls === 'done' ? '✓' : n) + '</span><span class="t">' + s[1] + '<small>' + s[0] + '</small></span></li>';
+  }).join('');
+}
+function setStep(n){ state.step = n; renderSteps(); }
+
+function renderTabs(){
+  $$('.tabs [data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === state.tab)));
+  ['pos','dash','log'].forEach(k => { $('#tab-' + k).hidden = (k !== state.tab); });
+  $('#pip').classList.toggle('on', !!state.draft);
+}
+function switchTab(t){ state.tab = t; renderTabs(); }
+
+function renderRole(){
+  $$('.seg [data-role]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.role === state.role)));
+}
+
+function renderPOS(){
+  $('#posRows').innerHTML = DATA.products.map(p =>
+    '<div class="prow"><div class="emo" aria-hidden="true">' + p.emoji + '</div>' +
+    '<div class="grow"><div class="nm">' + p.name + '<span>' + p.zh + '</span></div>' +
+    '<div class="meta">成本 ' + money(p.cost) + '，原价 ' + money(p.original) + '</div></div>' +
+    '<div class="stepper"><button type="button" data-dec="' + p.id + '" aria-label="减少 ' + p.name + '">−</button>' +
+    '<input type="text" inputmode="numeric" data-q="' + p.id + '" value="' + state.qty[p.id] + '" aria-label="' + p.name + ' 剩余数量">' +
+    '<button type="button" data-inc="' + p.id + '" aria-label="增加 ' + p.name + '">+</button></div></div>'
+  ).join('');
+}
+
+function renderKPI(animate, prev){
+  const k = state.kpi;
+  if(animate && prev){
+    countTo($('#kRec'), prev.recovered, k.recovered, 2, 'RM');
+    countTo($('#kCo2'), prev.co2, k.co2, 1);
+    countTo($('#kFood'), prev.food, k.food, 1);
+    countTo($('#kPromo'), prev.promos, k.promos, 0);
+  } else {
+    $('#kRec').textContent = money(k.recovered);
+    $('#kCo2').textContent = k.co2.toFixed(1);
+    $('#kFood').textContent = k.food.toFixed(1);
+    $('#kPromo').textContent = String(k.promos);
+  }
+}
+
+function renderDraft(){
+  const box = $('#draftBox'), d = state.draft, r = state.result;
+  if(r){
+    box.innerHTML = r.rejected
+      ? '<div class="card done-card"><div class="big" aria-hidden="true">🛑</div><div><span class="badge">已拒绝</span><h3>这份促销没有发送</h3><p class="muted" style="margin:6px 0 0">拒绝已写入活动日志。需要的话，可以回到“打烊盘点”重新提交。</p></div></div>'
+      : '<div class="card done-card"><div class="big" aria-hidden="true">✅</div><div><span class="badge ok">已发送</span><h3>已批准并群发给 ' + r.n + ' 位熟客</h3><p class="muted" style="margin:6px 0 0">锁定库存 ' + r.units + ' 件，预计挽回 ' + money(r.rev) + '，减少 ' + r.co2.toFixed(2) + ' kg CO₂e。右边手机可以看到熟客收到的消息。</p></div></div>';
+    return;
+  }
+  if(!d){
+    box.innerHTML = '<div class="card empty"><h3>现在没有待审批的促销</h3><p>店员提交打烊盘点后，草稿会出现在这里。</p><button type="button" class="btn btn-main" data-act="gopos">去打烊盘点</button></div>';
+    return;
+  }
+  const rows = d.items.map(i =>
+    '<tr><td>' + i.emoji + ' ' + i.name + '</td><td class="num">' + i.qty + '</td><td class="num">' + money(i.cost) +
+    '</td><td class="num">' + money(i.original) + '</td><td class="num strong">' + money(i.price) +
+    '</td><td class="num">+' + money(i.price - i.cost) + '</td></tr>').join('');
+  const owner = state.role === 'owner';
+  box.innerHTML =
+    '<div class="card">' +
+    '<div class="draft-head"><div><span class="badge">待审批</span><h3>今晚的临期促销草稿</h3>' +
+    '<p class="muted" style="margin:4px 0 0">Siti 提交盘点后，系统自动生成。</p></div></div>' +
+    '<div class="tblwrap"><table><thead><tr><th>商品</th><th class="num">剩余</th><th class="num">成本</th><th class="num">原价</th><th class="num">清仓价</th><th class="num">单件毛利</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    '<div class="metrics">' +
+    '<div class="hl"><b>' + money(d.rev) + '</b><span>预计挽回营收</span></div>' +
+    '<div><b>' + money(d.profit) + '</b><span>其中净利润</span></div>' +
+    '<div><b>' + d.co2.toFixed(2) + ' kg</b><span>减少碳排 CO₂e</span></div>' +
+    '<div><b>' + d.kg.toFixed(2) + ' kg</b><span>避免浪费食物</span></div></div>' +
+    '<label class="f" for="copyBox">WhatsApp 文案（可以直接修改）</label>' +
+    '<textarea id="copyBox" rows="10">' + esc(d.text) + '</textarea>' +
+    '<div class="tools"><button type="button" class="btn" data-act="regen">重新生成文案</button><span class="safe">价格由代码计算，AI 只写文案</span></div>' +
+    '<details><summary>这些数字是怎么算的？</summary><ul>' +
+    '<li>清仓价 = max(原价 × 50%, 成本 × 1.2)，取到 RM0.10，所以永远高于成本价。</li>' +
+    '<li>预计售出 = 剩余数量 × ' + Math.round(DATA.sellThrough * 100) + '%（假设值）。</li>' +
+    '<li>预计挽回 = 预计售出 × 清仓价；减碳 = 预计售出的重量 × ' + DATA.carbonFactor + ' kg CO₂e/kg。</li>' +
+    '<li>以上全部是普通代码计算，没有任何一步交给 AI。</li></ul></details>' +
+    '<div class="approve-bar">' +
+    '<button type="button" class="btn btn-approve" data-act="approve"' + (owner ? '' : ' disabled') + '>批准并群发</button>' +
+    '<button type="button" class="btn btn-reject" data-act="reject"' + (owner ? '' : ' disabled') + '>拒绝</button></div>' +
+    (owner ? '' : '<div class="lock">🔒 只有老板可以批准群发。请在右上角切换到 Uncle Wong。</div>') +
+    '</div>';
+}
+
+function renderLog(){
+  $('#logList').innerHTML = state.log.map(e =>
+    '<li class="' + e.type + (e.fresh ? ' fresh' : '') + '"><span class="dot"></span><div><div><b>' + esc(e.who) + '</b> ' + esc(e.act) + '</div>' +
+    '<div class="l2">' + esc(e.detail) + '</div>' + (e.sdg ? '<div class="sdg">🌍 ' + esc(e.sdg) + '</div>' : '') +
+    '</div><time>' + esc(e.t) + '</time></li>').join('');
+}
+function addLog(who, act, detail, sdg, type){
+  state.log.forEach(e => { e.fresh = false; });
+  state.log.unshift({t:'今天 ' + clock(), who, act, detail, sdg:sdg || '', type, fresh:true});
+  renderLog();
+}
+
+/* ================== 流程：提交盘点 → 审批 → 群发 ================== */
+async function submitEOD(){
+  if(state.busy) return;
+  const items = DATA.products.filter(p => state.qty[p.id] > 0);
+  if(!items.length){ $('#posHint').textContent = '请至少输入一件剩余商品。'; return; }
+  $('#posHint').textContent = '';
+  state.busy = true; state.result = null; state.draft = null;
+  $('#submitBtn').disabled = true;
+  const pipe = $('#pipe'); pipe.innerHTML = ''; pipe.classList.add('on');
+  const push = t => { const li = document.createElement('li'); li.textContent = t; pipe.appendChild(li); };
+
+  addLog(roleName(), '提交打烊盘点', items.map(p => p.name + ' ' + state.qty[p.id]).join('、'), '', 'info');
+  setStep(2);
+  await sleep(650);
+  push('已调取 Orbyte 数据：' + items.length + ' 个商品的成本价、' + DATA.customers.length + ' 位熟客、碳排系数 ' + DATA.carbonFactor + ' kg CO₂e/kg');
+  setStep(3);
+  await sleep(750);
+  const d = buildDraft();
+  push('定价引擎（纯代码）：清仓价 = max(原价 × 50%, 成本 × 1.2)，保证不亏本');
+  await sleep(650);
+  d.text = genCopy(d.items, 0);
+  state.draft = d;
+  push('文案引擎：已生成 WhatsApp 促销文案');
+  setStep(4);
+  await sleep(600);
+  push('已送交老板审批，等待确认');
+  await sleep(500);
+  state.busy = false;
+  $('#submitBtn').disabled = false;
+  renderDraft();
+  switchTab('dash');
+  toast('草稿已生成，等待老板批准');
+}
+
+async function approve(){
+  const d = state.draft;
+  if(!d || state.busy) return;
+  if(state.role !== 'owner'){ toast('只有老板可以批准群发'); return; }
+  const text = (($('#copyBox') || {}).value || d.text).trim();
+  if(!text){ toast('文案不能为空'); return; }
+  state.busy = true;
+  const units = d.items.reduce((a, i) => a + i.sold, 0);
+  const n = DATA.customers.length;
+  const prev = Object.assign({}, state.kpi);
+  state.kpi.recovered += d.rev; state.kpi.co2 += d.co2; state.kpi.food += d.kg; state.kpi.promos += 1;
+  addLog('Uncle Wong', d.edited ? '修改文案后批准并群发' : '批准并群发促销',
+    d.items.map(i => i.name + ' ×' + i.qty).join('、') + '，发给 ' + n + ' 位熟客，锁定库存 ' + units + ' 件，预计挽回 ' + money(d.rev),
+    '减少 ' + d.co2.toFixed(2) + ' kg CO₂e（SDG 12.3）', 'ok');
+  state.result = {n, units, rev:d.rev, co2:d.co2};
+  const items = d.items;
+  state.draft = null;
+  setStep(6);
+  renderDraft(); renderTabs(); renderKPI(true, prev);
+  toast('已批准并群发，已记录到活动日志');
+  if(window.innerWidth < 960) $('#phoneWrap').scrollIntoView({behavior:'smooth', block:'center'});
+  await broadcast(text, items, n);
+  state.busy = false;
+}
+
+function reject(){
+  if(!state.draft || state.busy) return;
+  if(state.role !== 'owner'){ toast('只有老板可以拒绝'); return; }
+  addLog('Uncle Wong', '拒绝促销草稿', '未发送任何消息，库存保持原状', '', 'no');
+  state.result = {rejected:true};
+  state.draft = null;
+  setStep(6);
+  renderDraft(); renderTabs();
+  toast('已拒绝，已记录到活动日志');
+}
+
+async function broadcast(text, items, n){
+  const body = $('#waBody'); body.innerHTML = '';
+  const day = document.createElement('div'); day.className = 'wa-day'; day.textContent = '今天'; body.appendChild(day);
+  const out = document.createElement('div'); out.className = 'msg out';
+  const txt = document.createElement('div'); txt.className = 'txt'; txt.textContent = text;
+  const meta = document.createElement('div'); meta.className = 'meta';
+  const time = document.createElement('span'); time.textContent = clock();
+  const tick = document.createElement('span'); tick.className = 'tick'; tick.textContent = '✓';
+  meta.append(time, tick); out.append(txt, meta); body.appendChild(out);
+  body.scrollTop = body.scrollHeight;
+  const sub = $('#waSub');
+  sub.textContent = '正在发送…';
+  await sleep(900);
+  tick.textContent = '✓✓';
+  const t0 = performance.now();
+  await new Promise(res => (function f(t){
+    const k = reduced ? 1 : Math.min(1, (t - t0) / 900);
+    sub.textContent = '已送达 ' + Math.round(n * k) + '/' + n;
+    if(k < 1) requestAnimationFrame(f); else res();
+  })(t0));
+  await sleep(500);
+  tick.classList.add('read');
+  sub.textContent = '已送达 ' + n + '/' + n + '，已读';
+  await sleep(1500);
+  const a = items[0].name.toLowerCase(), b = (items[1] || items[0]).name.toLowerCase();
+  const replies = [
+    ['Auntie Lim', 'Nak 2 ' + a + '! Simpan untuk saya ya 🙏'],
+    ['Farid', 'Saya nak 3, boleh pick up pukul 7.45?'],
+    ['Mei Ling', 'Nak! 1 ' + b + ' 😍']
+  ];
+  for(const r of replies){
+    const m = document.createElement('div'); m.className = 'msg in';
+    const w = document.createElement('div'); w.className = 'who'; w.textContent = r[0];
+    const t = document.createElement('div'); t.className = 'txt'; t.textContent = r[1];
+    m.append(w, t); body.appendChild(m);
+    body.scrollTop = body.scrollHeight;
+    await sleep(1100);
+  }
+}
+
+/* ================== POS：快速输入解析 ================== */
+function parseQuick(){
+  const s = $('#quickText').value;
+  const found = {};
+  s.split(/[,，;；\n]|\band\b|和/i).forEach(part => {
+    const m = part.match(/(\d+)/); if(!m) return;
+    const low = part.toLowerCase();
+    DATA.products.forEach(p => { if(p.alias.some(a => low.includes(a))) found[p.id] = parseInt(m[1], 10); });
+  });
+  if(!Object.keys(found).length){ $('#posHint').textContent = '没识别到商品。试试：12 croissants, 5 chocolate slices'; return; }
+  DATA.products.forEach(p => { state.qty[p.id] = found[p.id] || 0; });
+  $('#posHint').textContent = '';
+  renderPOS();
+}
+
+/* ================== 事件 ================== */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if(!t) return;
+  if(t.dataset.tab){ switchTab(t.dataset.tab); return; }
+  if(t.dataset.role){ state.role = t.dataset.role; renderRole(); if(state.draft) renderDraft(); return; }
+  if(t.dataset.inc){ state.qty[t.dataset.inc] = Math.min(999, (state.qty[t.dataset.inc] || 0) + 1); renderPOS(); return; }
+  if(t.dataset.dec){ state.qty[t.dataset.dec] = Math.max(0, (state.qty[t.dataset.dec] || 0) - 1); renderPOS(); return; }
+  switch(t.dataset.act){
+    case 'parse': parseQuick(); break;
+    case 'submit': submitEOD(); break;
+    case 'approve': approve(); break;
+    case 'reject': reject(); break;
+    case 'gopos': switchTab('pos'); break;
+    case 'regen':
+      if(state.draft){
+        state.draft.variant += 1;
+        state.draft.text = genCopy(state.draft.items, state.draft.variant);
+        state.draft.edited = false;
+        $('#copyBox').value = state.draft.text;
+      }
+      break;
+  }
+});
+document.addEventListener('input', e => {
+  if(e.target.dataset && e.target.dataset.q){
+    const v = parseInt(e.target.value.replace(/\D/g, ''), 10);
+    state.qty[e.target.dataset.q] = isNaN(v) ? 0 : Math.min(999, v);
+  }
+  if(e.target.id === 'copyBox' && state.draft){ state.draft.text = e.target.value; state.draft.edited = true; }
+  if(e.target.id === 'quickText'){ $('#posHint').textContent = ''; }
+});
+$('#quickText').addEventListener('keydown', e => { if(e.key === 'Enter') parseQuick(); });
+$('#resetBtn').addEventListener('click', () => { state = fresh(); $('#pipe').classList.remove('on'); $('#pipe').innerHTML = ''; $('#quickText').value = ''; $('#posHint').textContent = ''; $('#submitBtn').disabled = false; $('#waSub').textContent = '50 位成员'; $('#waBody').innerHTML = '<div class="wa-empty">还没有消息。<br>老板批准后，促销会出现在这里。</div>'; renderAll(); });
+
+function renderAll(){ renderSteps(); renderRole(); renderPOS(); renderKPI(false); renderDraft(); renderLog(); renderTabs(); }
+renderAll();
+</script>
+</body>
+</html>
