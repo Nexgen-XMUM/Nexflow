@@ -146,8 +146,9 @@ def test_stock_boundary(client, qty, status):
         }
 
 
+@pytest.mark.parametrize("method, route", [("GET", "/api/inventory"), ("POST", "/api/generate-promo")])
 @pytest.mark.parametrize("damage", ["missing", "json", "fields", "negative", "alias", "id", "currency", "nan"])
-def test_inventory_unavailable(client, inventory_file, damage):
+def test_inventory_unavailable(client, inventory_file, damage, method, route):
     data = json.loads(inventory_file.read_text())
     if damage == "missing":
         inventory_file.unlink()
@@ -167,9 +168,9 @@ def test_inventory_unavailable(client, inventory_file, damage):
         elif damage == "nan":
             data["products"][0]["retail_price"] = float("nan")
         inventory_file.write_text(json.dumps(data))
-    response = client.post(
-        "/api/generate-promo", json=[{"item": "croissant", "qty": 1}]
-    )
+    response = client.request(method, route, **(
+        {"json": [{"item": "croissant", "qty": 1}]} if method == "POST" else {}
+    ))
     assert response.status_code == 503
     assert response.json()["error"] == {
         "code": "INVENTORY_UNAVAILABLE",
@@ -333,7 +334,6 @@ def test_data_files_unchanged_after_success_failure_and_repeat(client, inventory
     [
         ("GET", "/api/customers"),
         ("GET", "/api/users"),
-        ("GET", "/api/inventory"),
         ("GET", "/api/activity"),
         ("POST", "/api/approve"),
         ("POST", "/api/draft"),
@@ -358,19 +358,20 @@ def test_private_and_out_of_scope_routes_are_not_exposed(client, method, route):
         (" http://localhost:5173, https://ui.example ", "https://ui.example", True),
     ],
 )
-def test_cors_exact_origins(monkeypatch, configured, origin, allowed):
+@pytest.mark.parametrize("method, route", [("GET", "/api/inventory"), ("POST", "/api/generate-promo")])
+def test_cors_exact_origins(monkeypatch, configured, origin, allowed, method, route):
     monkeypatch.setenv("CORS_ALLOWED_ORIGINS", configured)
     with TestClient(main.create_app()) as cors_client:
         headers = {
             "Origin": origin,
-            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Method": method,
             "Access-Control-Request-Headers": "content-type",
         }
-        preflight = cors_client.options("/api/generate-promo", headers=headers)
+        preflight = cors_client.options(route, headers=headers)
         assert preflight.status_code == (200 if allowed else 400)
-        response = cors_client.post(
-            "/api/generate-promo", json=[{"item": "croissant", "qty": 1}],
-            headers={"Origin": origin},
+        response = cors_client.request(
+            method, route, headers={"Origin": origin},
+            **({"json": [{"item": "croissant", "qty": 1}]} if method == "POST" else {}),
         )
         assert response.status_code == 200
         for result in (preflight, response):

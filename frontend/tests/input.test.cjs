@@ -55,3 +55,13 @@ test('draft preserves backend decimal strings and warnings without an invented f
   assert.equal(result.source, 'local_demo');
   assert.equal('kg' in result, false);
 });
+
+test('draft keeps AI fallback distinct from deliberately selected local mode', () => {
+  const { ctx } = context();
+  for (const [source, is_fallback] of [['local_demo', false], ['local_demo', true], ['deepseek', false]]) {
+    const result = ctx.toDraft({ totals: {}, items: [],
+      promo: { text: 'Copy', source, is_fallback }, carbon: { is_estimate: true }, warnings: [] });
+    assert.equal(result.source, source);
+    assert.equal(result.is_fallback, is_fallback);
+  }
+});

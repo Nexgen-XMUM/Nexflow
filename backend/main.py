@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Annotated, Literal
 from urllib.parse import urlsplit
 
+from dotenv import load_dotenv
+from backend.ai_copy import CopyUnavailable, deepseek_lines
 from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,6 +48,18 @@ class Inventory(BaseModel):
     currency: Literal["MYR"]
     carbon_unit: Literal["kg CO2e"]
     products: list[Product] = Field(min_length=1)
+
+
+class InventoryItemResponse(BaseModel):
+    id: str
+    name: str
+    retail_price: Money
+    on_hand: int
+
+
+class InventoryResponse(BaseModel):
+    currency: Literal["MYR"] = "MYR"
+    products: list[InventoryItemResponse]
 
 
 class PromoItem(BaseModel):
@@ -104,8 +118,9 @@ class CarbonInfo(BaseModel):
 
 class PromoCopy(BaseModel):
     text: str
-    source: Literal["local_demo"] = "local_demo"
-    is_fallback: Literal[False] = False
+    source: Literal["local_demo", "deepseek"] = "local_demo"
+    is_fallback: bool = False
+    fallback_reason: str | None = None
 
 
 class PromoWarning(BaseModel):
@@ -135,7 +150,36 @@ def local_demo_copy(items: list[ItemResult], totals: Totals) -> str:
     )
 
 
-def load_products() -> dict[str, Product]:
+def generate_copy(items: list[ItemResult], totals: Totals) -> PromoCopy:
+    local = local_demo_copy(items, totals)
+    provider = os.getenv("AI_PROVIDER", "local_demo").strip()
+    if provider == "local_demo":
+        return PromoCopy(text=local)
+    try:
+        if provider != "deepseek":
+            raise CopyUnavailable("INVALID_AI_PROVIDER")
+        offers = [
+            {"name": item.name, "qty": item.qty, "unit_price": f"{item.unit_clearance_price:.2f}"}
+            for item in items
+        ]
+        lines = deepseek_lines(offers)
+        facts = "; ".join(
+            f"{item.qty} {item.name} at RM{item.unit_clearance_price:.2f} each"
+            for item in items
+        )
+        text = (
+            f"🥐 {lines.opening.strip()} {facts}. "
+            f"All {totals.qty} for RM{totals.clearance_total:.2f} (50% off). "
+            f"{lines.closing.strip()}"
+        )
+        if len(text.split()) > 50:
+            raise CopyUnavailable("INVALID_AI_COPY")
+        return PromoCopy(text=text, source="deepseek")
+    except CopyUnavailable as exc:
+        return PromoCopy(text=local, is_fallback=True, fallback_reason=str(exc))
+
+
+def load_inventory() -> Inventory:
     try:
         with INVENTORY_PATH.open(encoding="utf-8") as source:
             inventory = Inventory.model_validate(json.load(source, parse_float=Decimal))
@@ -146,7 +190,7 @@ def load_products() -> dict[str, Product]:
                 if key in lookup and lookup[key] is not product:
                     raise ValueError("Product identifiers must be unambiguous.")
                 lookup[key] = product
-        return lookup
+        return inventory
     except (OSError, UnicodeError, ValueError):
         raise HTTPException(
             status_code=503,
@@ -156,6 +200,30 @@ def load_products() -> dict[str, Product]:
                 "details": [],
             },
         ) from None
+
+
+def load_products() -> dict[str, Product]:
+    return {
+        name.casefold(): product
+        for product in load_inventory().products
+        for name in [product.id, *product.aliases]
+    }
+
+
+def get_inventory() -> InventoryResponse:
+    inventory = load_inventory()
+    return InventoryResponse(
+        currency=inventory.currency,
+        products=[
+            InventoryItemResponse(
+                id=product.id,
+                name=product.name,
+                retail_price=product.retail_price,
+                on_hand=product.on_hand,
+            )
+            for product in inventory.products
+        ],
+    )
 
 
 async def invalid_request(_request: Request, exc: RequestValidationError):
@@ -242,7 +310,7 @@ def generate_promo(
         items=results,
         totals=totals,
         carbon=CarbonInfo(),
-        promo=PromoCopy(text=local_demo_copy(results, totals)),
+        promo=generate_copy(results, totals),
         warnings=[
             PromoWarning(
                 code="BELOW_COST",
@@ -263,6 +331,7 @@ def product_options() -> ProductOptions:
 
 
 def create_app() -> FastAPI:
+    load_dotenv(Path(__file__).resolve().parent / ".env", override=False)
     origins = [
         value.strip()
         for value in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
@@ -300,6 +369,10 @@ def create_app() -> FastAPI:
         "/api/products", response_model=ProductOptions,
         responses={503: {"model": ErrorResponse}},
     )(product_options)
+    application.get(
+        "/api/inventory", response_model=InventoryResponse,
+        responses={503: {"model": ErrorResponse}},
+    )(get_inventory)
 
     @application.get("/app", include_in_schema=False)
     def frontend():

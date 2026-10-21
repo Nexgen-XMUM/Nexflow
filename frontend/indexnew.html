@@ -268,7 +268,7 @@ details ul{margin:8px 0 0;padding-left:20px;color:var(--muted)} /* 展开后的�
         <div class="card"><ul class="log" id="logList" aria-live="polite"></ul></div> <!-- 日志列表，由 JS 生成 -->
       </section> <!-- 第三个页面结束 -->
 
-      <p class="foot">商品来自共享库存。价格和 CO₂e 由后端代码计算，文案使用本地模板。角色切换、审批与广播均为模拟，未实现身份认证。</p> <!-- 页面底部的诚实说明 -->
+      <p class="foot">商品来自共享库存。价格和 CO₂e 由后端代码计算，文案模式由后端配置，来源见草稿。角色切换、审批与广播均为模拟，未实现身份认证。</p> <!-- 页面底部的诚实说明 -->
     </main> <!-- 左边内容区结束 -->
 
     <aside class="side" id="phoneWrap"> <!-- 右边：手机模拟器 -->
@@ -371,7 +371,7 @@ async function loadProducts(){
 function toDraft(res){
   const t = res.totals;
   return {items:res.items, totals:t, rev:t.clearance_total, profit:t.gross_profit_total,
-    co2:t.estimated_co2e_kg, text:res.promo.text, source:res.promo.source,
+    co2:t.estimated_co2e_kg, text:res.promo.text, source:res.promo.source, is_fallback:res.promo.is_fallback,
     carbon:res.carbon, warnings:res.warnings, edited:false};
 }
 
@@ -446,7 +446,7 @@ function renderDraft(){ // 函数：画出看板页的“待审批草稿”区�
     '<div><b>' + money(d.totals.loss_total) + '</b><span>亏损合计</span></div></div>' + // 指标 4：避免浪费的食物重量
     '<label class="f" for="copyBox">WhatsApp 文案（可以直接修改）</label>' + // 文案输入框的标签
     '<textarea id="copyBox" rows="10">' + esc(d.text) + '</textarea>' + // 文案输入框，里面放着系统生成的文案
-    '<div class="tools"><span class="safe">' + (d.source === 'local_demo' ? '本地演示文案（未调用 AI）' : esc(d.source)) + '</span></div>' +
+    '<div class="tools"><span class="safe">' + (d.is_fallback ? 'AI 配置或调用异常，已回退本地文案' : d.source === 'deepseek' ? 'DeepSeek AI 辅助文案' : '本地演示文案（未调用 AI）') + '</span></div>' +
     '<p class="muted">CO₂e 为估算，不是经认证减排量或碳积分。' + esc(d.carbon.note) + '</p>' + // 说明
     '<details><summary>这些数字是怎么算的？</summary><ul>' + // 可展开的公式说明
     '<li>清仓价 = 原价 × 50%（后端计算，取到 RM0.01）。低于成本时后端会给出警告。</li>' + // 公式 1：清仓价
