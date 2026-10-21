@@ -1,0 +1,162 @@
+{
+  "updated_at": "2026-10-21T19:10:00+08:00",
+  "dataset": "synthetic_demo_only",
+  "orders": [
+    {
+      "id": "ord-demo-completed-001",
+      "source_message_ids": ["msg-demo-completed-001"],
+      "group_id": "grp_uncle_wong_regulars",
+      "customer_id": "c001",
+      "items": [
+        {"product_id": "croissant", "qty": 2},
+        {"product_id": "chocolate_slice", "qty": 1}
+      ],
+      "intent": "place_order",
+      "confidence": 0.99,
+      "status": "fulfilled",
+      "avoided_co2e_kg": 0.7,
+      "points_awarded": 7,
+      "demo_data": true
+    },
+    {
+      "id": "ord-demo-completed-002",
+      "source_message_ids": ["msg-demo-completed-002"],
+      "group_id": "grp_uncle_wong_regulars",
+      "customer_id": "c003",
+      "items": [
+        {"product_id": "chocolate_slice", "qty": 4}
+      ],
+      "intent": "place_order",
+      "confidence": 0.99,
+      "status": "fulfilled",
+      "avoided_co2e_kg": 1.2,
+      "points_awarded": 12,
+      "demo_data": true
+    },
+    {
+      "id": "ord-demo-001",
+      "source_message_ids": [
+        "msg-001",
+        "msg-002"
+      ],
+      "group_id": "grp_uncle_wong_regulars",
+      "customer_id": "c001",
+      "items": [
+        {
+          "product_id": "croissant",
+          "qty": 2
+        },
+        {
+          "product_id": "chocolate_slice",
+          "qty": 1
+        }
+      ],
+      "pickup_time": "2026-10-21T19:30:00+08:00",
+      "intent": "place_order",
+      "confidence": 0.98,
+      "status": "awaiting_customer_confirmation",
+      "agent_reply_draft": "Noted, Aina: 2 croissants + 1 chocolate slice for pickup at 7:30 PM. Reply YES to confirm.",
+      "requires_human_review": false,
+      "demo_data": true
+    },
+    {
+      "id": "ord-demo-002",
+      "source_message_ids": [
+        "msg-003"
+      ],
+      "group_id": "grp_uncle_wong_regulars",
+      "customer_id": "c002",
+      "items": [
+        {
+          "product_id": "croissant",
+          "qty": 2
+        }
+      ],
+      "pickup_deadline": "2026-10-21T20:00:00+08:00",
+      "intent": "place_order",
+      "confidence": 0.97,
+      "status": "awaiting_customer_confirmation",
+      "agent_reply_draft": "Boleh, Ravi — 2 croissants reserved for pickup before 8 PM. Reply YES to confirm.",
+      "requires_human_review": false,
+      "demo_data": true
+    },
+    {
+      "id": "ord-demo-003",
+      "source_message_ids": [
+        "msg-004",
+        "msg-005"
+      ],
+      "group_id": "grp_uncle_wong_regulars",
+      "customer_id": "c003",
+      "items": [
+        {
+          "product_id": "chocolate_slice",
+          "qty": 2
+        }
+      ],
+      "intent": "place_order",
+      "confidence": 0.96,
+      "status": "awaiting_customer_confirmation",
+      "agent_reply_draft": "Updated, Mei: 2 chocolate slices. Reply YES to confirm.",
+      "requires_human_review": false,
+      "demo_data": true
+    },
+    {
+      "id": "ord-demo-004",
+      "source_message_ids": [
+        "msg-006"
+      ],
+      "group_id": "grp_uncle_wong_regulars",
+      "customer_id": "c004",
+      "items": [],
+      "intent": "unclear_order",
+      "confidence": 0.51,
+      "status": "needs_clarification",
+      "agent_reply_draft": "Sure! Which item and how many would you like me to reserve?",
+      "requires_human_review": true,
+      "demo_data": true
+    },
+    {
+      "id": "ord-demo-005",
+      "source_message_ids": [
+        "msg-007"
+      ],
+      "group_id": "grp_uncle_wong_regulars",
+      "customer_id": "c005",
+      "items": [
+        {
+          "product_id": "croissant",
+          "qty": 3,
+          "requested_total_myr": 8
+        }
+      ],
+      "intent": "price_negotiation",
+      "confidence": 0.94,
+      "status": "needs_owner_approval",
+      "agent_reply_draft": "I’ll check today’s offer price and confirm shortly.",
+      "requires_human_review": true,
+      "demo_data": true
+    },
+    {
+      "id": "ord-demo-006",
+      "source_message_ids": [
+        "msg-008"
+      ],
+      "group_id": "grp_uncle_wong_regulars",
+      "customer_id": "c006",
+      "items": [
+        {
+          "product_id": "sourdough",
+          "qty": 1
+        }
+      ],
+      "pickup_time": "2026-10-21T19:45:00+08:00",
+      "intent": "place_order",
+      "confidence": 0.99,
+      "status": "awaiting_customer_confirmation",
+      "agent_reply_draft": "Got it: 1 sourdough loaf for 7:45 PM pickup. Reply YES to confirm.",
+      "requires_human_review": false,
+      "demo_data": true
+    }
+  ]
+}
