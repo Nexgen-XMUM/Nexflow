@@ -1,6 +1,15 @@
 # Nexflow · Orbyte Smart Yield
 Automate the Routine. Empower the People.
 
+## 本地统一电脑版整合（2026-10-22）
+
+当前工作包在 main c4841d6 基础上统一正式 `/app`、经营看板和 Kaiden 救援模块。购买与积分接口按负责人交付后再接入，当前不宣称全流程已完成。
+
+已有 Python 依赖时运行 `.\.venv\Scripts\python.exe -X utf8 -m backend.desktop_demo`，打开 http://127.0.0.1:8000/app；使用本地文案、临时数据库和固定应用时钟，支持白天演示清算与捐赠交接。
+
+交付入口：[项目转接文档](docs/desktop-integration/project-handoff.md) · [新人启动](docs/desktop-integration/quickstart.md) · [三分钟演示](docs/desktop-integration/demo-script.md) · [验收记录](docs/desktop-integration/acceptance.md)。
+
+
 面向马来西亚烘焙店的黑客松项目。店员在打烊时录入剩余商品，后端计算清仓价和 CO₂e 估算，生成 Manglish 促销文案，老板审核后在页面上模拟 WhatsApp 广播。剩余食物还可以组成盲盒出售；组不成盲盒时，给出捐赠孤儿院或生物燃料的方案。
 
 ## 当前状态（受控本地演示）
@@ -41,10 +50,10 @@ Copy-Item backend\.env.example backend\.env   # 默认 local_demo，不调用模
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest backend/tests -q
-node --test frontend/tests/
+node --test frontend/tests/*.test.cjs
 ```
 
-已知问题：在 Windows 上，如果 Git 开启了 `core.autocrlf=true`，`test_frontend_entry_does_not_expose_repository` 会因为 CRLF 换行而失败，与业务逻辑无关。
+入口测试已显式按 UTF-8 读取并规范换行，以兼容 Windows 的 CRLF。
 
 ## 主要接口
 
@@ -70,10 +79,10 @@ docs/               交接、AI 文案与验收记录
 
 `data/charities.json` 里是占位示例，不是真实机构；上线前必须换成已核实、同意接收的机构。所有客户和电话都是虚构的演示数据。
 
-## 进行中的 PR
+## 历史模块参考（状态以 GitHub 为准）
 
-- #20 `codex/feature-new-ui`：新版 UI 接入盲盒报价、付款模拟、捐赠和积分
-- #21 `feat/rescue-ui`：`/app/rescue` 打烊去向页面（盲盒、模拟孤儿院捐赠、生物燃料估算、模拟碳排放量交易）
+- #20 `codex/feature-new-ui`：旧 UI 方案，已关闭未合并；本轮不以此替代购买负责人交付
+- #21 `feat/rescue-ui`：已合并的救援模块，本工作包整合进 `/app#rescue`；没有碳交易功能
 
 ## 团队
 

@@ -153,7 +153,7 @@ test('pending request blocks duplicate/reset and respects navigation; failure cl
     assert.equal(p.run('state.result'), null);
     assert.equal(p.run('state.busy'), false);
     assert.equal(p.node('#submitBtn').disabled, false);
-    assert.equal(p.node('#kRec').textContent, '—');
+    assert.equal(p.node('#kRec').textContent, '暂无数据');
     assert.doesNotMatch(p.node('#draftBox').innerHTML, /RM30\.00/);
     assert.ok(p.node('#posHint').textContent);
   }
@@ -258,7 +258,7 @@ test('official page includes new design and reads independent blind inventory wi
   }
   assert.doesNotMatch(p.node('#promotionBox').innerHTML, /undefined|NaN/);
   assert.equal(p.node('#rescuePanel').hidden, true);
-  assert.equal(p.run('state.consumer.points'), 0);
+  assert.equal(p.run('"consumer" in state'), false);
   assert.ok(p.calls.slice(1).every(c => ['/api/blind-boxes/inventory','/api/blind-boxes/calculate'].includes(c.url)));
 });
 
@@ -324,14 +324,13 @@ test('blind failure clears previous advice, unlocks retry, and pending results r
   assert.equal(p.run('state.blind.result'), null);
 });
 
-test('consumer points stay an independent demo and do not call backend redemption', async () => {
+test('consumer entry no longer maintains or redeems an independent business balance', async () => {
   const p = await page();
-  p.run('state.role="consumer"; state.consumer.points=50; renderConsumerShop()');
-  assert.match(p.node('#consumerShop').innerHTML, /前端独立积分演示/);
-  assert.match(p.node('#consumerShop').innerHTML, /尚待负责人统一/);
-  assert.match(p.node('#consumerShop').innerHTML, /100 分抵 RM1/);
-  p.run('redeemConsumerItem("croissant")');
-  assert.equal(p.run('state.consumer.points'), 10);
+  p.run('state.role="consumer"; renderConsumerShop()');
+  assert.match(p.node('#consumerShop').innerHTML, /顾客账户/);
+  assert.match(p.node('#consumerShop').innerHTML, /data-tab="customer"/);
+  assert.equal(p.run('"consumer" in state'), false);
+  assert.doesNotMatch(script, /POINTS_PER_CO2_KG|REDEMPTION_ITEMS|state\.consumer/);
   assert.equal(p.calls.length, 1);
   assert.equal(p.run('state.blind.result'), null);
 });
