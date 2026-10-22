@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>打烊去向 · Nexflow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* 本页独立：只调用 /api/blind-boxes/*，不改主页面状态。三条去向各有一个颜色。 */
+:root {
+  --bg: #eef2ef; --surface: #ffffff; --sunk: #e3e9e5; --line: #d3ddd7;
+  --ink: #12302a; --ink-2: #3d5650; --muted: #6b7f79;
+  --box: #2e6b4e; --box-soft: #dcebe2;
+  --give: #b9862b; --give-soft: #f4e9d2;
+  --fuel: #3f6572; --fuel-soft: #dde8ec;
+  --warn: #a63d2f; --warn-soft: #f7e3df;
+  --focus: #2e6b4e;
+  --display: "Bricolage Grotesque", "Figtree", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --body: "Figtree", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1714; --surface: #15221d; --sunk: #1c2c26; --line: #2a3d36;
+    --ink: #e7efe9; --ink-2: #b9c9c1; --muted: #8aa097;
+    --box: #6fbf93; --box-soft: #1f3a2d; --give: #e0b25c; --give-soft: #3a3020;
+    --fuel: #82b3c3; --fuel-soft: #1d3138; --warn: #f08b7a; --warn-soft: #3d221e; --focus: #6fbf93;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1714; --surface: #15221d; --sunk: #1c2c26; --line: #2a3d36;
+  --ink: #e7efe9; --ink-2: #b9c9c1; --muted: #8aa097;
+  --box: #6fbf93; --box-soft: #1f3a2d; --give: #e0b25c; --give-soft: #3a3020;
+  --fuel: #82b3c3; --fuel-soft: #1d3138; --warn: #f08b7a; --warn-soft: #3d221e; --focus: #6fbf93;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: inherit; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -0.01em; }
+.muted { color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  max-width: 1180px; margin: 0 auto; padding: 28px 24px 8px; }
+.top h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 700; line-height: 1.05; }
+.top p { margin: 6px 0 0; color: var(--ink-2); max-width: 60ch; }
+.top nav { display: flex; gap: 14px; align-items: center; font-weight: 600; }
+.clock { font-family: var(--display); font-size: 22px; }
+
+.layout { max-width: 1180px; margin: 0 auto; padding: 16px 24px 64px; display: grid; gap: 28px;
+  grid-template-columns: 300px minmax(0, 1fr); align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; padding: 12px 16px 48px; } .top { padding: 20px 16px 4px; } }
+
+/* 左侧控制栏：不用卡片，用分隔线组织 */
+.controls { position: sticky; top: 16px; display: grid; gap: 18px; }
+@media (max-width: 860px) { .controls { position: static; } }
+.controls fieldset { border: 0; border-top: 1px solid var(--line); margin: 0; padding: 14px 0 0; display: grid; gap: 10px; }
+.controls legend { font-weight: 700; padding: 0 0 4px; }
+label.field { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); }
+input[type=text], input[type=number], select { width: 100%; padding: 9px 11px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.seg label { display: flex; gap: 6px; align-items: center; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface); font-size: 14px; cursor: pointer; }
+.seg input { accent-color: var(--box); }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 10px 14px; border-radius: 9px;
+  font-weight: 600; cursor: pointer; }
+.btn:hover { background: var(--sunk); }
+.btn.primary { background: var(--box); border-color: var(--box); color: #fff; }
+.btn.primary:hover { filter: brightness(1.08); background: var(--box); }
+.btn.give { background: var(--give); border-color: var(--give); color: #1d1404; }
+.btn.fuel { background: var(--fuel); border-color: var(--fuel); color: #fff; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.status { min-height: 1.5em; font-size: 14px; }
+.status.err { color: var(--warn); }
+
+/* 结果主区 */
+.stage { display: grid; gap: 28px; }
+.hero { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 24px; }
+.hero h2 { font-size: 22px; }
+.hero .lead { margin: 4px 0 18px; color: var(--ink-2); }
+
+/* 招牌元素：剩余重量分流带 */
+.ribbon { display: flex; height: 54px; border-radius: 12px; overflow: hidden; background: var(--sunk); }
+.ribbon span { display: flex; align-items: center; padding: 0 12px; font-weight: 700; font-size: 13px; white-space: nowrap;
+  overflow: hidden; width: 0; transition: width .7s cubic-bezier(.2,.7,.2,1); }
+.ribbon .r-box { background: var(--box); color: #fff; }
+.ribbon .r-give { background: var(--give); color: #1d1404; }
+.ribbon .r-fuel { background: var(--fuel); color: #fff; }
+@media (prefers-reduced-motion: reduce) { .ribbon span { transition: none; } }
+.legend { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.legend div { border-left: 4px solid var(--c); padding: 2px 0 2px 10px; }
+.legend b { display: block; font-family: var(--display); font-size: 24px; font-weight: 700; }
+.legend small { color: var(--muted); }
+@media (max-width: 520px) { .legend { grid-template-columns: 1fr; } }
+
+section.lane h2 { font-size: 20px; margin-bottom: 4px; }
+section.lane > p { margin: 0 0 14px; color: var(--ink-2); }
+.options { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: rank; }
+.options li { counter-increment: rank; display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.options li::before { content: counter(rank); font-family: var(--display); font-size: 26px; font-weight: 700; color: var(--box); }
+.options .price { text-align: right; font-family: var(--display); font-size: 20px; font-weight: 700; }
+.options .price small { display: block; font: 12px var(--body); color: var(--muted); }
+.bar { height: 6px; border-radius: 3px; background: var(--box-soft); margin-top: 6px; }
+.bar i { display: block; height: 100%; border-radius: 3px; background: var(--box); }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+td.r, th.r { text-align: right; }
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 12px; align-content: start; }
+.panel.give { border-top: 4px solid var(--give); }
+.panel.fuel { border-top: 4px solid var(--fuel); }
+.panel h3 { font-size: 17px; }
+.recipients { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.recipients label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.recipients input { accent-color: var(--give); margin-top: 4px; }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.timeline li { display: flex; gap: 10px; align-items: center; color: var(--muted); }
+.timeline li::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+.timeline li.done { color: var(--ink); }
+.timeline li.done::before { background: var(--give); border-color: var(--give); }
+.fuelnums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fuelnums div { background: var(--fuel-soft); border-radius: 10px; padding: 10px; }
+.fuelnums b { display: block; font-family: var(--display); font-size: 20px; }
+.fuelnums small { color: var(--ink-2); font-size: 12px; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--sunk); }
+.tag.ok { background: var(--box-soft); color: var(--box); }
+.tag.pending { background: var(--give-soft); color: var(--give); }
+.tag.bad { background: var(--warn-soft); color: var(--warn); }
+
+/* 碳排放量模拟交易 */
+.carbon { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; }
+@media (max-width: 860px) { .carbon { grid-template-columns: 1fr; } }
+.carbon .pool { font-family: var(--display); font-size: clamp(36px, 6vw, 56px); font-weight: 700; line-height: 1; color: var(--box); }
+.disclaimer { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); max-width: 440px; width: calc(100% - 32px); padding: 20px; }
+dialog::backdrop { background: rgba(10, 20, 16, .45); }
+.empty { padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>打烊去向</h1>
+    <p>把今晚剩下的食物分成三条路：组成盲盒卖掉，捐给附近孤儿院，或者送去做生物燃料。所有交接和交易都是本地模拟。</p>
+  </div>
+  <nav aria-label="页面">
+    <span class="clock num" id="clock" title="门店时间 UTC+08:00">--:--</span>
+    <a href="/app">返回工作台</a>
+    <button type="button" class="btn" id="themeBtn" aria-label="切换深浅色">深浅色</button>
+  </nav>
+</header>
+
+<div class="layout">
+  <form class="controls" id="calcForm" novalidate>
+    <fieldset>
+      <legend>库存</legend>
+      <p class="note" id="stockLine">正在读取盲盒库存…</p>
+      <div class="row">
+        <button type="button" class="btn" id="seedBtn">载入今晚演示库存</button>
+        <button type="button" class="btn" id="sweepBtn">打烊清算</button>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>取货时段</legend>
+      <div class="seg" role="radiogroup" aria-label="取货时段">
+        <label><input type="radio" name="slot" value="21:30" checked> 21:30–22:00</label>
+        <label><input type="radio" name="slot" value="22:00"> 22:00–22:30</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>顾客偏好</legend>
+      <label class="field">避开过敏原（逗号分隔）<input type="text" name="avoid" placeholder="wheat, egg"></label>
+      <label class="field">必须符合的饮食<input type="text" name="diets" placeholder="vegetarian"></label>
+      <label class="field">喜欢的品类
+        <select name="likes"><option value="">不限</option><option value="bread">面包</option><option value="dessert">甜点</option><option value="drink">饮料</option><option value="meal">正餐</option></select>
+      </label>
+      <label class="field">方案数量<input type="number" name="top" min="1" max="10" value="3"></label>
+    </fieldset>
+    <button type="submit" class="btn primary" id="calcBtn">计算去向</button>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </form>
+
+  <main class="stage">
+    <section class="hero" aria-labelledby="heroTitle">
+      <h2 id="heroTitle">今晚的剩余重量怎么分</h2>
+      <p class="lead" id="heroLead">选好时段后点“计算去向”。</p>
+      <div class="ribbon" id="ribbon" aria-hidden="true">
+        <span class="r-box" id="rBox"></span><span class="r-give" id="rGive"></span><span class="r-fuel" id="rFuel"></span>
+      </div>
+      <div class="legend">
+        <div style="--c: var(--box)"><small>盲盒出售</small><b class="num" id="kgBox">–</b></div>
+        <div style="--c: var(--give)"><small>捐给孤儿院</small><b class="num" id="kgGive">–</b></div>
+        <div style="--c: var(--fuel)"><small>生物燃料</small><b class="num" id="kgFuel">–</b></div>
+      </div>
+    </section>
+
+    <section class="lane" id="optionsLane" hidden aria-labelledby="optTitle">
+      <h2 id="optTitle">可以组成的盲盒</h2>
+      <p>按评分从高到低。评分综合临期程度、库存压力、品类多样和顾客偏好。</p>
+      <ol class="options" id="options"></ol>
+    </section>
+
+    <section class="lane" id="fallbackLane" hidden aria-labelledby="fbTitle">
+      <h2 id="fbTitle">组不成盲盒，剩下这些</h2>
+      <p id="fbReason"></p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>品类</th><th class="r">件数</th><th class="r">重量</th><th>去向</th></tr></thead>
+        <tbody id="leftRows"></tbody>
+      </table></div>
+      <div class="pair" style="margin-top:16px">
+        <div class="panel give" id="givePanel">
+          <h3>捐给附近孤儿院</h3>
+          <ul class="recipients" id="recipients"></ul>
+          <button type="button" class="btn give" id="giveBtn">模拟捐赠</button>
+          <ol class="timeline" id="timeline" hidden></ol>
+          <p class="note">名单来自 data/charities.json，目前是占位示例。实际捐赠前要联系机构确认，并核对食品安全。</p>
+        </div>
+        <div class="panel fuel" id="fuelPanel">
+          <h3>送去做生物燃料</h3>
+          <div class="fuelnums" id="fuelNums"></div>
+          <p class="note" id="fuelFormula"></p>
+          <button type="button" class="btn fuel" id="fuelBtn">模拟送往处理厂</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="lane" aria-labelledby="donTitle">
+      <h2 id="donTitle">捐赠清单</h2>
+      <p>打烊清算后，未售出的安全食品会进入这里，等待交接。</p>
+      <div id="donations"></div>
+    </section>
+
+    <section class="carbon" aria-labelledby="co2Title">
+      <div>
+        <h2 id="co2Title">碳排放量估算</h2>
+        <p class="muted">本次演示中已模拟送达或交接的食物，估算避免的排放：</p>
+        <div class="pool num" id="pool">0.00 kg</div>
+        <p class="note">按商品重量 × CO₂e 系数估算，系数为演示值。</p>
+      </div>
+      <div style="display:grid; gap:12px">
+        <div class="disclaimer">这是模拟交易：不是经认证的减排量或碳信用，不会连接任何真实碳市场，也不会产生真实付款。</div>
+        <div class="row">
+          <label class="field" style="flex:1">数量（kg CO₂e）<input type="number" id="tradeKg" min="0.01" step="0.01"></label>
+          <label class="field" style="flex:1">报价（RM / 吨）<input type="number" id="tradePrice" min="1" step="1" value="60"></label>
+        </div>
+        <button type="button" class="btn primary" id="tradeBtn">模拟交易</button>
+        <div class="tablewrap"><table>
+          <thead><tr><th>时间</th><th class="r">kg CO₂e</th><th class="r">金额</th><th>状态</th></tr></thead>
+          <tbody id="trades"><tr><td colspan="4" class="muted">还没有模拟交易。</td></tr></tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="tradeDialog" aria-labelledby="dlgTitle">
+  <form method="dialog" style="display:grid; gap:14px">
+    <h3 id="dlgTitle">确认模拟交易</h3>
+    <p id="dlgBody" style="margin:0"></p>
+    <label style="display:flex; gap:8px; align-items:flex-start; font-size:14px">
+      <input type="checkbox" id="dlgAck"> 我明白这是估算值的模拟交易，不是认证碳信用，也不会真实成交。
+    </label>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn" value="cancel">取消</button>
+      <button class="btn primary" value="ok" id="dlgOk" disabled>确认模拟交易</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const BASE = '/api/blind-boxes';
+const STORE = 'nexflow.rescue.v1';
+const LABEL = { bread: '面包', dessert: '甜点', drink: '饮料', meal: '正餐' };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const kg = (n) => `${Number(n || 0).toFixed(2)} kg`;
+const rm = (sen) => `RM${(sen / 100).toFixed(2)}`;
+
+// 本页模拟记录只存在这个浏览器；读写失败时退回内存
+let saved = { delivered: [], trades: [] };
+try { saved = { ...saved, ...JSON.parse(localStorage.getItem(STORE) || '{}') }; } catch {}
+const persist = () => { try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch {} };
+
+async function api(path, body) {
+  let res;
+  try {
+    res = await fetch(BASE + path, body === undefined ? {} : {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+  } catch {
+    throw new Error('连不上后端。请确认 uvicorn 正在运行，然后重试。');
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error?.message || `请求失败（HTTP ${res.status}）`);
+  return data;
+}
+
+function say(text, isError) {
+  $('status').textContent = text;
+  $('status').classList.toggle('err', !!isError);
+}
+
+function storeNow() {
+  // 门店固定 UTC+08:00
+  const d = new Date(Date.now() + 8 * 3600e3);
+  return { date: d.toISOString().slice(0, 10), time: d.toISOString().slice(11, 16) };
+}
+const tick = () => { $('clock').textContent = storeNow().time; };
+tick(); setInterval(tick, 30e3);
+
+$('themeBtn').onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+};
+
+async function loadStock() {
+  try {
+    const { batches } = await api('/inventory');
+    const free = batches.reduce((n, b) => n + b.available, 0);
+    $('stockLine').textContent = batches.length
+      ? `${batches.length} 个批次，可用 ${free} 件。`
+      : '还没有盲盒库存。演示时先点“载入今晚演示库存”。';
+  } catch (e) { $('stockLine').textContent = e.message; }
+}
+
+$('seedBtn').onclick = async () => {
+  try { await api('/demo-seed', {}); say('已载入面包、蛋糕、茶三种演示库存。'); }
+  catch (e) { say(e.message, true); }
+  loadStock();
+};
+
+$('sweepBtn').onclick = async () => {
+  try { await api('/sweep', {}); say('清算完成。22:30 之后，未售出的食物会进入捐赠清单。'); }
+  catch (e) { say(e.message, true); }
+  loadStock(); loadDonations();
+};
+
+function request() {
+  const f = new FormData($('calcForm'));
+  const { date } = storeNow();
+  const [start, end] = f.get('slot') === '21:30' ? ['21:30', '22:00'] : ['22:00', '22:30'];
+  const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const top = Number(f.get('top'));
+  return {
+    pickup_start: `${date}T${start}:00+08:00`, pickup_end: `${date}T${end}:00+08:00`,
+    top: Number.isInteger(top) ? top : 0,
+    preferences: { avoid_allergens: list(f.get('avoid')), required_diets: list(f.get('diets')), likes: list(f.get('likes')), dislikes: [] },
+  };
+}
+
+let last = null;
+$('calcForm').onsubmit = async (event) => {
+  event.preventDefault();
+  const body = request();
+  if (body.top < 1 || body.top > 10) return say('方案数量要在 1 到 10 之间。', true);
+  $('calcBtn').disabled = true; say('正在计算…');
+  try {
+    last = await api('/calculate', body);
+    render(last);
+    say(last.status === 'OPTIONS' ? `找到 ${last.options.length} 个盲盒方案。` : '组不成盲盒，已给出捐赠和生物燃料方案。');
+  } catch (e) { say(e.message, true); }
+  finally { $('calcBtn').disabled = false; }
+};
+
+function ribbon(box, give, fuel) {
+  const total = box + give + fuel;
+  const pct = (v) => (total ? (v / total) * 100 : 0) + '%';
+  [['rBox', box, '盲盒'], ['rGive', give, '捐赠'], ['rFuel', fuel, '燃料']].forEach(([id, v, name]) => {
+    $(id).style.width = pct(v); $(id).textContent = v ? name : '';
+  });
+  $('kgBox').textContent = kg(box); $('kgGive').textContent = kg(give); $('kgFuel').textContent = kg(fuel);
+  $('heroLead').textContent = total ? `共 ${kg(total)}，以下为估算。` : '没有可分配的剩余食物。';
+}
+
+function render(r) {
+  $('optionsLane').hidden = r.status !== 'OPTIONS';
+  $('fallbackLane').hidden = r.status === 'OPTIONS';
+  if (r.status === 'OPTIONS') {
+    const best = r.options[0].scores.total || 1;
+    $('options').innerHTML = r.options.map((o) => `
+      <li>
+        <div>
+          <strong>${o.qty} 件 · 评分 ${o.scores.total.toFixed(1)}</strong>
+          <div class="muted" style="font-size:13px">${o.lines.map((l) => `${esc(l.batch_id)} × ${l.qty}`).join('，')}${o.allergens.length ? ` · 含 ${esc(o.allergens.join('、'))}` : ''}</div>
+          <div class="bar"><i style="width:${(o.scores.total / best) * 100}%"></i></div>
+        </div>
+        <span class="muted num" style="font-size:13px">隐藏款 ${(o.hidden_probability * 100).toFixed(0)}%</span>
+        <div class="price num">${rm(o.price_sen)}<small>原价 ${rm(o.retail_sen)}</small></div>
+      </li>`).join('');
+    ribbon(r.options[0].weight_g / 1000, 0, 0);
+    return;
+  }
+  const fb = r.fallback;
+  const give = fb.choices.find((c) => c.type === 'ORPHANAGE_DONATION');
+  const fuel = fb.choices.find((c) => c.type === 'BIOFUEL');
+  $('fbReason').textContent = fb.reason === 'SEARCH_LIMIT'
+    ? '搜索达到上限，没有找到合格组合。' : '现有库存满足不了盲盒规则（至少 1 件主食、2～4 件、售价不高于原价 70%）。';
+  const rows = [
+    ...Object.entries(fb.donatable.by_category).map(([c, v]) => [c, v, give ? '<span class="tag pending">可捐赠</span>' : '<span class="tag">无机构接收，转燃料</span>']),
+    ...Object.entries(fb.inedible.by_category).map(([c, v]) => [c, v, '<span class="tag bad">不可食用，转燃料</span>']),
+  ];
+  $('leftRows').innerHTML = rows.length ? rows.map(([c, v, tag]) =>
+    `<tr><td>${esc(LABEL[c] || c)}</td><td class="r num">${v.qty}</td><td class="r num">${kg(v.weight_kg)}</td><td>${tag}</td></tr>`).join('')
+    : '<tr><td colspan="4" class="muted">没有剩余库存。</td></tr>';
+
+  $('givePanel').hidden = !give;
+  if (give) {
+    $('recipients').innerHTML = give.recipients.map((c, i) => `
+      <li><label><input type="radio" name="recipient" value="${i}" ${i ? '' : 'checked'}>
+        <span><strong>${esc(c.name)}</strong><br><span class="muted" style="font-size:13px">${c.distance_km} km · 接收 ${c.accepts.map((a) => esc(LABEL[a] || a)).join('、')}</span></span>
+      </label></li>`).join('');
+    $('timeline').hidden = true; $('giveBtn').disabled = false;
+  }
+  $('fuelPanel').hidden = !fuel;
+  if (fuel) {
+    $('fuelNums').innerHTML = `
+      <div><small>沼气</small><b class="num">${fuel.biogas_m3.toFixed(2)}</b><small>m³</small></div>
+      <div><small>甲烷</small><b class="num">${fuel.methane_m3.toFixed(2)}</b><small>m³</small></div>
+      <div><small>能量</small><b class="num">${fuel.energy_kwh.toFixed(1)}</b><small>kWh</small></div>`;
+    const f = fuel.formula;
+    $('fuelFormula').textContent = `估算：沼气 = ${kg(fuel.weight_kg)} × ${f.biogas_m3_per_kg} m³/kg，甲烷占 ${f.methane_share * 100}%，能量 = 沼气 × ${f.kwh_per_biogas_m3} kWh/m³。`;
+    $('fuelBtn').disabled = false;
+  }
+  ribbon(0, give ? give.weight_kg : 0, fuel ? fuel.weight_kg : 0);
+}
+
+const co2PerKg = () => {
+  const d = last?.fallback?.donatable;
+  return d && d.weight_kg ? d.estimated_co2e_kg / d.weight_kg : 2.5;
+};
+
+$('giveBtn').onclick = () => {
+  const give = last.fallback.choices.find((c) => c.type === 'ORPHANAGE_DONATION');
+  const pick = give.recipients[Number(document.querySelector('input[name=recipient]:checked')?.value || 0)];
+  const steps = [`已联系 ${pick.name}`, '机构确认接收', '司机已取货', '已送达，等待机构签收'];
+  $('giveBtn').disabled = true; $('timeline').hidden = false;
+  $('timeline').innerHTML = steps.map((s) => `<li>${esc(s)}</li>`).join('');
+  const items = [...$('timeline').children];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  items.forEach((li, i) => setTimeout(() => {
+    li.classList.add('done');
+    if (i === items.length - 1) {
+      saved.delivered.push({ at: Date.now(), to: pick.name, kg: give.weight_kg, co2e: give.weight_kg * co2PerKg() });
+      persist(); renderCarbon(); say(`已模拟送达 ${pick.name}。`);
+    }
+  }, reduce ? 0 : 700 * (i + 1)));
+};
+
+$('fuelBtn').onclick = () => {
+  $('fuelBtn').disabled = true;
+  say('已记录：剩余不可食用食物模拟送往生物燃料处理厂。生物燃料不计入碳排放量估算池。');
+};
+
+async function loadDonations() {
+  try {
+    const { donations } = await api('/donations');
+    $('donations').innerHTML = donations.length ? `<div class="tablewrap"><table>
+      <thead><tr><th>建立时间</th><th class="r">件数</th><th class="r">重量</th><th>状态</th><th></th></tr></thead>
+      <tbody>${donations.map((d) => `<tr>
+        <td class="num">${esc(d.created.slice(11, 16))}</td><td class="r num">${d.payload.qty}</td>
+        <td class="r num">${kg(d.payload.weight_g / 1000)}</td>
+        <td>${d.status === 'DONATED' ? `<span class="tag ok">已交接 · ${esc(d.recipient)}</span>` : d.status === 'PENDING' ? '<span class="tag pending">待交接</span>' : '<span class="tag bad">已报废</span>'}</td>
+        <td>${d.status === 'PENDING' ? `<button type="button" class="btn" data-handoff="${esc(d.id)}">模拟交接</button>` : ''}</td>
+      </tr>`).join('')}</tbody></table></div>`
+      : '<p class="empty">暂无捐赠单。22:30 后点“打烊清算”，未售出的食物会出现在这里。</p>';
+    backendDonated = donations.filter((d) => d.status === 'DONATED').reduce((n, d) => n + d.payload.estimated_co2e_kg, 0);
+    renderCarbon();
+  } catch (e) { $('donations').innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
+}
+
+$('donations').onclick = async (event) => {
+  const id = event.target.dataset.handoff;
+  if (!id) return;
+  const recipient = prompt('接收机构名称（演示）', 'Demo Orphanage A (placeholder)');
+  if (!recipient?.trim()) return;
+  try { await api('/donations/handoff', { donation_id: id, recipient: recipient.trim() }); say('交接已记录。'); }
+  catch (e) { say(e.message, true); }
+  loadDonations(); loadStock();
+};
+
+let backendDonated = 0;
+function poolKg() {
+  const delivered = saved.delivered.reduce((n, d) => n + d.co2e, 0);
+  const traded = saved.trades.reduce((n, t) => n + t.kg, 0);
+  return Math.max(0, delivered + backendDonated - traded);
+}
+function renderCarbon() {
+  $('pool').textContent = kg(poolKg()) + ' 可交易';
+  $('trades').innerHTML = saved.trades.length ? saved.trades.slice().reverse().map((t) => `<tr>
+    <td class="num">${new Date(t.at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</td>
+    <td class="r num">${t.kg.toFixed(2)}</td><td class="r num">RM${t.total.toFixed(2)}</td>
+    <td><span class="tag ok">模拟成交</span></td></tr>`).join('')
+    : '<tr><td colspan="4" class="muted">还没有模拟交易。</td></tr>';
+}
+
+$('tradeBtn').onclick = () => {
+  const amount = Number($('tradeKg').value), price = Number($('tradePrice').value);
+  if (!(amount > 0)) return say('请填写要交易的 kg 数。', true);
+  if (amount > poolKg() + 1e-9) return say(`可交易的只有 ${kg(poolKg())}。先模拟捐赠或完成交接。`, true);
+  if (!(price > 0)) return say('报价要大于 0。', true);
+  const total = (amount / 1000) * price;
+  $('dlgBody').textContent = `以 RM${price}/吨 模拟出售 ${amount.toFixed(2)} kg CO₂e 估算量，合计 RM${total.toFixed(2)}。`;
+  $('dlgAck').checked = false; $('dlgOk').disabled = true;
+  $('tradeDialog').showModal();
+  $('tradeDialog').onclose = () => {
+    if ($('tradeDialog').returnValue !== 'ok') return;
+    saved.trades.push({ at: Date.now(), kg: amount, price, total });
+    persist(); renderCarbon(); $('tradeKg').value = '';
+    say(`已模拟成交 ${amount.toFixed(2)} kg，金额 RM${total.toFixed(2)}，未产生真实付款。`);
+  };
+};
+$('dlgAck').onchange = () => { $('dlgOk').disabled = !$('dlgAck').checked; };
+
+loadStock(); loadDonations(); renderCarbon();
+</script>
+</body>
+</html>

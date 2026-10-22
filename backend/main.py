@@ -382,6 +382,10 @@ def create_app() -> FastAPI:
     def frontend():
         return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "index.html")
 
+    @application.get("/app/rescue", include_in_schema=False)
+    def rescue_page():
+        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "rescue.html")
+
     application.post(
         "/api/generate-promo",
         response_model=PromoResponse,
