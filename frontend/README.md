@@ -1,14 +1,16 @@
 # Nexflow 前后端联调
 
 页面沿用 `index.html` 的原生 HTML/CSS/JavaScript，无需 Node 构建或安装前端依赖。
-商品目录来自后端共享库存，金额、CO₂e 和初始文案全部使用后端响应。
+正式入口 `/app` 已整合根目录 `orbyte smart yield.html` 的新增卡片样式和消费者入口；根目录文件保留为原稿，不直接提供给浏览器。
+清仓商品来自后端共享 JSON；盲盒来自独立 SQLite 批次。金额、CO₂e 和初始文案使用后端响应。
 
 ## 启动
 
-从仓库根目录运行已有虚拟环境中的后端：
+从仓库根目录运行已有虚拟环境中的后端。下面使用临时盲盒数据库，避免演示和定时清算影响已有本地库存：
 
 ```bash
-AI_PROVIDER=local_demo DEEPSEEK_API_KEY='' .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+NEXFLOW_DEMO_DIR=$(mktemp -d)
+AI_PROVIDER=local_demo DEEPSEEK_API_KEY='' BLIND_BOX_DB_PATH="$NEXFLOW_DEMO_DIR/blind.sqlite3" .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
 打开 <http://127.0.0.1:8000/app>。页面与 API 同源，`API = ''`，无需代理或 CORS 配置。
@@ -18,6 +20,7 @@ AI_PROVIDER=local_demo DEEPSEEK_API_KEY='' .venv/bin/python -m uvicorn backend.m
 如必须分开运行静态前端，服务目录只设为 `frontend/`，并修改页面的 `API` 为后端地址；
 后端进程设置 `CORS_ALLOWED_ORIGINS` 为精确前端来源，例如 `http://127.0.0.1:5173`。
 后端启动时自动加载 `backend/.env`，已有进程环境变量优先。`localhost` 与 `127.0.0.1` 是不同来源。
+上述配置只影响当前进程，不修改 `.env`，不调用收费模型。按 Ctrl+C 关闭服务；临时数据库路径保存在该终端的 `NEXFLOW_DEMO_DIR` 中。
 
 ## 当前接口
 
@@ -50,6 +53,45 @@ CO₂e 是估算，不是认证减排或碳积分；默认使用本地文案；�
 角色切换不构成身份认证。审批、广播、送达、已读、回复和日志均为本页模拟，刷新重置。
 页面入口只提供指定 HTML，不公开数据目录。生成接口仍包含成本，仅供受控本地演示。
 
+## 盲盒与余料
+
+打开左侧“盲盒与余料”。首次打开读取 `GET /api/blind-boxes/inventory`，显示名称、批次、可用件数、原价和安全截止时间。
+空数据库明确显示空库存，不会拿清仓商品填充。在另一个终端明确导入当天合成库存：
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/blind-boxes/demo-seed
+```
+
+重复导入返回 409，不会重置库存。点击“刷新盲盒库存”，选择规划日期、时段及可选筛选条件，再点击“计算盲盒方案”。
+页面先刷新批次名称，再发送 `POST /api/blind-boxes/calculate`，请求示例（日期换成规划日期）：
+
+```json
+{
+  "pickup_start": "2026-10-22T21:30:00+08:00",
+  "pickup_end": "2026-10-22T22:00:00+08:00",
+  "preferences": {"avoid_allergens": [], "required_diets": []},
+  "top": 3
+}
+```
+
+- `OPTIONS`：按批次对应商品名称和数量，展示后端的 `retail_sen`、`price_sen`、`packaging_sen` 和 `estimated_co2e_kg`。
+  100 sen = RM1；页面只转换展示单位，不重新计算定价。候选互为替代，不表示可同时售出。
+- `NO_OPTIONS`：展示后端总原因、逐批次拒绝原因、`fallback` 余料统计和 `choices` 建议。
+  机构为演示数据，直线距离、能源及 CO₂e 为估算；没有真实联系机构、交接食品或发送消息。
+- 计算不下单、不预留、不扣库存、不加积分。计算器允许营业时间外规划，下单限制没有改变。
+  后端每分钟清算；22:30 后可用库存可能转入待捐赠，安全期限也会影响结果。不要修改机器时间绕过限制。
+
+建议检查：
+
+1. 新数据库先计算空库存，确认提示；导入当天演示批次后计算，应出现候选商品和 RM 价格。
+2. 在批次仍安全时填 `wheat`：演示面包和蛋糕被排除，剩余饮料无法单独组成含主食的盒子，展示捐赠建议。
+3. 规划日期选在批次安全截止之后：展示安全期限拒绝及生物能源估算。这只修改请求日期，不改变系统时间。
+4. 停掉服务后计算：旧建议清空、错误可见、按钮恢复；以相同进程配置重启后可重试。
+
+消费者卡片沿用前端独立积分样例，刷新重置，不连接后端积分账户。
+前端每 kg CO₂e 估算记 10 演示分、40/30 分换商品，与后端隐藏款核销奖励 10 分、100 分抵 RM1 的规则不同。
+两套规则尚未统一，不能据此前端余额执行真实兑换；待决策项见 [本轮汇报](../docs/blind-box-integration/summary.md)。
+
 ## 检查
 
 ```bash
@@ -58,6 +100,7 @@ node --test frontend/tests/*.test.cjs
 ```
 
 测试无需安装前端依赖；接口映射测试使用仓库 `.venv` 中的 Python TestClient 读取真实响应，并强制本地文案模式。AI 成功与失败回退仅用模拟响应验证，不调用供应商。
+盲盒映射测试使用临时数据库，覆盖候选、捐赠、生物能源、空库存、失败恢复、重复请求和积分隔离。
 
 ## 团队
 
