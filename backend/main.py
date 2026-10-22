@@ -382,6 +382,18 @@ def create_app() -> FastAPI:
     def frontend():
         return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "index.html")
 
+    @application.get("/app/new-ui", include_in_schema=False)
+    def new_ui():
+        return FileResponse(Path(__file__).resolve().parents[1] / "orbyte smart yield.html")
+
+    @application.get("/ui/blind-boxes.js", include_in_schema=False)
+    def blind_box_script():
+        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "blind-boxes.js", media_type="text/javascript")
+
+    @application.get("/ui/blind-boxes.css", include_in_schema=False)
+    def blind_box_style():
+        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "blind-boxes.css", media_type="text/css")
+
     application.post(
         "/api/generate-promo",
         response_model=PromoResponse,

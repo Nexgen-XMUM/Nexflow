@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, '../..');
 const html = fs.readFileSync(path.join(root, 'frontend/index.html'), 'utf8');
 const script = html.replace(/<!--[\s\S]*?-->/g, '').match(/<script>([\s\S]*?)<\/script>/)[1];
 // Exercise the actual API contract with local copy only, without a running server.
-const python = path.join(root, '.venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
+const python = process.env.NEXFLOW_TEST_PYTHON || path.join(root, '.venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
 const responses = JSON.parse(execFileSync(python, ['-W', 'ignore', '-c', `
 import json
 from fastapi.testclient import TestClient

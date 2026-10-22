@@ -13,7 +13,10 @@ from fastapi.routing import APIRoute
 from . import charity
 from .pickup import LOCAL, RuleError, clock
 from .repository import Repository
-from .schemas import Batch, CalculateRequest, SuggestRequest, OrderRequest, ActionRequest, DonationAction, RedeemRequest
+from .schemas import (
+    Batch, CalculateRequest, SuggestRequest, OrderRequest, ActionRequest,
+    DonationAction, RedeemRequest, QuoteConfirmRequest,
+)
 
 
 class DomainRoute(APIRoute):
@@ -112,6 +115,18 @@ def calculate(request: CalculateRequest, repo: Repo, now: Now):
     return repo.calculate(request, now, config.get("store"), config.get("charities", []))
 
 
+@router.post("/quotes")
+def quote(request: OrderRequest, repo: Repo, now: Now):
+    """Local demo customer quote. Contents remain on the server; stock is not reserved."""
+    return repo.quote(request, now)
+
+
+@router.post("/quotes/confirm")
+def confirm_quote(request: QuoteConfirmRequest, repo: Repo, now: Now):
+    """Confirm the stored quote without another draw or client-supplied price."""
+    return repo.confirm_quote(request, now)
+
+
 @router.post("/orders")
 def order(request: OrderRequest, repo: Repo, now: Now):
     return repo.order(request, now)
@@ -146,6 +161,12 @@ def handoff(request: DonationAction, repo: Repo, now: Now):
 @router.post("/points/redeem")
 def redeem(request: RedeemRequest, repo: Repo, now: Now):
     return repo.redeem(request, now)
+
+
+@router.get("/customer/account")
+def customer_account(user_id: str, repo: Repo):
+    """Demo-only customer view with an explicit field allowlist, not real authentication."""
+    return repo.customer_account(user_id)
 
 
 @router.get("/dashboard")
