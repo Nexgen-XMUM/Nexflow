@@ -376,7 +376,7 @@ def create_app() -> FastAPI:
 
     @application.get("/app", include_in_schema=False)
     def frontend():
-        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "indexnew.html")
+        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "index.html")
 
     application.post(
         "/api/generate-promo",
