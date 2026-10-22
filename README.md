@@ -1,46 +1,87 @@
-# Nexflow
+# Nexflow · Orbyte Smart Yield
 Automate the Routine. Empower the People.
 
-面向马来西亚烘焙店的黑客松项目：录入剩余商品，由后端计算清仓价格和碳排放估算，AI 生成 Manglish 促销文案，老板审核后展示模拟 WhatsApp 广播。
+面向马来西亚烘焙店的黑客松项目。店员在打烊时录入剩余商品，后端计算清仓价和 CO₂e 估算，生成 Manglish 促销文案，老板审核后在页面上模拟 WhatsApp 广播。剩余食物还可以组成盲盒出售；组不成盲盒时，给出捐赠孤儿院或生物燃料的方案。
 
-## 当前状态
+## 当前状态（受控本地演示）
 
-已实现 FastAPI 后端、商品查询 `GET /api/inventory`、促销计算 `POST /api/generate-promo` 及自动化测试。根目录 `requirements.txt` 包含 Python 依赖，启动和接口说明见 [后端 README](backend/README.md)。支持可选 DeepSeek 文案及失败时本地模板回退，真实连接需配置本地密钥后验证；审批和模拟广播的后端流程尚未实现，前端联调尚未完成。
+| 功能 | 状态 |
+|---|---|
+| 商品查询、清仓价计算、BELOW_COST 亏损提示 | 已实现，有自动化测试 |
+| 促销文案：本地模板；可选 DeepSeek，失败时回退本地模板 | 已实现，DeepSeek 真实调用记录见 [docs/deepseek-live-validation.md](docs/deepseek-live-validation.md) |
+| 盲盒后端：筛选、组合、评分、模拟付款、预约核销、积分、清算捐赠 | 本地 SQLite 演示，见 [backend/blind_boxes/README.md](backend/blind_boxes/README.md) |
+| 盲盒计算器 `/api/blind-boxes/calculate`：多方案，或给出孤儿院捐赠 / 生物燃料方案 | 已实现，只读 |
+| 老板审批、WhatsApp 广播、送达 / 已读 / 回复 | **页面模拟**，不会真实发送 |
 
-## 目录与分工
+**尚未完成验收、没有上线**：真实 WhatsApp 收发、订单成交扣库存、积分发放、真实捐赠流程、线上部署，以及登录认证和支付。不要对外宣传成已上线功能。
+
+**环保数字都是估算**：CO₂e = 商品重量 × 演示用 CO₂e 系数，生物燃料按固定系数估算。这些数字不是经认证的减排量，也不是碳积分或碳信用。
+
+## 快速启动（Windows）
+
+在项目根目录的 PowerShell 中运行：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Copy-Item backend\.env.example backend\.env   # 默认 local_demo，不调用模型、不需要密钥
+.\.venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
+
+| 地址 | 内容 |
+|---|---|
+| http://127.0.0.1:8000/app | 主页面：打烊盘点、老板看板、活动日志 |
+| http://127.0.0.1:8000/docs | 接口文档；盲盒接口在 `Blind boxes LOCAL DEMO` 下 |
+
+如果要用 DeepSeek，在 `backend/.env` 里设置 `AI_PROVIDER=deepseek` 和你自己的 `DEEPSEEK_API_KEY`。密钥不要提交到 Git。详细配置见 [backend/README.md](backend/README.md)。
+
+盲盒 API 使用服务器当前时间：21:30 开售，22:30 打烊清算后，剩余食物才会进入捐赠清单。白天演示可以运行固定时钟的模拟程序：`.\.venv\Scripts\python.exe -m backend.blind_boxes.demo`。
+
+## 测试
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests -q
+node --test frontend/tests/
+```
+
+已知问题：在 Windows 上，如果 Git 开启了 `core.autocrlf=true`，`test_frontend_entry_does_not_expose_repository` 会因为 CRLF 换行而失败，与业务逻辑无关。
+
+## 主要接口
+
+| 方法 | 路径 | 作用 |
+|---|---|---|
+| GET | `/api/products` | 商品选项（id、名称、别名、库存） |
+| GET | `/api/inventory` | 商品原价与库存 |
+| POST | `/api/generate-promo` | 提交 `[{"item":"croissant","qty":10}]`，返回价格、CO₂e 估算、文案和警告 |
+| POST | `/api/blind-boxes/calculate` | 盲盒方案；没有方案时返回剩余食材统计，以及捐赠或生物燃料方案 |
+| — | `/api/blind-boxes/*` | 演示库存、下单、核销、清算、捐赠交接、积分、看板 |
+
+错误统一返回 `{"error": {"code", "message", "details"}}`：输入错误是 422，数据文件不可用是 503，盲盒业务冲突是 409。
+
+## 目录
 
 ```text
-frontend/                 前端页面与交互（成员 1）
-backend/                  后端、业务计算与 AI 接口（成员 2 / 项目开发负责人）
-data/
-  inventory.json          商品、价格、重量、碳排放系数与库存
-  users.json              演示角色与权限
-  customers.json          演示 WhatsApp 联系人
-docs/
-  reference-demo/README.md 队友提供的原始说明，仅供参考
+backend/            FastAPI 后端：main.py（促销）、ai_copy.py（文案）、blind_boxes/（盲盒、计算器）、tests/
+frontend/           index.html（主页面），ui system（Ivan 的新版 UI 草稿，尚未接入后端路由），tests/
+data/               inventory.json（商品）、charities.json（孤儿院占位名单）、users.json、customers.json
+docs/               交接、AI 文案与验收记录
+*.json（根目录）     促销、订单、WhatsApp、积分、推荐规则等合成样例，后端目前不读取
 ```
 
-- 成员 1：店员录入表单、老板 Dashboard、模拟 WhatsApp 对话框；先使用假数据，再接入真实 API。
-- 成员 2（项目开发负责人）：服务器、输入校验、价格与碳排放计算、AI 文案生成、接口联调。
-- 成员 3：维护共享 JSON、API 边界测试及项目文档。
-- 成员 4：提供业务公式和 UI 素材；碳排放系数依据、碳积分换算规则待确认。
+`data/charities.json` 里是占位示例，不是真实机构；上线前必须换成已核实、同意接收的机构。所有客户和电话都是虚构的演示数据。
 
-## 后端接口
+## 进行中的 PR
 
-前端先通过 `GET /api/inventory` 获取商品编号、名称、原价和库存，再向 `POST /api/generate-promo` 提交：
+- #20 `codex/feature-new-ui`：新版 UI 接入盲盒报价、付款模拟、捐赠和积分
+- #21 `feat/rescue-ui`：`/app/rescue` 打烊去向页面（盲盒、模拟孤儿院捐赠、生物燃料估算、模拟碳排放量交易）
 
-```json
-[{"item":"croissant","qty":10}]
-```
+## 团队
 
-后端从 `data/inventory.json` 的 `products` 数组读取商品（分工中的 `products.json` 对应这份文件，无需维护两份）。价格和碳排放由代码计算，文案由本地模板或可选 DeepSeek 开头、结尾与程序插入的商品事实组成；请求、响应和错误格式见后端 README。
+| 角色 | 成员 |
+|---|---|
+| 队长 / 整合 / 前端 | YEO JIN HONG |
+| 后端 / 整合 | QIU BO CHUAN |
+| 前端 | （待填） |
+| 提案 / 演示 | （待填） |
 
-以现有数据和分工中的五折示例计算，10 个牛角包原价 RM60、成本 RM20、清仓价 RM30。数据中的 `weight_kg` 是商品重量，不是面粉重量；按 `qty × weight_kg × co2e_per_kg` 得到的示例估算为 2 kg CO₂e。该数值不是已验证的减排量，也不是碳积分，业务规则确认后再用于正式展示。
-
-## 数据与参考说明
-
-三份 JSON 和 [队友原始 README](docs/reference-demo/README.md) 均按原文件导入。原始说明中的项目名、`server.py`、`/api/draft`、`/api/approve` 和运行方式描述的是队友的 demo，不表示本仓库已有对应实现。
-
-原始说明将联系人标注为虚构演示数据，仅用于模拟展示。`users.json` 只描述角色权限，不提供登录认证或实际权限校验。前端不要把包含成本价或联系人信息的完整数据直接作为公开静态资源发布。
-
-真实密钥使用本地环境变量；`.env`、虚拟环境、依赖目录、构建缓存、数据库及运行生成的 `data/activity.json` 不提交。需要本地修改的实验数据可放入已忽略的 `data/local/`，保留共享演示数据可复用。
+前端和后端的问题统一找队长。
