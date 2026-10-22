@@ -1,8 +1,8 @@
 # AI 文案补齐计划
 
-范围：保留 DeepSeek 只写开头结尾、Python 计算和插入商品事实的方式。保持现有 API、来源语义和业务计算；不改前端、共享库存，不调用真实服务，不提交或推送。
+范围：保留 DeepSeek 只写开头结尾、Python 计算和插入商品事实的方式。保持现有 API、来源语义和业务计算；不改前端、共享库存，不调用真实服务。初次实施未提交；2026-10-22 用户授权单独提交、推送并创建 PR 给 prog 审查。
 
-基线：当前分支 origin/dev-feng，已 rebase 到 main 的 1bd1358。原有未跟踪文件不作修改。
+初次实施基线：origin/dev-feng 已 rebase 到 main 的 1bd1358。2026-10-22 单独 PR 基线：main 的 c6d4ef2，分支 codex/ai-copy-follow-up。原共享工作区不作修改。
 
 1. Python 共用商品事实拼接：商品、促销数量、原价、清仓单价；本地和 AI 文案保持 Manglish、Emoji，当前商品组合整条不超过 50 词。
 2. 校验完整上游响应结构，畸形响应回退，原因只返回安全类别。
@@ -34,4 +34,6 @@ Ponytail/easy-* 本机不可用；经用户同意以本文档、直接实施、�
 
 手动验证步骤及预期响应见 backend/README.md 的“Windows 验证本轮修改”。自然语言关键词校验并非完整语义保证；发布前仍需人工审阅。50 词验证覆盖当前三种商品的所有非空组合，商品目录或名称扩大后需要重新验证。
 
-当前仍在 origin/dev-feng；未 commit、push 或创建 PR。原有 backend/blind_box_test.py 和 docs/frontend-integration/ 未修改。
+初次实施时在 origin/dev-feng，未 commit、push 或创建 PR；2026-10-22 已按用户要求单独提取到 codex/ai-copy-follow-up，创建 PR 供 prog 审查。原共享工作区和 PR #12 不修改；本 PR 不包含 backend/blind_box_test.py、docs/frontend-integration/ 或盲盒实现。
+
+本次单独 PR 工作区复验：214 passed, 1 warning in 3.40s；编译及差异检查通过，未调用真实模型。
