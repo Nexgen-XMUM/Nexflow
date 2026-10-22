@@ -1,6 +1,6 @@
 # Nexflow 前后端联调
 
-页面沿用 `indexnew.html` 的原生 HTML/CSS/JavaScript，无需 Node 构建或安装前端依赖。
+页面沿用 `index.html` 的原生 HTML/CSS/JavaScript，无需 Node 构建或安装前端依赖。
 商品目录来自后端共享库存，金额、CO₂e 和初始文案全部使用后端响应。
 
 ## 启动
@@ -8,7 +8,7 @@
 从仓库根目录运行已有虚拟环境中的后端：
 
 ```bash
-.venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+AI_PROVIDER=local_demo DEEPSEEK_API_KEY='' .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
 打开 <http://127.0.0.1:8000/app>。页面与 API 同源，`API = ''`，无需代理或 CORS 配置。
@@ -23,24 +23,29 @@
 
 - `GET /api/products`：`{"products":[{"id":"croissant","name":"Butter Croissant","aliases":["croissant","croissants"],"on_hand":18}]}`。
   示例只展示一项，实际返回共享库存的所有商品；不包含成本、售价和客户信息。
+- `GET /api/inventory`：已有的售价查询，提供 `currency` 和商品 `id/name/retail_price/on_hand`，没有成本。
+  当前录入页无需售价，使用带别名的 `/api/products` 即可；报价统一取生成结果。
 - `POST /api/generate-promo`：发送 `[{"item":"croissant","qty":10}]`，不发送角色、价格或零数量项。
   使用 `items`、`totals`、`carbon`、`promo`、`warnings` 渲染。
-- HTTP 422／503 的 `error.message` 显示在录入页；网络失败或 15 秒超时后恢复操作。
+- HTTP 422／503 的 `error.message` 显示在录入页；网络失败或 30 秒超时后恢复操作；切页时还会显示全局错误提示。
   商品加载失败时点击“重置演示”重新加载。
 
 金额为两位小数字符串，币种 MYR；CO₂e 为十进制字符串、单位 kg CO₂e。
 固定半价，可能低于成本；页面显示毛利、亏损合计和警告。
+录入列表只显示名称与库存，统一包装图标仅作装饰；不编造中文名、重量或成本。
 情景金额按本次数量全部售出计算，不代表已成交营收。
 CO₂e 是估算，不是认证减排或碳积分；默认使用本地文案；后端可配置 DeepSeek。页面区分本地模式、AI 文案和失败回退。
 
 ## 演示验收
 
-1. 输入牛角包 10 个：清仓金额 RM30.00、毛利 RM10.00、CO₂e 估算 2 kg。
+1. 输入 Butter Croissant（牛角包）10 个：原价 RM60.00、成本 RM20.00、清仓金额 RM30.00、毛利 RM10.00、CO₂e 估算 2 kg。
 2. 快速输入 `10 croissants, 2 chocolate slices, 1 sourdough`：RM45.00、3.725 kg CO₂e。
 3. 输入 19 个牛角包：显示超库存错误；修正为 10 后可以重试。
 4. 输入 `1.5`、`-1`：明确报错，不会改成 15 或 1。
 5. 切换店员：模拟批准／拒绝按钮禁用；切回老板可编辑文案并模拟广播。
 6. 模拟批准不改变情景金额、不扣库存、不实际发送消息；只有本页模拟次数增加。
+7. 生成期间不能重复提交或重置；切换到活动日志后，返回结果不会强行跳页。
+8. 停掉后端再提交：清掉旧草稿和金额，显示错误，按钮恢复；重新启动后可重试。
 
 角色切换不构成身份认证。审批、广播、送达、已读、回复和日志均为本页模拟，刷新重置。
 页面入口只提供指定 HTML，不公开数据目录。生成接口仍包含成本，仅供受控本地演示。
@@ -48,9 +53,11 @@ CO₂e 是估算，不是认证减排或碳积分；默认使用本地文案；�
 ## 检查
 
 ```bash
-.venv/bin/python -m pytest backend/tests -q
-node --test frontend/tests/input.test.cjs
+AI_PROVIDER=local_demo DEEPSEEK_API_KEY='' .venv/bin/python -m pytest backend/tests -q
+node --test frontend/tests/*.test.cjs
 ```
+
+测试无需安装前端依赖；接口映射测试使用仓库 `.venv` 中的 Python TestClient 读取真实响应，并强制本地文案模式。AI 成功与失败回退仅用模拟响应验证，不调用供应商。
 
 ## 团队
 

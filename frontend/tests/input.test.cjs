@@ -4,9 +4,10 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
 
-const html = fs.readFileSync(path.join(__dirname, '../indexnew.html'), 'utf8');
-const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-new vm.Script(script); // Check the complete inline script's syntax too.
+const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+const scripts = [...html.replace(/<!--[\s\S]*?-->/g, '').matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
+for (const source of scripts) new vm.Script(source); // Check business and UI shell syntax.
+const script = scripts[0];
 const quantity = script.slice(script.indexOf('function quantity('), script.indexOf('/* ================== 后端数据'));
 const quick = script.slice(script.indexOf('function parseQuick('), script.indexOf('/* ================== 事件'));
 const draft = script.slice(script.indexOf('function toDraft('), script.indexOf('/* ================== 渲染'));
@@ -15,7 +16,7 @@ function context() {
   const inventory = JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/inventory.json')));
   const fields = { '#quickText': { value: '' }, '#posHint': { textContent: '' } };
   const ctx = vm.createContext({ products: inventory.products, state: { qty: { croissant: 7 } },
-    $: selector => fields[selector], renderPOS() {} });
+    $: selector => fields[selector], renderPOS() {}, clearResult() {} });
   vm.runInContext(quantity + quick + draft, ctx);
   return { ctx, fields };
 }
