@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
@@ -21,7 +22,10 @@ def test_catalogue_uses_inventory_without_private_fields(tmp_path, monkeypatch):
             for product in data["products"]
         ]
         result = client.post("/api/generate-promo", json=[{"item": options[0]["id"], "qty": 10}])
+        assert result.json()["totals"]["retail_total"] == "60.00"
+        assert result.json()["totals"]["cost_total"] == "20.00"
         assert result.json()["totals"]["clearance_total"] == "30.00"
+        assert result.json()["totals"]["gross_profit_total"] == "10.00"
         assert result.json()["totals"]["estimated_co2e_kg"] == "2"
         assert client.get("/app").status_code == 200
     assert path.read_bytes() == before
@@ -40,7 +44,10 @@ def test_frontend_entry_does_not_expose_repository():
         page = client.get("/app")
         assert page.status_code == 200
         assert "text/html" in page.headers["content-type"]
+        assert page.text == (Path(__file__).resolve().parents[2] / "frontend" / "index.html").read_text()
         assert "/api/products" in page.text
+        assert 'id="guide-sidebar"' in page.text
+        assert 'id="themeToggleBtn"' in page.text
         for path in ("/data/inventory.json", "/data/customers.json", "/backend/main.py", "/api/approve"):
             assert client.get(path).status_code == 404
 

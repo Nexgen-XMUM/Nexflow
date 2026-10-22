@@ -232,7 +232,11 @@ async def invalid_request(_request: Request, exc: RequestValidationError):
         content={
             "error": {
                 "code": "INVALID_REQUEST",
-                "message": "Request must be a non-empty array of items with positive integer quantities.",
+                "message": (
+                    "Request does not match the blind-box endpoint schema."
+                    if _request.url.path.startswith("/api/blind-boxes/")
+                    else "Request must be a non-empty array of items with positive integer quantities."
+                ),
                 "details": [
                     {"location": list(error["loc"]), "code": error["type"]}
                     for error in exc.errors()
@@ -376,13 +380,15 @@ def create_app() -> FastAPI:
 
     @application.get("/app", include_in_schema=False)
     def frontend():
-        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "indexnew.html")
+        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "index.html")
 
     application.post(
         "/api/generate-promo",
         response_model=PromoResponse,
         responses={422: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
     )(generate_promo)
+    from backend.blind_boxes.router import router as blind_box_router
+    application.include_router(blind_box_router)
     return application
 
 

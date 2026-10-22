@@ -1,0 +1,8 @@
+{
+  "_note": "PLACEHOLDER demo entries, not real organisations. Replace with verified orphanages/charities and their consent before use.",
+  "store": {"name": "Demo store", "lat": 2.8327, "lng": 101.7066},
+  "charities": [
+    {"name": "Demo Orphanage A (placeholder)", "lat": 2.8460, "lng": 101.7200, "accepts": ["bread", "dessert", "drink", "meal"], "address": null, "contact": null},
+    {"name": "Demo Orphanage B (placeholder)", "lat": 2.9200, "lng": 101.6550, "accepts": ["bread", "meal"], "address": null, "contact": null}
+  ]
+}
