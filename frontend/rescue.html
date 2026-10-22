@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>打烊去向 · Nexflow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* 本页独立：只调用 /api/blind-boxes/*，不改主页面状态。金额、库存、能源和碳估算全部来自后端。 */
+:root {
+  --bg: #eef2ef; --surface: #ffffff; --sunk: #e3e9e5; --line: #d3ddd7;
+  --ink: #12302a; --ink-2: #3d5650; --muted: #6b7f79;
+  --box: #2e6b4e; --box-soft: #dcebe2;
+  --give: #b9862b; --give-soft: #f4e9d2;
+  --fuel: #3f6572; --fuel-soft: #dde8ec;
+  --warn: #a63d2f; --warn-soft: #f7e3df;
+  --focus: #2e6b4e;
+  --display: "Bricolage Grotesque", "Figtree", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --body: "Figtree", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1714; --surface: #15221d; --sunk: #1c2c26; --line: #2a3d36;
+    --ink: #e7efe9; --ink-2: #b9c9c1; --muted: #8aa097;
+    --box: #6fbf93; --box-soft: #1f3a2d; --give: #e0b25c; --give-soft: #3a3020;
+    --fuel: #82b3c3; --fuel-soft: #1d3138; --warn: #f08b7a; --warn-soft: #3d221e; --focus: #6fbf93;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1714; --surface: #15221d; --sunk: #1c2c26; --line: #2a3d36;
+  --ink: #e7efe9; --ink-2: #b9c9c1; --muted: #8aa097;
+  --box: #6fbf93; --box-soft: #1f3a2d; --give: #e0b25c; --give-soft: #3a3020;
+  --fuel: #82b3c3; --fuel-soft: #1d3138; --warn: #f08b7a; --warn-soft: #3d221e; --focus: #6fbf93;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -0.01em; }
+.muted { color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  max-width: 1180px; margin: 0 auto; padding: 28px 24px 8px; }
+.top h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 700; line-height: 1.05; }
+.top p { margin: 6px 0 0; color: var(--ink-2); max-width: 64ch; }
+.top nav { display: flex; gap: 14px; align-items: center; font-weight: 600; }
+.clock { font-family: var(--display); font-size: 22px; }
+
+.layout { max-width: 1180px; margin: 0 auto; padding: 16px 24px 64px; display: grid; gap: 28px;
+  grid-template-columns: 300px minmax(0, 1fr); align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; padding: 12px 16px 48px; } .top { padding: 20px 16px 4px; } }
+
+.controls { position: sticky; top: 16px; display: grid; gap: 18px; }
+@media (max-width: 860px) { .controls { position: static; } }
+.controls fieldset { border: 0; border-top: 1px solid var(--line); margin: 0; padding: 14px 0 0; display: grid; gap: 10px; }
+.controls legend { font-weight: 700; padding: 0 0 4px; }
+label.field { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); }
+input[type=text], input[type=number], select, textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface); }
+textarea { resize: vertical; min-height: 110px; font-size: 14px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.seg label { display: flex; gap: 6px; align-items: center; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface); font-size: 14px; cursor: pointer; }
+.seg input { accent-color: var(--box); }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 10px 14px; border-radius: 9px;
+  font-weight: 600; cursor: pointer; }
+.btn:hover { background: var(--sunk); }
+.btn.primary { background: var(--box); border-color: var(--box); color: #fff; }
+.btn.primary:hover { filter: brightness(1.08); background: var(--box); }
+.btn.give { background: var(--give); border-color: var(--give); color: #1d1404; }
+.btn.small { padding: 6px 10px; font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.status { min-height: 1.5em; font-size: 14px; }
+.status.err { color: var(--warn); }
+
+.stage { display: grid; gap: 32px; }
+.banner { background: var(--give-soft); color: var(--ink); border-left: 4px solid var(--give); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+section.lane h2 { font-size: 20px; margin-bottom: 4px; display: flex; gap: 10px; align-items: baseline; }
+section.lane h2 .step { font-size: 13px; font-family: var(--body); font-weight: 700; color: var(--muted); }
+section.lane > p { margin: 0 0 14px; color: var(--ink-2); }
+.sub { display: grid; gap: 12px; margin-top: 18px; }
+.sub h3 { font-size: 17px; }
+
+.options { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: rank; }
+.options li { counter-increment: rank; display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.options li::before { content: counter(rank); font-family: var(--display); font-size: 26px; font-weight: 700; color: var(--box); }
+.options .price { text-align: right; font-family: var(--display); font-size: 20px; font-weight: 700; }
+.options .price small { display: block; font: 12px var(--body); color: var(--muted); }
+@media (max-width: 520px) { .options li { grid-template-columns: 32px 1fr; } .options .price { grid-column: 2; text-align: left; } }
+.bar { height: 6px; border-radius: 3px; background: var(--box-soft); margin-top: 6px; }
+.bar i { display: block; height: 100%; border-radius: 3px; background: var(--box); }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; }
+td.r, th.r { text-align: right; }
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.tablewrap.give { border-top: 4px solid var(--give); }
+.tablewrap.fuel { border-top: 4px solid var(--fuel); }
+
+.recipients { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.recipients li { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.fuelnums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fuelnums div { background: var(--fuel-soft); border-radius: 10px; padding: 10px; }
+.fuelnums b { display: block; font-family: var(--display); font-size: 20px; }
+.fuelnums small { color: var(--ink-2); font-size: 12px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.stats div { border-left: 4px solid var(--give); padding: 2px 0 2px 10px; }
+.stats b { display: block; font-family: var(--display); font-size: 24px; font-weight: 700; }
+.stats small { color: var(--muted); }
+@media (max-width: 520px) { .stats, .fuelnums { grid-template-columns: 1fr; } }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--sunk); }
+.tag.ok { background: var(--box-soft); color: var(--box); }
+.tag.pending { background: var(--give-soft); color: var(--give); }
+.tag.bad { background: var(--warn-soft); color: var(--warn); }
+.future { border: 1px dashed var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 8px; }
+.future ul { margin: 0; padding-left: 20px; color: var(--ink-2); }
+dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); max-width: 460px; width: calc(100% - 32px); padding: 20px; }
+dialog::backdrop { background: rgba(10, 20, 16, .45); }
+.empty { padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>打烊去向</h1>
+    <p>卖不出去的食物怎么办：先看剩余食品，能组成盲盒就出售；组不成时，安全食品建议捐赠，不可食用或资料未核验的食品单独列出处理建议和能源估算。</p>
+  </div>
+  <nav aria-label="页面">
+    <span class="clock num" id="clock" title="门店时间 UTC+08:00">--:--</span>
+    <a href="/app">返回工作台</a>
+    <button type="button" class="btn" id="themeBtn" aria-label="切换深浅色">深浅色</button>
+  </nav>
+</header>
+
+<div class="layout">
+  <form class="controls" id="calcForm" novalidate>
+    <fieldset>
+      <legend>盲盒库存</legend>
+      <p class="note" id="stockLine">正在读取盲盒库存…</p>
+      <div class="row">
+        <button type="button" class="btn" id="seedBtn">载入今晚演示库存</button>
+        <button type="button" class="btn" id="sweepBtn">打烊清算</button>
+      </div>
+      <p class="note">清算由后端按门店时间执行，结果以后端为准。</p>
+    </fieldset>
+    <fieldset>
+      <legend>取货时段</legend>
+      <div class="seg" role="radiogroup" aria-label="取货时段">
+        <label><input type="radio" name="slot" id="slot2130" value="21:30" checked> 21:30–22:00</label>
+        <label><input type="radio" name="slot" id="slot2200" value="22:00"> 22:00–22:30</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>顾客偏好</legend>
+      <label class="field">避开过敏原（逗号分隔）<input type="text" id="avoid" placeholder="wheat, egg"></label>
+      <label class="field">必须符合的饮食<input type="text" id="diets" placeholder="vegetarian"></label>
+      <label class="field">喜欢的品类
+        <select id="likes"><option value="">不限</option><option value="bread">面包</option><option value="dessert">甜点</option><option value="drink">饮料</option><option value="meal">正餐</option></select>
+      </label>
+      <label class="field">方案数量<input type="number" id="top" min="1" max="10" value="3"></label>
+    </fieldset>
+    <button type="submit" class="btn primary" id="calcBtn">计算去向</button>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </form>
+
+  <main class="stage">
+    <p class="banner">演示环境：接收机构是占位资料，联系文案不会发送，运输未安排，付款为模拟。只有在“待捐赠清单”里由操作人确认交接后，状态才会改变。</p>
+
+    <section class="lane" aria-labelledby="invTitle">
+      <h2 id="invTitle"><span class="step">第 1 步</span>剩余食品</h2>
+      <p>来自盲盒库存（与清仓库存分开）。“可用”是现有数量减去已预留数量。</p>
+      <div id="invList"></div>
+    </section>
+
+    <section class="lane" id="optionsLane" hidden aria-labelledby="optTitle">
+      <h2 id="optTitle"><span class="step">第 2 步</span>可以组成的盲盒</h2>
+      <p>按后端评分从高到低。各方案互为替代，不代表可以同时售出；计算不下单、不预留、不扣库存。</p>
+      <ol class="options" id="options"></ol>
+    </section>
+
+    <section class="lane" id="fallbackLane" hidden aria-labelledby="fbTitle">
+      <h2 id="fbTitle"><span class="step">第 2 步</span>组不成盲盒</h2>
+      <p id="fbReason"></p>
+      <p class="empty" id="emptyLeft" hidden>当前没有剩余库存，不需要捐赠或处理。</p>
+
+      <div class="sub" id="donateBlock" hidden>
+        <h3>可捐赠食品 <span class="tag pending">推荐，尚未联系</span></h3>
+        <div class="tablewrap give"><table>
+          <thead><tr><th>食品</th><th class="r">件数</th><th class="r">重量</th><th>说明</th></tr></thead>
+          <tbody id="donRows"></tbody>
+        </table></div>
+        <div id="recipientBlock">
+          <h3 style="margin-bottom:8px">附近演示接收机构</h3>
+          <ul class="recipients" id="recipients"></ul>
+        </div>
+        <p class="note" id="noRecipient" hidden>附近没有可接收这些品类的演示机构，后端已把这部分重量计入下方的能源估算。</p>
+        <label class="field" id="copyBlock">联系文案（演示，不会发送）
+          <textarea id="contactCopy" readonly></textarea>
+        </label>
+        <div class="row" id="copyRow"><button type="button" class="btn small" id="copyBtn">复制文案</button><span class="note">复制后需由门店人工联系机构确认。</span></div>
+        <p class="note">这里只是建议。食品真正进入后端“待捐赠清单”（打烊清算后）并由操作人确认交接，才算交出。</p>
+      </div>
+
+      <div class="sub" id="wasteBlock" hidden>
+        <h3>不可食用或资料未核验 <span class="tag bad">不进入捐赠</span></h3>
+        <div class="tablewrap fuel"><table>
+          <thead><tr><th>食品</th><th class="r">件数</th><th class="r">重量</th><th>原因</th></tr></thead>
+          <tbody id="wasteRows"></tbody>
+        </table></div>
+        <p class="note">处理建议：与可食用食品分开存放，不出售、不捐赠；交给有资质的厨余或厌氧消化处理方。处理方为未来合作，目前没有对接。</p>
+      </div>
+
+      <div class="sub" id="fuelBlock" hidden>
+        <h3>后端能源估算</h3>
+        <div class="fuelnums" id="fuelNums"></div>
+        <p class="note" id="fuelFormula"></p>
+      </div>
+    </section>
+
+    <section class="lane" aria-labelledby="donTitle">
+      <h2 id="donTitle"><span class="step">第 3 步</span>待捐赠清单</h2>
+      <p>来自后端。打烊清算后，未售出的安全食品和未领取的盲盒会出现在这里。确认交接时后端会重新检查安全并扣减库存。</p>
+      <div id="donations"></div>
+      <div class="sub" id="discardBlock" hidden>
+        <h3>已报废 <span class="tag bad">不计入捐赠</span></h3>
+        <div id="discarded"></div>
+      </div>
+    </section>
+
+    <section class="lane" aria-labelledby="statTitle">
+      <h2 id="statTitle">已确认交接统计</h2>
+      <p>来自后端 /dashboard，只统计已确认交接的捐赠；同一张捐赠单重复确认不会重复计数。</p>
+      <div class="stats" id="stats"></div>
+      <p class="note" id="statNote"></p>
+    </section>
+
+    <section class="future" aria-labelledby="futTitle">
+      <h2 id="futTitle" style="font-size:18px">未来业务（未实现）</h2>
+      <ul>
+        <li>碳交易：现在的 CO₂e 只是食物碳足迹估算，不是经认证的减排量，不能出售。要先有认证方法和第三方核证。</li>
+        <li>肥料厂、沼气厂收入：目前没有合作方，也没有报价。上面的能源数字只是估算，不代表收入。</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<dialog id="handoffDialog" aria-labelledby="hoTitle">
+  <form method="dialog" style="display:grid; gap:14px">
+    <h3 id="hoTitle">确认模拟交接</h3>
+    <p id="hoBody" style="margin:0"></p>
+    <label class="field">接收机构（演示）<input type="text" id="hoRecipient" maxlength="120"></label>
+    <label style="display:flex; gap:8px; align-items:flex-start; font-size:14px">
+      <input type="checkbox" id="hoAck"> 我已当面核对食品状态并交出（演示）。这不代表运输已完成或机构已签收。
+    </label>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn" value="cancel">取消</button>
+      <button class="btn give" value="ok" id="hoOk" disabled>确认交接</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const BASE = '/api/blind-boxes';
+const LABEL = { bread: '面包', dessert: '甜点', drink: '饮料', meal: '正餐' };
+const REASON = {
+  SAFETY_UNVERIFIED: '安全或储存未核验', UNKNOWN_RESTRICTIONS: '过敏原或饮食资料未知', SAFETY_WINDOW: '超过安全期限',
+  ALLERGEN_CONFLICT: '含所选过敏原（仅不适合本次顾客）', DIET_CONFLICT: '不符合所选饮食（仅不适合本次顾客）', OUT_OF_STOCK: '无可用数量',
+  NO_FEASIBLE_COMBINATION: '现有库存满足不了盲盒规则（至少 1 件主食、每盒 2～4 件、售价不高于原价 70%）。',
+  SEARCH_LIMIT: '搜索达到上限，没有找到合格组合。',
+};
+const PLACEHOLDER = 'Demo recipient (placeholder)';
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const kg = (n) => `${Number(n || 0).toFixed(2)} kg`;
+const rm = (sen) => `RM${(sen / 100).toFixed(2)}`;
+
+const state = { names: {}, result: null, recipients: [], donations: [], busy: false, inflight: new Set(), handoffId: null };
+
+async function api(path, body) {
+  let res;
+  try {
+    res = await fetch(BASE + path, body === undefined ? {} : {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+  } catch {
+    throw new Error('连不上后端。请确认 uvicorn 正在运行，然后重试。');
+  }
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error?.message || `请求失败（HTTP ${res.status}）`);
+  if (!data) throw new Error('后端返回的内容无法读取，请重试。');
+  return data;
+}
+
+function say(text, isError) {
+  $('status').textContent = text;
+  $('status').classList.toggle('err', !!isError);
+}
+
+function storeNow() {
+  // 门店固定 UTC+08:00
+  const d = new Date(Date.now() + 8 * 3600e3);
+  return { date: d.toISOString().slice(0, 10), time: d.toISOString().slice(11, 16) };
+}
+const tick = () => { $('clock').textContent = storeNow().time; };
+tick(); setInterval(tick, 30e3);
+
+$('themeBtn').onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+};
+
+const nameOf = (batchId) => state.names[batchId] || batchId;
+const linesText = (lines) => lines.map((l) => `${esc(nameOf(l.batch_id))} × ${l.qty}`).join('，');
+
+async function loadInventory() {
+  try {
+    const { batches } = await api('/inventory');
+    state.names = Object.fromEntries(batches.map((b) => [b.batch_id, b.name]));
+    const free = batches.reduce((n, b) => n + b.available, 0);
+    $('stockLine').textContent = batches.length ? `${batches.length} 个批次，可用 ${free} 件。` : '盲盒库存为空。';
+    $('invList').innerHTML = batches.length ? `<div class="tablewrap"><table>
+      <thead><tr><th>食品</th><th>品类</th><th class="r">可用</th><th class="r">原价</th><th>安全截止</th><th>核验</th></tr></thead>
+      <tbody>${batches.map((b) => `<tr>
+        <td>${esc(b.name)}<br><span class="muted" style="font-size:12px">${esc(b.batch_id)}</span></td>
+        <td>${esc(LABEL[b.category] || b.category)}</td><td class="r num">${b.available}</td>
+        <td class="r num">${rm(b.retail_sen)}</td><td class="num">${esc(String(b.safe_until).slice(0, 16).replace('T', ' '))}</td>
+        <td>${b.safe && b.storage_verified ? '<span class="tag ok">已核验</span>' : '<span class="tag bad">未核验</span>'}</td>
+      </tr>`).join('')}</tbody></table></div>`
+      : '<p class="empty">无库存：盲盒库存为空。演示时先点左侧“载入今晚演示库存”。</p>';
+    return true;
+  } catch (e) {
+    $('stockLine').textContent = '库存加载失败。';
+    $('invList').innerHTML = `<p class="empty">库存加载失败：${esc(e.message)} <button type="button" class="btn small" data-retry="inventory">重试</button></p>`;
+    return false;
+  }
+}
+
+$('seedBtn').onclick = async () => {
+  $('seedBtn').disabled = true;
+  try { await api('/demo-seed', {}); say('已载入面包、蛋糕、茶三种演示库存。'); }
+  catch (e) { say(e.message, true); }
+  finally { $('seedBtn').disabled = false; }
+  loadInventory();
+};
+
+$('sweepBtn').onclick = async () => {
+  $('sweepBtn').disabled = true;
+  const before = state.donations.filter((d) => d.status === 'PENDING').length;
+  try {
+    await api('/sweep', {});
+    await loadDonations();
+    const added = state.donations.filter((d) => d.status === 'PENDING').length - before;
+    say(added > 0 ? `清算完成，新增 ${added} 张待交接捐赠单。` : '清算完成，后端没有新增待交接捐赠单。');
+  } catch (e) { say(e.message, true); }
+  finally { $('sweepBtn').disabled = false; }
+  loadInventory(); loadStats();
+};
+
+function request() {
+  const { date } = storeNow();
+  const [start, end] = $('slot2200').checked ? ['22:00', '22:30'] : ['21:30', '22:00'];
+  const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const top = Number($('top').value);
+  return {
+    pickup_start: `${date}T${start}:00+08:00`, pickup_end: `${date}T${end}:00+08:00`,
+    top: Number.isInteger(top) ? top : 0,
+    preferences: { avoid_allergens: list($('avoid').value), required_diets: list($('diets').value), likes: list($('likes').value), dislikes: [] },
+  };
+}
+
+function clearResult() {
+  state.result = null; state.recipients = [];
+  $('optionsLane').hidden = true; $('fallbackLane').hidden = true;
+  $('options').innerHTML = ''; $('donRows').innerHTML = ''; $('wasteRows').innerHTML = '';
+  $('recipients').innerHTML = ''; $('contactCopy').value = ''; $('fuelNums').innerHTML = '';
+}
+
+async function calculate() {
+  if (state.busy) return;
+  const body = request();
+  if (body.top < 1 || body.top > 10) return say('方案数量要在 1 到 10 之间。', true);
+  state.busy = true; $('calcBtn').disabled = true; say('正在计算…');
+  try {
+    await loadInventory();
+    const result = await api('/calculate', body);
+    render(result);
+    say(result.status === 'OPTIONS' ? `找到 ${result.options.length} 个盲盒方案。`
+      : result.fallback.donatable.qty + result.fallback.inedible.qty ? '组不成盲盒，已列出捐赠建议和处理建议。' : '没有剩余库存。');
+  } catch (e) {
+    clearResult();
+    say(`计算失败：${e.message}`, true);
+  } finally { state.busy = false; $('calcBtn').disabled = false; }
+}
+$('calcForm').onsubmit = (event) => { event.preventDefault(); calculate(); };
+
+function contactText(recipient, donatable) {
+  const items = donatable.items.map((i) => `${i.name} × ${i.qty}`).join('、');
+  return `【演示文案，未发送】您好，${recipient}：\n我们是 Nexflow 演示门店。今晚打烊后有 ${items}，共 ${donatable.qty} 件、约 ${kg(donatable.weight_kg)}，门店已登记为可食用并核对储存。\n请问贵机构今晚是否方便接收？接收方式和时间待双方确认。`;
+}
+
+function render(r) {
+  clearResult();
+  state.result = r;
+  if (r.status === 'OPTIONS') {
+    $('optionsLane').hidden = false;
+    const best = r.options[0].scores.total || 1;
+    $('options').innerHTML = r.options.map((o) => `
+      <li>
+        <div>
+          <strong>${linesText(o.lines)}</strong>
+          <div class="muted" style="font-size:13px">${o.qty} 件 · 评分 ${o.scores.total.toFixed(1)} · 碳足迹估算 ${kg(o.estimated_co2e_kg)} CO₂e${o.allergens.length ? ` · 含 ${esc(o.allergens.join('、'))}` : ''}</div>
+          <div class="bar"><i style="width:${(o.scores.total / best) * 100}%"></i></div>
+        </div>
+        <div class="price num">${rm(o.price_sen)}<small>含包装 ${rm(o.packaging_sen)} · 原价 ${rm(o.retail_sen)}</small></div>
+      </li>`).join('');
+    return;
+  }
+  const fb = r.fallback;
+  const give = fb.choices.find((c) => c.type === 'ORPHANAGE_DONATION');
+  const fuel = fb.choices.find((c) => c.type === 'BIOFUEL');
+  const empty = !fb.donatable.qty && !fb.inedible.qty;
+  $('fallbackLane').hidden = false;
+  $('fbReason').textContent = empty ? '盲盒库存里没有可用食品。' : (REASON[fb.reason] || fb.reason);
+  $('emptyLeft').hidden = !empty;
+
+  $('donateBlock').hidden = !fb.donatable.qty;
+  $('donRows').innerHTML = fb.donatable.items.map((i) => `<tr><td>${esc(i.name)}</td><td class="r num">${i.qty}</td>
+    <td class="r num">${kg(i.weight_kg)}</td><td>${i.reason ? esc(REASON[i.reason] || i.reason) : '安全，可捐赠'}</td></tr>`).join('');
+  state.recipients = give ? give.recipients.map((c) => c.name) : [];
+  $('recipientBlock').hidden = !give; $('copyBlock').hidden = !give; $('copyRow').hidden = !give;
+  $('noRecipient').hidden = !fb.donatable.qty || !!give;
+  if (give) {
+    $('recipients').innerHTML = give.recipients.map((c) => `<li>
+      <strong>${esc(c.name)}</strong> <span class="tag">演示机构</span><br>
+      <span class="muted" style="font-size:13px">直线距离约 ${c.distance_km} km · 接收 ${c.accepts.map((a) => esc(LABEL[a] || a)).join('、')} · 联系方式：${c.contact ? esc(c.contact) : '未核实'}</span>
+    </li>`).join('');
+    $('contactCopy').value = contactText(give.recipients[0].name, fb.donatable);
+  }
+
+  $('wasteBlock').hidden = !fb.inedible.qty;
+  $('wasteRows').innerHTML = fb.inedible.items.map((i) => `<tr><td>${esc(i.name)}</td><td class="r num">${i.qty}</td>
+    <td class="r num">${kg(i.weight_kg)}</td><td><span class="tag bad">${esc(REASON[i.reason] || i.reason)}</span></td></tr>`).join('');
+
+  $('fuelBlock').hidden = !fuel;
+  if (fuel) {
+    $('fuelNums').innerHTML = `
+      <div><small>沼气</small><b class="num">${fuel.biogas_m3.toFixed(3)}</b><small>m³</small></div>
+      <div><small>甲烷</small><b class="num">${fuel.methane_m3.toFixed(3)}</b><small>m³</small></div>
+      <div><small>能量</small><b class="num">${fuel.energy_kwh.toFixed(3)}</b><small>kWh</small></div>`;
+    const f = fuel.formula;
+    $('fuelFormula').textContent = `估算，不是实测：${kg(fuel.weight_kg)} × ${f.biogas_m3_per_kg} m³/kg 得沼气，甲烷占 ${f.methane_share * 100}%，能量 = 沼气 × ${f.kwh_per_biogas_m3} kWh/m³。`;
+  }
+}
+
+$('copyBtn').onclick = async () => {
+  try { await navigator.clipboard.writeText($('contactCopy').value); say('文案已复制，未发送给任何机构。'); }
+  catch { $('contactCopy').select(); say('无法自动复制，请手动复制。', true); }
+};
+
+function donationRow(d) {
+  const p = d.payload;
+  const source = d.source_order ? '未领取盲盒' : '打烊余料';
+  const busy = state.inflight.has(d.id);
+  const status = d.status === 'DONATED' ? `<span class="tag ok">已交接（模拟）· ${esc(d.recipient)}</span>`
+    : d.status === 'PENDING' ? '<span class="tag pending">待交接</span>' : '<span class="tag bad">已报废</span>';
+  return `<tr>
+    <td>${linesText(p.lines)}<br><span class="muted" style="font-size:12px">${source} · 建立 ${esc(String(d.created).slice(11, 16))}</span></td>
+    <td class="r num">${p.qty}</td><td class="r num">${kg(p.weight_g / 1000)}</td><td class="r num">${kg(p.estimated_co2e_kg)}</td>
+    <td>${status}</td>
+    <td>${d.status === 'PENDING' ? `<button type="button" class="btn small give" data-handoff="${esc(d.id)}" ${busy ? 'disabled' : ''}>${busy ? '提交中…' : '确认交接'}</button>` : ''}</td>
+  </tr>`;
+}
+const donationTable = (rows) => `<div class="tablewrap"><table>
+  <thead><tr><th>食品</th><th class="r">件数</th><th class="r">重量</th><th class="r">CO₂e 估算</th><th>状态</th><th></th></tr></thead>
+  <tbody>${rows.map(donationRow).join('')}</tbody></table></div>`;
+
+function renderDonations() {
+  const live = state.donations.filter((d) => d.status !== 'DISCARDED');
+  const discarded = state.donations.filter((d) => d.status === 'DISCARDED');
+  $('donations').innerHTML = live.length ? donationTable(live)
+    : '<p class="empty">暂无捐赠单。打烊（22:30）后点“打烊清算”，未售出的安全食品会出现在这里。</p>';
+  $('discardBlock').hidden = !discarded.length;
+  $('discarded').innerHTML = discarded.length ? donationTable(discarded) : '';
+}
+
+async function loadDonations() {
+  try {
+    state.donations = (await api('/donations')).donations;
+    renderDonations();
+  } catch (e) {
+    state.donations = [];
+    $('discardBlock').hidden = true;
+    $('donations').innerHTML = `<p class="empty">捐赠清单加载失败：${esc(e.message)} <button type="button" class="btn small" data-retry="donations">重试</button></p>`;
+  }
+}
+
+async function loadStats() {
+  try {
+    const s = await api('/dashboard');
+    $('stats').innerHTML = `
+      <div><small>已交接件数</small><b class="num">${s.donated_qty}</b></div>
+      <div><small>已交接重量</small><b class="num">${kg(s.donated_weight_g / 1000)}</b></div>
+      <div><small>待交接单数</small><b class="num">${state.donations.filter((d) => d.status === 'PENDING').length}</b></div>`;
+    $('statNote').textContent = `已领取盲盒与已交接捐赠的食物碳足迹估算合计 ${kg(s.estimated_co2e_kg)} CO₂e。只是估算，不是经认证的减排量或碳信用。`;
+  } catch (e) {
+    $('stats').innerHTML = '';
+    $('statNote').innerHTML = `统计加载失败：${esc(e.message)} <button type="button" class="btn small" data-retry="stats">重试</button>`;
+  }
+}
+
+function openHandoff(id) {
+  const d = state.donations.find((x) => x.id === id);
+  if (!d || d.status !== 'PENDING' || state.inflight.has(id)) return;
+  state.handoffId = id;
+  $('hoBody').innerHTML = `${linesText(d.payload.lines)}，共 ${d.payload.qty} 件、${kg(d.payload.weight_g / 1000)}。`;
+  $('hoRecipient').value = state.recipients[0] || PLACEHOLDER;
+  $('hoAck').checked = false; $('hoOk').disabled = true;
+  $('handoffDialog').showModal();
+}
+$('hoAck').onchange = () => { $('hoOk').disabled = !$('hoAck').checked; };
+$('handoffDialog').onclose = () => {
+  const id = state.handoffId; state.handoffId = null;
+  if ($('handoffDialog').returnValue === 'ok' && $('hoAck').checked) handoff(id, $('hoRecipient').value.trim() || PLACEHOLDER);
+};
+
+async function handoff(id, recipient) {
+  if (!id || state.inflight.has(id)) return;
+  state.inflight.add(id); renderDonations();
+  try {
+    const row = await api('/donations/handoff', { donation_id: id, recipient });
+    say(`已记录模拟交接给 ${row.recipient}。这不代表运输已完成或机构已签收。`);
+  } catch (e) {
+    say(`交接失败：${e.message}`, true);
+  } finally {
+    state.inflight.delete(id);
+    await loadDonations();
+    await Promise.all([loadInventory(), loadStats()]);
+  }
+}
+
+document.addEventListener('click', (event) => {
+  const el = event.target.closest?.('[data-handoff],[data-retry]');
+  if (!el) return;
+  if (el.dataset.handoff) return openHandoff(el.dataset.handoff);
+  ({ inventory: loadInventory, donations: () => loadDonations().then(loadStats), stats: loadStats })[el.dataset.retry]?.();
+});
+
+loadInventory();
+loadDonations().then(loadStats);
+</script>
+</body>
+</html>
