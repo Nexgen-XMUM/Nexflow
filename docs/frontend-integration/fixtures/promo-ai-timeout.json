@@ -1,0 +1,40 @@
+{
+  "currency": "MYR",
+  "discount_rate": "0.50",
+  "items": [
+    {
+      "qty": 10,
+      "retail_total": "60.00",
+      "cost_total": "20.00",
+      "clearance_total": "30.00",
+      "gross_profit_total": "10.00",
+      "loss_total": "0.00",
+      "estimated_co2e_kg": "2",
+      "item": "croissant",
+      "name": "Butter Croissant",
+      "unit_retail_price": "6.00",
+      "unit_cost_price": "2.00",
+      "unit_clearance_price": "3.00"
+    }
+  ],
+  "totals": {
+    "qty": 10,
+    "retail_total": "60.00",
+    "cost_total": "20.00",
+    "clearance_total": "30.00",
+    "gross_profit_total": "10.00",
+    "loss_total": "0.00",
+    "estimated_co2e_kg": "2"
+  },
+  "carbon": {
+    "is_estimate": true,
+    "note": "Based on product weight and the supplied CO2e factor; not certified emissions reductions or carbon credits."
+  },
+  "promo": {
+    "text": "🥐 Eh, bakery deals lah! 10 Butter Croissant at RM3.00 each. All 10 for RM30.00 (50% off). 😊",
+    "source": "local_demo",
+    "is_fallback": true,
+    "fallback_reason": "AI_TIMEOUT"
+  },
+  "warnings": []
+}

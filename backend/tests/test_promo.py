@@ -300,7 +300,10 @@ def test_local_promo_facts_and_length(client, selection):
     assert "lah" in text
     assert len(text.split()) <= 50
     for item in result["items"]:
-        assert f'{item["qty"]} {item["name"]} at RM{item["unit_clearance_price"]} each' in text
+        assert (
+            f'{item["qty"]} {item["name"]}: original RM{item["unit_retail_price"]}, '
+            f'clearance RM{item["unit_clearance_price"]}/each'
+        ) in text
     assert f'All {result["totals"]["qty"]} for RM{result["totals"]["clearance_total"]}' in text
     assert "cost" not in text.casefold()
     assert "phone" not in response.text

@@ -1,6 +1,6 @@
 # Nexflow Backend
 
-FastAPI 后端，提供 `GET /api/products`、`GET /api/inventory` 和 `POST /api/generate-promo`。默认使用本地演示文案，可配置 DeepSeek 生成文案开头和结尾；商品、数量、价格和总额由 Python 插入。
+FastAPI 后端，提供 `GET /api/products`、`GET /api/inventory` 和 `POST /api/generate-promo`。默认使用本地演示文案，可配置 DeepSeek 生成文案开头和结尾；商品、促销数量、原价、清仓单价和总额由 Python 插入。
 
 ## Windows 本地配置与启动
 
@@ -17,6 +17,7 @@ FastAPI 后端，提供 `GET /api/products`、`GET /api/inventory` 和 `POST /ap
 AI_PROVIDER=deepseek
 DEEPSEEK_API_KEY=your_key_here
 DEEPSEEK_MODEL=deepseek-flash
+DEEPSEEK_TOTAL_TIMEOUT_SECONDS=15
 CORS_ALLOWED_ORIGINS=
 ```
 
@@ -26,9 +27,9 @@ CORS_ALLOWED_ORIGINS=
 只向官方 `https://api.deepseek.com/chat/completions` 发送商品名称、数量和清仓单价；不发送成本、毛利、客户或电话。
 模型默认 `deepseek-flash`，使用非思考模式和 JSON 输出，参考 [DeepSeek 官方文档](https://api-docs.deepseek.com/api/create-chat-completion/)。
 
-连接超时 4 秒，读写等阶段超时 12 秒，不自动重试；这不是整个请求的严格总时限。
+连接超时 4 秒，读写等阶段超时 12 秒；另以 `DEEPSEEK_TOTAL_TIMEOUT_SECONDS` 限制整个模型请求，默认 15 秒（必须为有限正数）。总时限覆盖请求及响应体读取，持续保活空行不会延长时限。到期取消异步 HTTP 等待并关闭请求，回退为 `AI_TIMEOUT`，不自动重试；本地计算和 HTTP 响应封装不计入模型请求时限。
 密钥缺失、HTTP 错误、网络错误、超时、回复结构错误或文案过长时，促销接口仍返回计算结果和本地模板。
-AI 只生成不含金额的开头和结尾，程序检查基本格式、长度和数字等限制；自然语言仍需老板审核，不能保证不存在任何语义错误。
+AI 只生成不含金额的开头和结尾，先去除首尾空白再验证两者非空，并校验上游对象、choices、message、content 的类型。程序检查长度、数字和 Manglish 常用表达，并限制配送、优惠门槛、优惠券、库存承诺、认证（包括 halal）、减排和碳积分等无依据声明；英文及马来文常见表述、Unicode 兼容数字均纳入检查。关键词检查不能覆盖所有同义改写、语言或隐含语义，文案发布前仍需老板人工审阅，不代表认证或合规保证。
 
 | `promo` 字段 | 含义 |
 |---|---|
@@ -37,9 +38,9 @@ AI 只生成不含金额的开头和结尾，程序检查基本格式、长度�
 | `source: "local_demo"`，`is_fallback: true` | AI 配置或调用有问题，已回退 |
 | `fallback_reason` | 成功或本地模式为 null，失败为不含密钥的类别代码 |
 
-失败类别：`MISSING_API_KEY`、`INVALID_AI_PROVIDER`、`AI_TIMEOUT`、`AI_HTTP_ERROR`、`AI_NETWORK_ERROR`、`INVALID_AI_COPY`。
+失败类别：`MISSING_API_KEY`、`INVALID_AI_PROVIDER`、`INVALID_AI_CONFIG`（总时限配置非法）、`AI_TIMEOUT`、`AI_HTTP_ERROR`、`AI_NETWORK_ERROR`、`INVALID_AI_COPY`。
 不会把供应商原始错误响应或密钥返回给前端。
-测试通过模拟供应商响应验证，不消耗真实额度；真实连接必须在用户本地填写密钥后另行验证。
+测试通过模拟供应商响应验证，不消耗真实额度；测试固定清空密钥，并禁止 HTTPX 真实传输。只有用户明确说“开始真实测试”后，才另行验证真实连接。
 
 ## 商品查询
 
@@ -190,7 +191,7 @@ curl -sS http://127.0.0.1:8000/api/generate-promo \
     "note": "Based on product weight and the supplied CO2e factor; not certified emissions reductions or carbon credits."
   },
   "promo": {
-    "text": "🥐 Eh, bakery deals lah! 10 Butter Croissant at RM3.00 each. All 10 for RM30.00 (50% off). 😊",
+    "text": "🥐 Eh, bakery deals lah! 10 Butter Croissant: original RM6.00, clearance RM3.00/each. All 10 for RM30.00 (50% off). 😊",
     "source": "local_demo",
     "is_fallback": false,
     "fallback_reason": null
@@ -238,7 +239,7 @@ curl -sS http://127.0.0.1:8000/api/generate-promo \
 
 `promo.source` 为 `local_demo` 时，前端应标识“本地演示文案”；为 `deepseek` 时，标识 AI 辅助文案。
 `is_fallback` 区分主动本地模式和 AI 失败回退，含义见上方表格。
-本地模板只使用代码返回的名称、数量、清仓单价和清仓总价，不包含成本、亏损或客户资料。
+AI 成功与本地模板复用 Python 拼接的商品事实：名称、促销数量、原价、清仓单价和清仓总价；原价和清仓价均为每件价格，不包含成本、亏损或客户资料。
 对当前三个商品的所有非空组合，文案包含 Emoji 和 Manglish，按空白分词不超过 50 词。
 未来商品目录扩大或名称变长时，再调整本地模板的长度策略。
 
@@ -301,6 +302,36 @@ CORS 预检错误由标准中间件返回 HTTP 400，不使用上述业务错误
 测试覆盖已知金额、数量类型、别名重复、库存边界、舍入、亏损混合汇总、CO₂e、文案、
 数据不变、非公开接口和精确跨域来源。临时库存样本不会改写共享文件。
 `test_ai_copy.py` 使用模拟 HTTP 响应覆盖 AI 成功、密钥缺失、超时、网络失败、HTTP 错误和回复校验；测试默认禁用真实 AI 调用。
+
+### Windows 验证本轮修改（不需要密钥）
+
+在项目根目录的 PowerShell 运行：
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests -q
+.\.venv\Scripts\python.exe -m compileall -q backend
+```
+
+新增反例覆盖 `choices: [null]`、错误嵌套类型、空白开头/结尾、`Delivery included, halal certified!` 及同类声明；持续空行测试用 0.05 秒模拟总时限，验证取消、关闭请求和仅调用一次。临时亏损样本对照本地基线，确认各类回退后金额、亏损、CO₂e 和警告完全一致。当前三种商品的所有非空组合均验证本地、AI 成功、AI 回退的事实和 50 词上限。
+
+手动检查本地接口时，可在单独 PowerShell 窗口明确选择本地模式，再启动（进程变量优先于 `.env`）：
+
+```powershell
+$env:AI_PROVIDER = 'local_demo'
+.\.venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
+
+另开窗口请求：
+
+```powershell
+$body = '[{"item":"croissant","qty":10}]'
+$result = Invoke-RestMethod -Uri 'http://127.0.0.1:8000/api/generate-promo' -Method Post -ContentType 'application/json' -Body $body
+$result.promo
+($result.promo.text -split '\s+').Count
+$result.totals
+```
+
+预期：`source=local_demo`、`is_fallback=false`、`fallback_reason=null`；文案包含 10 个 Butter Croissant、原价 RM6.00、清仓单价 RM3.00，不超过 50 词；清仓总额 `30.00`、亏损 `0.00`、CO₂e 估算 `2`。异常模型路径由上述模拟测试验证，无需开启真实 DeepSeek。
 
 当前固定的 Starlette TestClient 使用 httpx 会发出一条弃用提示；测试仍能执行。
 后续升级测试客户端时再切换其支持的新版客户端，不因此引入本阶段无关的库。
