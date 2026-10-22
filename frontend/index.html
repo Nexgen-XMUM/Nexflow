@@ -163,7 +163,27 @@ body.sidebar-collapsed .seg .rt { display: none; }
 .pipe li::before { content: "✓"; flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--brand); color: var(--brand-ink); font-size: 11px; font-weight: 700; display: grid; place-items: center; margin-top: 1px; }
 @keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
-/* ============ 老板看板（#kRec #kCo2 #kFood #kPromo） ============ */
+/* ============ 老板看板与促销计算 ============ */
+.promo-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+.promo-head h3 { font-size:19px; }
+.promo-item { border-top:1px solid var(--line); padding:14px 0 4px; }
+.promo-item h3 { font-size:16px; }
+.promo-item p { margin:4px 0 10px; }
+.promo-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.promo-metrics span { background:var(--sunk); border:1px solid var(--line); border-radius:10px; padding:10px; color:var(--muted); font-size:12px; }
+.promo-metrics b { display:block; color:var(--ink); font-size:16px; }
+@media(max-width:820px){.promo-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
+.consumer-shop[hidden] { display:none !important; }
+.consumer-shop h3 { font-size:18px; margin-bottom:4px; }
+.consumer-balance { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; margin:12px 0; border-radius:12px; background:var(--brand-light); border:1px solid var(--brand-border); }
+.consumer-balance strong { color:var(--brand); font-size:22px; }
+.redeem-list { display:grid; gap:8px; }
+.redeem-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
+.redeem-row .muted { font-size:12px; }
+.redeem-row .btn { padding:7px 10px; font-size:12px; white-space:nowrap; }
+.rescue-fields { display:grid; gap:10px; margin:12px 0; }
+.rescue-fields label { display:grid; gap:4px; font-size:12.5px; font-weight:700; }
+.rescue-fields input, .rescue-fields select { width:100%; padding:9px 10px; border:1px solid var(--line-strong); border-radius:9px; background:var(--surface); color:var(--ink); }
 .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
 .kpi-box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; box-shadow: var(--shadow-sm); border-top: 3px solid var(--kc, var(--brand)); }
 .kpi-box .v { display: block; font-family: var(--display); font-weight: 700; font-size: 26px; color: var(--ink); line-height: 1.15; font-variant-numeric: tabular-nums; }
@@ -356,7 +376,13 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
         <li><button type="button" class="nav-item" role="tab" data-tab="log" aria-selected="false">
           <span class="nav-icon" aria-hidden="true">📜</span><span class="nav-text">活动日志<span class="nav-sub">谁在什么时候做了什么</span></span>
         </button></li>
+        <li><button type="button" class="nav-item" role="tab" data-tab="blind" aria-selected="false">
+          <span class="nav-icon" aria-hidden="true">📦</span><span class="nav-text">盲盒与余料<span class="nav-sub">独立库存 · 只读计算</span></span>
+        </button></li>
       </ul>
+      <a class="nav-item" href="/app/rescue" style="text-decoration:none">
+        <span class="nav-icon" aria-hidden="true">🌿</span><span class="nav-text">打烊去向<span class="nav-sub">盲盒、捐赠、燃料与碳估算</span></span>
+      </a>
     </div>
 
     <div class="sidebar-footer" id="guide-role">
@@ -364,6 +390,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
       <div class="seg" role="group" aria-label="切换演示角色">
         <button type="button" data-role="staff" aria-pressed="false"><span class="ri" aria-hidden="true">🧑‍🍳</span><span class="rt">Siti<small>店员 · 只能提交盘点</small></span></button>
         <button type="button" data-role="owner" aria-pressed="true"><span class="ri" aria-hidden="true">👑</span><span class="rt">Uncle Wong<small>老板 · 可以模拟批准</small></span></button>
+        <button type="button" data-role="consumer" aria-pressed="false"><span class="ri" aria-hidden="true">🌱</span><span class="rt">消费者<small>顾客 · 查看积分与兑换</small></span></button>
       </div>
     </div>
   </aside>
@@ -413,6 +440,30 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
             <div class="kpi-box" style="--kc:#d94a5a"><span class="v" id="kPromo">0</span><span class="l">本页模拟广播次数</span></div>
           </div>
           <div id="draftBox"></div>
+
+        </section>
+
+        <section class="panel" id="tab-blind" hidden>
+          <div class="panel-head"><div><h2>📦 盲盒与余料</h2>
+            <p>盲盒批次库存与清仓 JSON 库存独立。计算只提供建议，不下单、不预留、不扣库存、不加积分。</p></div></div>
+          <div class="card">
+            <div class="promo-head"><h3>盲盒库存</h3><button type="button" class="btn btn-main" data-act="blind-load" data-blind>刷新盲盒库存</button></div>
+            <div id="blindInventory" aria-live="polite"></div>
+          </div>
+          <div class="card" style="margin-top:18px">
+            <h3>计算候选组合</h3>
+            <p class="muted">日期及取餐时段按马来西亚 UTC+08:00。计算器允许营业时间外规划；下单仍受后端营业限制。</p>
+            <div class="rescue-fields">
+              <label>规划日期<input type="date" id="blindDate" data-blind></label>
+              <label>计划取餐时段<select id="blindSlot" data-blind><option value="21:30">21:30–22:00</option><option value="22:00">22:00–22:30</option></select></label>
+              <label>需避开的过敏原（英文，逗号分隔）<input id="blindAllergens" data-blind placeholder="例如 wheat, milk"></label>
+              <label>必须满足的饮食标签（英文，逗号分隔）<input id="blindDiets" data-blind placeholder="例如 vegetarian"></label>
+            </div>
+            <button type="button" class="btn btn-main" data-act="blind-calculate" data-blind>计算盲盒方案</button>
+            <p id="blindHint" class="hint" role="status"></p>
+          </div>
+          <div id="promotionBox" class="card" style="margin-top:18px" aria-live="polite"></div>
+          <section id="rescuePanel" class="card" style="margin-top:18px" hidden aria-live="polite"></section>
         </section>
 
         <!-- 页面 3：活动日志 -->
@@ -426,7 +477,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
           <div class="card"><ul class="log" id="logList" aria-live="polite"></ul></div>
         </section>
 
-        <p class="foot">商品来自后端演示目录。金额、毛利、亏损和 CO₂e 由后端计算，AI 只负责文案。审批、WhatsApp 和活动日志为本页模拟，不实际发送、不扣库存、不产生成交；CO₂e 估算不是碳积分。</p>
+        <p class="foot">商品来自后端演示目录。金额、毛利、亏损和 CO₂e 使用后端结果。审批、WhatsApp、积分与兑换均为本页模拟，不实际发送、不扣库存、不产生成交；CO₂e 估算不是经认证减排量或碳积分。</p>
       </main>
 
       <!-- 右侧：WhatsApp 模拟器 -->
@@ -448,6 +499,8 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
           </div>
         </div>
         <p class="phone-cap">WhatsApp 模拟器。人物与回复为虚构演示，未实际发送或接单。</p>
+        <section class="card consumer-shop" id="consumerShop" hidden aria-live="polite"></section>
+
       </aside>
     </div>
   </div>
@@ -476,7 +529,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
 <script> /* script 标签里写 JavaScript：让网页“动起来” */
 
 /* =====================================================
-   所有数据都来自 backend（main.py），前端不存任何商品数据、不做任何计算
+   清仓与盲盒使用独立后端接口；消费者积分仅作独立页面演示
    ===================================================== */
 const API = ''; // /app 与接口同源，无需另起前端服务。
 async function api(path, body){
@@ -509,13 +562,15 @@ function fresh(){ // 函数：生成一份“全新的初始状态”
   return { // 返回一个对象，记录整个 demo 现在的状态
     role:'owner', tab:'pos', step:1, busy:false, // 当前角色、当前页面、当前第几步、是否正在处理中
     qty:{}, // 店员输入的剩余数量（按商品 id 记录，没填就是 0）
+    consumer:{points:0, earned:0, redeemed:0}, // 消费者积分仅保存在本页演示状态
+    blind:{batches:null, result:null, error:''}, // 与清仓商品、消费者演示余额独立
     draft:null, result:null, // 待审批的草稿、审批后的结果（一开始都没有）
     kpi:{recovered:null, co2:null, qty:null, promos:0}, // 金额与碳估算仅展示最近一次后端结果
     log:[] // 活动日志从空开始
   }; // 对象结束
 } // fresh 函数结束
 let state = fresh(); // state：整个 demo 的“当前状态”，所有页面都根据它来显示
-const roleName = () => state.role === 'owner' ? 'Uncle Wong' : 'Siti'; // 根据当前角色返回名字
+const roleName = () => state.role === 'owner' ? 'Uncle Wong' : state.role === 'consumer' ? 'Mei Ling' : 'Siti'; // 根据当前角色返回名字
 
 let toastTimer; // 记住提示条的计时器，方便重复触发时取消上一个
 function toast(msg){ // 函数：在屏幕底部弹出一条短提示
@@ -525,7 +580,8 @@ function toast(msg){ // 函数：在屏幕底部弹出一条短提示
 
 function setBusy(busy){
   state.busy = busy;
-  $$('[data-q], [data-inc], [data-dec], #quickText, [data-act="parse"], #submitBtn, #resetBtn, [data-role], #copyBox').forEach(el => { el.disabled = busy; });
+  renderConsumerShop();
+  $$('[data-q], [data-inc], [data-dec], #quickText, [data-act="parse"], #submitBtn, #resetBtn, [data-role], #copyBox, [data-blind]').forEach(el => { el.disabled = busy; });
   $$('[data-act="approve"], [data-act="reject"]').forEach(el => { el.disabled = busy || state.role !== 'owner'; });
 }
 
@@ -557,6 +613,7 @@ async function loadProducts(){
     $('#posHint').textContent = '商品加载失败，请检查服务后点击“重置演示”重试：' + err.message;
   } finally {
     setBusy(false);
+    renderKPI();
   }
 }
 
@@ -576,16 +633,47 @@ function renderSteps(){ // 函数：画出顶部的五步旅程条
 } // renderSteps 结束
 function setStep(n){ state.step = n; renderSteps(); } // 函数：切换到第 n 步，并刷新步骤条
 
-function renderTabs(){ // 函数：刷新三个标签页的显示/隐藏
+function renderTabs(){ // 函数：刷新四个标签页的显示/隐藏
   $$('.tabs [data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === state.tab))); // 当前页面对应的标签标记为“选中”
-  ['pos','dash','log'].forEach(k => { $('#tab-' + k).hidden = (k !== state.tab); }); // 只显示当前页面，其余隐藏
+  ['pos','dash','log','blind'].forEach(k => { $('#tab-' + k).hidden = (k !== state.tab); }); // 只显示当前页面，其余隐藏
   $('#pip').classList.toggle('on', !!state.draft); // 有待审批草稿时显示红点
 } // renderTabs 结束
-function switchTab(t){ state.tab = t; renderTabs(); } // 函数：切换到指定页面
+function switchTab(t){ state.tab = t; renderTabs(); if(t === 'blind' && state.blind.batches === null && !state.busy) loadBlindInventory(); } // 函数：切换到指定页面
 
 function renderRole(){ // 函数：刷新角色切换器的选中状态
   $$('.seg [data-role]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.role === state.role))); // 当前角色的按钮标记为“按下”
+  renderConsumerShop();
 } // renderRole 结束
+
+const POINTS_PER_CO2_KG = 10;
+const REDEMPTION_ITEMS = [
+  {id:'croissant', name:'牛角包', points:40},
+  {id:'chocolate_slice', name:'巧克力蛋糕片', points:30}
+];
+function renderConsumerShop(){
+  const panel=$('#consumerShop');
+  if(!panel) return;
+  panel.hidden=state.role!=='consumer';
+  if(panel.hidden) return;
+  panel.innerHTML='<h3>🌱 前端独立积分演示</h3><p class="muted">未确认的前端样例：每次模拟批准按 CO₂e 估算的每 kg 记 10 个演示分，不代表实际减排或碳积分。此余额不连接盲盒后端；后端仅隐藏款核销奖励 10 分，100 分抵 RM1，且最多抵正价消费 30%。两套规则尚待负责人统一。</p>'+
+    '<div class="consumer-balance"><span>Mei Ling 积分余额</span><strong>'+state.consumer.points+' 分</strong></div>'+
+    '<p class="muted">累计获得 '+state.consumer.earned+' 分 · 已兑换 '+state.consumer.redeemed+' 分</p><div class="redeem-list">'+
+    REDEMPTION_ITEMS.map(item=>{
+      const product=products.find(p=>p.id===item.id);
+      const label=product?.name || item.name;
+      return '<div class="redeem-row"><div><b>'+esc(label)+'</b><div class="muted">前端样例兑换价 '+item.points+' 分</div></div><button type="button" class="btn btn-main" data-act="redeem" data-product="'+esc(item.id)+'"'+(state.busy || state.consumer.points<item.points?' disabled':'')+'>兑换</button></div>';
+    }).join('')+'</div><p class="muted">兑换只扣除本页演示积分，不会创建订单、扣库存或实际发货。</p>';
+}
+function redeemConsumerItem(id){
+  const item=REDEMPTION_ITEMS.find(x=>x.id===id);
+  if(!item || state.busy || state.role !== 'consumer') return;
+  if(state.consumer.points<item.points){ toast('积分不足，暂时无法兑换'); return; }
+  state.consumer.points-=item.points;
+  state.consumer.redeemed+=item.points;
+  renderConsumerShop();
+  const product=products.find(p=>p.id===item.id);
+  toast('已模拟兑换 '+(product?.name || item.name));
+}
 
 function renderPOS(){ // 函数：画出 POS 页的商品列表
   $('#posRows').innerHTML = products.map(p => // 每个商品生成一行（商品来自后端）
@@ -664,6 +752,92 @@ function addLog(who, act, detail, sdg, type){ // 函数：新增一条日志（�
   renderLog(); // 刷新日志列表
 } // addLog 结束
 
+/* ================== 盲盒：独立库存、只读计算 ================== */
+const senMoney = sen => Number.isSafeInteger(sen) ? money(sen / 100) : '—';
+const estimate = value => Number.isFinite(value) ? value.toLocaleString('en-GB', {maximumFractionDigits:6}) : '—';
+function blindReason(code){
+  return ({SAFETY_UNVERIFIED:'安全或储存尚未核验', UNKNOWN_RESTRICTIONS:'过敏原或饮食资料未知',
+    SAFETY_WINDOW:'安全期限不能覆盖当前时间或计划取餐结束', ALLERGEN_CONFLICT:'过敏原与筛选条件冲突',
+    DIET_CONFLICT:'不满足饮食标签', OUT_OF_STOCK:'无可用库存', SEARCH_LIMIT:'搜索达到上限，未找到方案',
+    NO_FEASIBLE_COMBINATION:'没有符合后端组合规则的方案'})[code] || code;
+}
+function resetBlindForm(){
+  $('#blindDate').value = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Kuala_Lumpur', year:'numeric', month:'2-digit', day:'2-digit'}).format(new Date());
+  $('#blindSlot').value = '21:30';
+  $('#blindAllergens').value = ''; $('#blindDiets').value = '';
+}
+function renderBlindInventory(){
+  const batches = state.blind.batches;
+  $('#blindInventory').innerHTML = batches === null ? '<p class="muted">尚未加载盲盒库存。</p>'
+    : !batches.length ? '<p>盲盒库存为空。需由本地演示接口导入批次，不会使用清仓库存补足。</p>'
+    : '<div class="tblwrap"><table><thead><tr><th>商品 / 批次</th><th>可用件数</th><th>单件原价</th><th>安全截止时间</th></tr></thead><tbody>' + batches.map(b =>
+      '<tr><td>' + esc(b.name) + '<br><small>' + esc(b.batch_id) + '</small></td><td>' + esc(b.available) + '</td><td>' + senMoney(b.retail_sen) +
+      '</td><td>' + esc(b.safe_until) + '</td></tr>').join('') + '</tbody></table></div><p class="muted">可用件数来自后端，仍须通过安全和偏好筛选；金额单位由 sen 换算为 RM（100 sen = RM1）。</p>';
+}
+function renderBlindResult(){
+  const b = state.blind, box = $('#promotionBox'), rescue = $('#rescuePanel');
+  $('#blindHint').textContent = b.error;
+  rescue.hidden = true; rescue.innerHTML = '';
+  if(!b.result){ box.innerHTML = '<p class="muted">尚无本次计算结果。加载库存后选择条件，再计算候选组合。</p>'; return; }
+  const r = b.result;
+  const names = id => b.batches?.find(batch => batch.batch_id === id)?.name || ('未识别批次 ' + id);
+  const rejected = Object.entries(r.rejected).map(([id, reason]) => '<li>' + esc(names(id)) + '（' + esc(id) + '）：' + esc(blindReason(reason)) + ' [' + esc(reason) + ']</li>').join('');
+  const note = '<p class="muted">候选互为替代，不表示可同时售出。计算未预留库存；CO₂e 为估算，不是认证减排或碳积分。</p>' +
+    (r.search_truncated ? '<p class="lock">搜索已截断，结果不保证全局最优。</p>' : '') +
+    (rejected ? '<details open><summary>未纳入的库存及原因</summary><ul>' + rejected + '</ul></details>' : '');
+  if(r.status === 'OPTIONS'){
+    box.innerHTML = '<h3>盲盒候选组合</h3>' + r.options.map((o, index) => '<article class="promo-item"><h3>方案 ' + (index + 1) + ' · ' + senMoney(o.price_sen) + '</h3><ul>' +
+      o.lines.map(line => '<li>' + esc(names(line.batch_id)) + ' × ' + esc(line.qty) + '</li>').join('') + '</ul><div class="promo-metrics">' +
+      '<span><b>' + senMoney(o.retail_sen) + '</b>原价合计</span><span><b>' + senMoney(o.price_sen) + '</b>盲盒售价</span>' +
+      '<span><b>' + senMoney(o.packaging_sen) + '</b>已包含包装费</span><span><b>' + estimate(o.estimated_co2e_kg) + ' kg</b>CO₂e 估算</span></div></article>').join('') + note;
+    return;
+  }
+  const f = r.fallback;
+  const empty = f.donatable.qty === 0 && f.inedible.qty === 0;
+  box.innerHTML = '<h3>' + (empty ? '空库存：没有可用于规划的剩余商品' : '本次没有可行盲盒方案') + '</h3><p>' + esc(blindReason(f.reason)) + ' [' + esc(f.reason) + ']</p>' +
+    '<p class="muted">后端组合要求：至少 1 件主食，每盒 2–4 件，同商品最多 2 件，并满足安全、偏好及售价上限。以下为后端返回的分流建议。</p>' + note;
+  rescue.hidden = false;
+  rescue.innerHTML = '<h3>余料分流建议</h3><p class="lock">机构为演示数据，尚未核实接收安排；没有联系、派送或完成捐赠。能源和碳排均为估算。</p>' +
+    [['donatable','可捐赠分类'],['inedible','不可食用或资料未核验分类']].map(([key,label]) => {
+      const group = f[key];
+      return '<article class="promo-item"><h3>' + label + '</h3><p>' + esc(group.qty) + ' 件 · ' + estimate(group.weight_kg) + ' kg · CO₂e 估算 ' + estimate(group.estimated_co2e_kg) + ' kg</p><ul>' +
+        group.items.map(item => '<li>' + esc(item.name) + ' × ' + esc(item.qty) + (item.reason ? ' · ' + esc(blindReason(item.reason)) : '') + '</li>').join('') + '</ul></article>';
+    }).join('') + f.choices.map(choice => {
+      if(choice.type === 'ORPHANAGE_DONATION') return '<article class="promo-item"><h3>建议捐赠 · ' + estimate(choice.weight_kg) + ' kg</h3><ul>' +
+        choice.recipients.map(c => '<li><b>' + esc(c.name) + '（演示机构）</b> · 直线距离 ' + estimate(c.distance_km) + ' km<br>' + esc(c.address || '未提供地址') + ' · 接收品类 ' + esc(c.accepts.join('、')) + '</li>').join('') + '</ul></article>';
+      if(choice.type === 'BIOFUEL') return '<article class="promo-item"><h3>生物能源建议（估算）</h3><p>原料 ' + estimate(choice.weight_kg) + ' kg · 沼气 ' + estimate(choice.biogas_m3) + ' m³ · 甲烷 ' + estimate(choice.methane_m3) + ' m³ · 能量 ' + estimate(choice.energy_kwh) + ' kWh</p><p class="muted">仅转述后端估算，不代表已回收能源或减排。</p></article>';
+      return '<p>后端建议类型：' + esc(choice.type) + '</p>';
+    }).join('') + (f.choices.length ? '' : '<p>后端没有返回可执行的分流建议。</p>');
+}
+async function loadBlindInventory(){
+  if(state.busy) return;
+  state.blind = {batches:null, result:null, error:''};
+  setBusy(true); renderBlindInventory(); renderBlindResult();
+  $('#blindHint').textContent = '正在加载盲盒独立库存…';
+  try { state.blind.batches = (await api('/api/blind-boxes/inventory')).batches; }
+  catch(err){ state.blind.error = '盲盒库存加载失败：' + err.message + '。请刷新盲盒库存重试。'; }
+  finally { setBusy(false); renderBlindInventory(); renderBlindResult(); }
+}
+async function calculateBlind(){
+  if(state.busy) return;
+  state.blind.result = null; state.blind.error = ''; renderBlindResult();
+  const day = $('#blindDate').value, slot = $('#blindSlot').value;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(day) || !['21:30','22:00'].includes(slot)){
+    state.blind.error = '请选择有效规划日期和取餐时段。'; renderBlindResult(); return;
+  }
+  const tags = value => value.split(/[,，]/).map(v => v.trim()).filter(Boolean);
+  const request = {pickup_start:day + 'T' + slot + ':00+08:00',
+    pickup_end:day + 'T' + (slot === '21:30' ? '22:00' : '22:30') + ':00+08:00', top:3,
+    preferences:{avoid_allergens:tags($('#blindAllergens').value), required_diets:tags($('#blindDiets').value)}};
+  setBusy(true); $('#blindHint').textContent = '正在由后端计算候选组合…';
+  try {
+    state.blind.batches = null;
+    state.blind.batches = (await api('/api/blind-boxes/inventory')).batches;
+    state.blind.result = await api('/api/blind-boxes/calculate', request);
+  } catch(err){ state.blind.error = '盲盒计算失败：' + err.message + '。可修改条件或重试。'; }
+  finally { setBusy(false); renderBlindInventory(); renderBlindResult(); }
+}
+
 /* ================== 流程：提交盘点 → 审批 → 群发 ================== */
 async function submitEOD(){
   if(state.busy) return;
@@ -710,12 +884,15 @@ async function approve(){
   try {
     await broadcast(text, d.items);
     state.kpi.promos += 1;
+    const pointsEarned=d.co2!==null && Number.isFinite(Number(d.co2)) ? Math.floor(Math.max(0,Number(d.co2))*POINTS_PER_CO2_KG) : 0;
+    state.consumer.points+=pointsEarned; state.consumer.earned+=pointsEarned;
+    renderConsumerShop();
     addLog('Uncle Wong', d.edited ? '修改文案后模拟批准并广播' : '模拟批准并广播',
-      '仅本页动画：未实际发送、未扣库存、未产生成交。', 'CO₂e 估算 ' + d.co2 + ' kg，不是碳积分。', 'ok');
+      '仅本页动画：未实际发送、未扣库存、未产生成交。', 'CO₂e 估算 ' + d.co2 + ' kg；前端独立演示积分 +' + pointsEarned + '。', 'ok');
     state.result = {units:d.totals.qty, rev:d.rev, co2:d.co2};
     state.draft = null;
     setStep(6);
-    toast('模拟广播完成，已记入本页演示日志');
+    toast('模拟广播完成，前端独立演示积分 +' + pointsEarned + '，可切换消费者角色查看');
   } catch(err){
     toast('模拟展示失败，请重试：' + err.message);
   } finally {
@@ -798,7 +975,10 @@ document.addEventListener('click', e => { // 监听整个页面的点击（这�
   const t = e.target.closest('button'); if(!t) return; // 找到被点的按钮，如果点的不是按钮就结束
   if(t.dataset.tab){ switchTab(t.dataset.tab); return; } // 点的是标签按钮：切换页面
   if(state.busy) return;
+  if(t.dataset.act === 'blind-load'){ loadBlindInventory(); return; }
+  if(t.dataset.act === 'blind-calculate'){ calculateBlind(); return; }
   if(t.dataset.role){ state.role = t.dataset.role; renderRole(); if(state.draft) renderDraft(); return; }
+  if(t.dataset.act === 'redeem'){ redeemConsumerItem(t.dataset.product); return; }
   const id = t.dataset.inc || t.dataset.dec;
   if(id){
     const qty = quantity(state.qty[id]);
@@ -818,6 +998,7 @@ document.addEventListener('click', e => { // 监听整个页面的点击（这�
 }); // 点击监听结束
 document.addEventListener('input', e => {
   if(state.busy) return;
+  if(e.target.matches?.('[data-blind]')){ state.blind.result = null; state.blind.error = ''; renderBlindResult(); }
   if(e.target.dataset?.q){
     const id = e.target.dataset.q, raw = e.target.value;
     state.qty[id] = raw;
@@ -834,10 +1015,11 @@ $('#resetBtn').addEventListener('click', () => {
   if(state.busy) return;
   state = fresh();
   $('#quickText').value = ''; $('#posHint').textContent = '';
-  clearResult(); renderAll(); loadProducts();
+  clearResult(); renderAll(); resetBlindForm(); loadProducts();
 });
 
-function renderAll(){ renderSteps(); renderRole(); renderPOS(); renderKPI(); renderDraft(); renderLog(); renderTabs(); } // 函数：一次性画出页面所有部分
+function renderAll(){ renderSteps(); renderRole(); renderPOS(); renderKPI(); renderDraft(); renderLog(); renderTabs(); renderBlindInventory(); renderBlindResult(); } // 函数：一次性画出页面所有部分
+resetBlindForm();
 renderAll(); // 网页打开时，立刻画出初始页面
 loadProducts(); // 再从后端取商品列表
 </script> <!-- JavaScript 结束 -->
@@ -877,12 +1059,12 @@ loadProducts(); // 再从后端取商品列表
 
   /* 功能导览 */
   const STEPS_TOUR = [
-    {target:'#guide-sidebar', tab:'pos', place:'right', title:'左侧导航', desc:'三个工作页：打烊盘点、老板看板、活动日志。点左上角 ☰ 可以收起或展开菜单。'},
+    {target:'#guide-sidebar', tab:'pos', place:'right', title:'左侧导航', desc:'四个工作页：打烊盘点、老板看板、活动日志、盲盒与余料。点左上角 ☰ 可以收起或展开菜单。'},
     {target:'#guide-top-actions', tab:'pos', place:'bottom', title:'主题与工具', desc:'切换浅色/深色模式，随时重开导览，或一键重置演示数据。'},
     {target:'#steps', tab:'pos', place:'bottom', title:'五步自动化旅程', desc:'触发 → 关联数据 → 决策逻辑 → 人工审批 → 可见结果。当前进行到哪一步会高亮。'},
     {target:'#guide-pos-card', tab:'pos', place:'right', title:'打烊盘点', desc:'商品从后端载入。用一句话快速输入，或用 + / − 调整数量，然后点“提交盘点”。'},
-    {target:'#guide-kpis', tab:'dash', place:'bottom', title:'老板看板', desc:'本次全部售出情景金额、CO₂e 估算与商品件数来自后端；广播次数仅为本页模拟统计。'},
-    {target:'#guide-role', tab:'dash', place:'right', title:'角色切换', desc:'这是演示角色切换，不是身份认证。Siti 提交盘点，Uncle Wong 模拟批准或拒绝。'},
+    {target:'#guide-kpis', tab:'dash', place:'bottom', title:'老板看板', desc:'本次全部售出情景金额、CO₂e 估算与商品件数来自后端；广播次数仅为本页模拟统计。盲盒候选在独立工作页展示。'},
+    {target:'#guide-role', tab:'dash', place:'right', title:'角色切换', desc:'这是演示角色切换，不是身份认证。Siti 提交盘点，Uncle Wong 模拟批准或拒绝，消费者查看独立演示积分并模拟兑换。'},
     {target:'#guide-phone', tab:'pos', place:'left', title:'WhatsApp 模拟器', desc:'模拟批准后，在这里播放送达、已读和虚构熟客回复；不实际发送、不扣库存、不生成订单。'}
   ];
   let idx = 0, tourOn = false;

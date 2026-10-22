@@ -48,6 +48,11 @@ def test_frontend_entry_does_not_expose_repository():
         assert "/api/products" in page.text
         assert 'id="guide-sidebar"' in page.text
         assert 'id="themeToggleBtn"' in page.text
+        assert 'id="tab-blind"' in page.text
+        assert 'id="consumerShop"' in page.text
+        assert '/api/blind-boxes/inventory' in page.text
+        assert '/api/blind-boxes/calculate' in page.text
+        assert '100 sen = RM1' in page.text
         for path in ("/data/inventory.json", "/data/customers.json", "/backend/main.py", "/api/approve"):
             assert client.get(path).status_code == 404
 

@@ -1,5 +1,8 @@
 # Smart Rescue Box 本地 MVP
 
+当前 `/app` 已接入独立盲盒库存和只读计算，展示候选、无方案原因及余料建议；不连接下单、核销或积分兑换。
+启动和网页验收见 [前端说明](../../frontend/README.md)。下方 PR 12 测试数字为历史记录，当前联调验证见 [本轮汇报](../../docs/blind-box-integration/summary.md)。
+
 ## PR 12 精简更新记录
 
 2026-10-22：同步 main 的 d861f6b，仅保留盲盒模块9个文件、盲盒测试和 main.py 入口改动，共11个文件。已合入 main 的 AI 代码与历史交接文档沿用 main，不重复提交；旧联调样例和长交接资料从本次 PR 差异中移除，历史提交与之前提供的运行记录包仍保留。
@@ -25,7 +28,8 @@ $env:AI_PROVIDER = 'local_demo'
 .\.venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-打开 http://127.0.0.1:8000/docs 中的 `Blind boxes LOCAL DEMO`。API 使用服务器当前时间，非营业时间拒绝下单；不要为绕过营业规则修改真实机器时钟，白天用上面的模拟程序。旧 `/app` 页面尚无盲盒 UI。
+打开 http://127.0.0.1:8000/app 的“盲盒与余料”，或在 `/docs` 查看 `Blind boxes LOCAL DEMO`。
+API 使用服务器当前时间，非营业时间拒绝下单；只读计算允许营业时间外规划，不改变营业规则。不要修改真实机器时钟。
 
 SQLite 默认位置 `data/local/blind-boxes.sqlite3`，首次数据库操作才创建，已被 Git 忽略；可用 `BLIND_BOX_DB_PATH` 指定其他路径。无需新依赖，使用 Python 标准库 sqlite3。库存不从旧 inventory.json 自动导入，不凭商品名称推断安全、主食或饮食资格。
 
@@ -121,7 +125,7 @@ simulated_revenue_sen 统计所有模拟已付款订单，包括不可退款的�
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest backend/tests -q
-node --test frontend/tests/input.test.cjs
+node --test frontend/tests/*.test.cjs
 .\.venv\Scripts\python.exe -m compileall -q backend
 ```
 
