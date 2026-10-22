@@ -1,0 +1,66 @@
+{
+  "dataset": "synthetic_demo_only",
+  "version": 1,
+  "rules": [
+    {
+      "id": "exclude_opt_out",
+      "priority": 1,
+      "when": {
+        "whatsapp_opt_in": false
+      },
+      "action": "do_not_message"
+    },
+    {
+      "id": "exclude_allergens",
+      "priority": 2,
+      "when": {
+        "product_allergens_intersect_customer_allergens_to_avoid": true
+      },
+      "action": "exclude_product"
+    },
+    {
+      "id": "prefer_favorite",
+      "priority": 3,
+      "when": {
+        "product_id_matches_favorite_product": true
+      },
+      "action": "add_score",
+      "score": 5
+    },
+    {
+      "id": "category_interest",
+      "priority": 4,
+      "when": {
+        "product_category_in_customer_interested_categories": true
+      },
+      "action": "add_score",
+      "score": 3
+    },
+    {
+      "id": "within_budget",
+      "priority": 5,
+      "when": {
+        "offer_price_myr_lte_customer_max_offer_budget_myr": true
+      },
+      "action": "add_score",
+      "score": 2
+    },
+    {
+      "id": "stock_available",
+      "priority": 6,
+      "when": {
+        "available_stock_gt_zero": true
+      },
+      "action": "eligible"
+    },
+    {
+      "id": "human_approval",
+      "priority": 7,
+      "when": {
+        "campaign_ready": true
+      },
+      "action": "require_owner_approval_before_broadcast"
+    }
+  ],
+  "ranking": "eligible products sorted by total score descending, then offer expiry ascending; never message customers who have not opted in."
+}

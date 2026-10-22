@@ -1,0 +1,44 @@
+{
+  "dataset": "synthetic_demo_only",
+  "examples": [
+    {
+      "customer_id": "c001",
+      "promotion_id": "promo-demo-001",
+      "recommended_product_id": "croissant",
+      "score": 10,
+      "reason_codes": [
+        "favorite_product",
+        "category_interest",
+        "within_budget",
+        "stock_available"
+      ],
+      "personalized_message": "Aina, croissant duo 2 for RM5 before 8 PM 🥐 Reply NAK to reserve.",
+      "requires_owner_approval": true
+    },
+    {
+      "customer_id": "c002",
+      "promotion_id": "promo-demo-002",
+      "recommended_product_id": "chocolate_slice",
+      "score": 8,
+      "reason_codes": [
+        "category_interest",
+        "within_budget",
+        "stock_available"
+      ],
+      "personalized_message": "Ravi, chocolate slice RM4 until 8 PM 🍫 Reply NAK if you want one.",
+      "requires_owner_approval": true
+    },
+    {
+      "customer_id": "c003",
+      "promotion_id": "promo-demo-001",
+      "recommended_product_id": "croissant",
+      "score": 5,
+      "reason_codes": [
+        "within_budget",
+        "stock_available"
+      ],
+      "personalized_message": "Mei, fresh croissant duo 2 for RM5 before 8 PM 🥐 Reply NAK to reserve.",
+      "requires_owner_approval": true
+    }
+  ]
+}

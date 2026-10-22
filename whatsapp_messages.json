@@ -1,0 +1,85 @@
+{
+  "dataset": "synthetic_demo_only",
+  "messages": [
+    {
+      "id": "msg-001",
+      "group_id": "grp_uncle_wong_regulars",
+      "sender_id": "c001",
+      "sent_at": "2026-10-21T18:42:10+08:00",
+      "text": "Boss, 2 croissant for me please. I pick up 7:30 ya.",
+      "reply_to": null,
+      "status": "unprocessed",
+      "demo_data": true
+    },
+    {
+      "id": "msg-002",
+      "group_id": "grp_uncle_wong_regulars",
+      "sender_id": "c001",
+      "sent_at": "2026-10-21T18:42:36+08:00",
+      "text": "Add one chocolate slice also, same order.",
+      "reply_to": "msg-001",
+      "status": "unprocessed",
+      "demo_data": true
+    },
+    {
+      "id": "msg-003",
+      "group_id": "grp_uncle_wong_regulars",
+      "sender_id": "c002",
+      "sent_at": "2026-10-21T18:47:02+08:00",
+      "text": "Ada croissant lagi tak? Save 2 for me, collect before 8.",
+      "reply_to": null,
+      "status": "unprocessed",
+      "demo_data": true
+    },
+    {
+      "id": "msg-004",
+      "group_id": "grp_uncle_wong_regulars",
+      "sender_id": "c003",
+      "sent_at": "2026-10-21T18:51:20+08:00",
+      "text": "1 chocolate slice please 😊",
+      "reply_to": null,
+      "status": "unprocessed",
+      "demo_data": true
+    },
+    {
+      "id": "msg-005",
+      "group_id": "grp_uncle_wong_regulars",
+      "sender_id": "c003",
+      "sent_at": "2026-10-21T18:52:04+08:00",
+      "text": "Sorry make that 2 slices.",
+      "reply_to": "msg-004",
+      "status": "unprocessed",
+      "demo_data": true
+    },
+    {
+      "id": "msg-006",
+      "group_id": "grp_uncle_wong_regulars",
+      "sender_id": "c004",
+      "sent_at": "2026-10-21T18:55:11+08:00",
+      "text": "Keep me some please, will come later.",
+      "reply_to": null,
+      "status": "unprocessed",
+      "demo_data": true
+    },
+    {
+      "id": "msg-007",
+      "group_id": "grp_uncle_wong_regulars",
+      "sender_id": "c005",
+      "sent_at": "2026-10-21T19:02:30+08:00",
+      "text": "Bossku, 3 croissant for RM8 can?",
+      "reply_to": null,
+      "status": "unprocessed",
+      "demo_data": true
+    },
+    {
+      "id": "msg-008",
+      "group_id": "grp_uncle_wong_regulars",
+      "sender_id": "c006",
+      "sent_at": "2026-10-21T19:05:08+08:00",
+      "text": "Nak 1 sourdough loaf. Pick up 7:45.",
+      "reply_to": null,
+      "status": "unprocessed",
+      "demo_data": true
+    }
+  ]
+}

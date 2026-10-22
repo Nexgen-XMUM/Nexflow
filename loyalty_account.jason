@@ -1,0 +1,33 @@
+{
+  "dataset": "synthetic_demo_only",
+  "program_id": "save-food-earn-points",
+  "accounts": [
+    {
+      "customer_id": "c001",
+      "points_balance": 7,
+      "lifetime_points_earned": 7,
+      "lifetime_points_redeemed": 0,
+      "lifetime_avoided_co2e_kg": 0.7,
+      "tier": "Sprout",
+      "updated_at": "2026-10-21T19:10:00+08:00"
+    },
+    {
+      "customer_id": "c002",
+      "points_balance": 25,
+      "lifetime_points_earned": 40,
+      "lifetime_points_redeemed": 15,
+      "lifetime_avoided_co2e_kg": 4.0,
+      "tier": "Sprout",
+      "updated_at": "2026-10-21T19:10:00+08:00"
+    },
+    {
+      "customer_id": "c003",
+      "points_balance": 12,
+      "lifetime_points_earned": 12,
+      "lifetime_points_redeemed": 0,
+      "lifetime_avoided_co2e_kg": 1.2,
+      "tier": "Sprout",
+      "updated_at": "2026-10-21T19:10:00+08:00"
+    }
+  ]
+}
