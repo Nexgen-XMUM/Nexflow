@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录与注册 · Orbyte Smart Yield</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+/* ==========================================================================
+   1. Orbyte 统一设计令牌 (与 welcome_page.html 和 index.html 完全同步)
+   ========================================================================== */
+:root, html[data-theme="light"] {
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --sunk: #eef2f8;
+  --sunk-hover: #e2e8f0;
+  --ink: #0f172a;
+  --ink-secondary: #334155;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+
+  --brand: #1e40af;
+  --brand-hover: #1e3a8a;
+  --brand-light: #eff6ff;
+  --brand-border: #bfdbfe;
+  --brand-ink: #ffffff;
+  --accent: #2563eb;
+
+  --amber: #f59e0b;
+  --amber-bg: #fef3c7;
+  --amber-ink: #92400e;
+  --chili: #dc2626;
+  --chili-bg: #fef2f2;
+  --ok: #059669;
+  --ok-bg: #ecfdf5;
+
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.14);
+  --display: "Bricolage Grotesque", "Figtree", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --bg: #070d19;
+  --surface: #0f172a;
+  --surface-alt: #162033;
+  --sunk: #1e293b;
+  --sunk-hover: #334155;
+  --ink: #f8fafc;
+  --ink-secondary: #cbd5e1;
+  --muted: #94a3b8;
+  --line: #1e293b;
+  --line-strong: #334155;
+
+  --brand: #3b82f6;
+  --brand-hover: #60a5fa;
+  --brand-light: rgba(59, 130, 246, 0.15);
+  --brand-border: rgba(59, 130, 246, 0.35);
+  --brand-ink: #ffffff;
+  --accent: #60a5fa;
+
+  --amber: #fbbf24;
+  --amber-bg: rgba(245, 158, 11, 0.16);
+  --amber-ink: #fde68a;
+  --chili: #f87171;
+  --chili-bg: rgba(239, 68, 68, 0.15);
+  --ok: #34d399;
+  --ok-bg: rgba(16, 185, 129, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 28px 56px rgba(0, 0, 0, 0.65);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 14.5px;
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015em; line-height: 1.22; }
+
+/* ==========================================================================
+   2. 顶部导航栏 (.app-header)
+   ========================================================================== */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 66px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+  color: inherit;
+}
+.logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+.logo::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #60a5fa;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+.brand-text b {
+  font-family: var(--display);
+  font-size: 18px;
+  display: block;
+  line-height: 1.15;
+}
+.brand-text small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.icon-btn {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-secondary);
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.icon-btn:hover {
+  background: var(--sunk);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   3. 居中单栏主体容器 (.auth-wrapper & .auth-card)
+   ========================================================================== */
+.auth-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 56px;
+  position: relative;
+}
+.auth-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, 92vw);
+  height: 380px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 500px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 36px 38px;
+  box-shadow: var(--shadow-lg);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* 顶部步骤点与引导标识 */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+.step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  transition: all 0.25s ease;
+}
+.step-dot.active {
+  width: 24px;
+  border-radius: 99px;
+  background: var(--brand);
+}
+.step-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-left: 6px;
+}
+
+/* 顶部模式切换器 (🔐 账号登录 vs ✨ 注册新账号) */
+.mode-switcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+.mode-btn {
+  border: 0;
+  background: transparent;
+  padding: 9px 14px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+.mode-btn:hover {
+  color: var(--ink);
+}
+.mode-btn[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--brand);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-header {
+  margin-bottom: 20px;
+}
+.form-header h1 {
+  font-size: 25px;
+  margin-bottom: 5px;
+  color: var(--ink);
+}
+.form-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+/* 快速演示填入芯片 (3 等分：👑 老板 / 🧑‍🍳 店员 / 👤 普通用户) */
+.demo-quick-box {
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 22px;
+}
+.demo-quick-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand);
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.demo-chips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.chip-btn {
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.chip-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.chip-btn.active-chip {
+  border-color: var(--brand);
+  background: var(--surface);
+  color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-border);
+}
+
+/* 表单字段与输入框 */
+.auth-form[hidden] {
+  display: none !important;
+}
+.field-group {
+  margin-bottom: 16px;
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.field-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+  color: var(--muted);
+}
+.link-sm {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--brand);
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.link-sm:hover {
+  text-decoration: underline;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 11px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-size: 14.5px;
+  transition: all 0.2s ease;
+}
+.form-input.has-toggle {
+  padding-right: 42px;
+}
+.form-input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--brand-light);
+}
+.form-input.valid {
+  border-color: var(--ok);
+}
+.form-input.invalid {
+  border-color: var(--chili);
+  background: var(--chili-bg);
+}
+.form-input.flash-fill {
+  animation: highlightPulse 0.5s ease;
+}
+@keyframes highlightPulse {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.45); }
+  50% { box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.2); }
+  100% { box-shadow: none; }
+}
+
+.toggle-pwd {
+  position: absolute;
+  right: 9px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+}
+.toggle-pwd:hover {
+  background: var(--sunk);
+  color: var(--ink);
+}
+
+.field-msg {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 5px;
+  min-height: 17px;
+}
+.field-msg:empty {
+  display: none;
+}
+.field-msg.error { color: var(--chili); }
+.field-msg.ok { color: var(--ok); }
+
+/* 角色选择卡片 (注册页：3 等分 👑 老板 / 🧑‍🍳 店员 / 👤 普通用户，无副标题描述) */
+.role-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.role-card {
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface-alt);
+  border-radius: 11px;
+  padding: 11px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+.role-card:hover {
+  border-color: var(--brand-border);
+}
+.role-card.selected {
+  border-color: var(--brand);
+  background: var(--brand-light);
+}
+.role-card input {
+  display: none;
+}
+.radio-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--muted);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.radio-dot::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand);
+  transform: scale(0);
+  transition: transform 0.2s ease;
+}
+.role-card.selected .radio-dot {
+  border-color: var(--brand);
+}
+.role-card.selected .radio-dot::after {
+  transform: scale(1);
+}
+.role-card .r-emo {
+  font-size: 16px;
+  line-height: 1;
+}
+.role-card .r-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+/* 角色状态胶囊 */
+.role-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 2px 9px;
+  border-radius: 99px;
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  color: var(--brand);
+}
+
+/* 主提交按钮 */
+.btn-submit {
+  width: 100%;
+  margin-top: 8px;
+  padding: 13.5px 22px;
+  border-radius: 12px;
+  border: 0;
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-family: var(--display);
+  font-size: 15.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(30, 64, 175, 0.28);
+  transition: all 0.2s ease;
+}
+.btn-submit:hover:not(:disabled) {
+  background: var(--brand-hover);
+  transform: translateY(-1px);
+}
+.btn-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-footer-switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   4. 认证成功弹窗 & Toast
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 13, 25, 0.62);
+  backdrop-filter: blur(4px);
+  z-index: 9000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.active {
+  display: flex;
+}
+.modal-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 26px;
+  box-shadow: var(--shadow-lg);
+  animation: popIn 0.24s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 11px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13.5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s ease;
+  z-index: 9500;
+  box-shadow: var(--shadow-lg);
+  max-width: 90vw;
+}
+.toast.on {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 响应式适配 */
+@media (max-width: 520px) {
+  .app-header { padding: 0 16px; }
+  .brand-text small { display: none; }
+  .auth-card { padding: 26px 20px; }
+  .field-row, .demo-chips, .role-selector {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== 顶部栏 ==================== -->
+<header class="app-header">
+  <a href="welcome_page.html" class="brand" title="返回 Orbyte 首页">
+    <div class="logo" aria-hidden="true">O</div>
+    <div class="brand-text">
+      <b>Orbyte Smart Yield</b>
+      <small>智能烘焙打烊清仓与 AI 自动化系统</small>
+    </div>
+  </a>
+
+  <div class="header-actions">
+    <a href="welcome_page.html" class="icon-btn">
+      <span>←</span>
+      <span>返回首页</span>
+    </a>
+    <button type="button" class="icon-btn" id="themeToggleBtn" aria-label="切换深色或浅色模式">
+      <span id="themeIcon" aria-hidden="true">🌙</span>
+      <span id="themeText">深色模式</span>
+    </button>
+  </div>
+</header>
+
+<!-- ==================== 居中单栏登录与注册卡片 ==================== -->
+<main class="auth-wrapper">
+  <div class="auth-card">
+
+    <!-- 顶部步骤点指示器 -->
+    <div class="step-indicator" aria-hidden="true">
+      <span class="step-dot active" id="dotStep1"></span>
+      <span class="step-dot" id="dotStep2"></span>
+      <span class="step-label" id="stepTagText">STEP 1 OF 2 · 身份认证</span>
+    </div>
+
+    <!-- 双栏模式切换器 -->
+    <div class="mode-switcher" role="tablist" aria-label="选择账号登录或注册新账号">
+      <button type="button" class="mode-btn" id="tabLoginBtn" role="tab" aria-selected="true" data-mode="login">
+        🔐 账号登录
+      </button>
+      <button type="button" class="mode-btn" id="tabSignupBtn" role="tab" aria-selected="false" data-mode="signup">
+        ✨ 注册新账号
+      </button>
+    </div>
+
+    <!-- ==================== 表单 1：账号登录 ==================== -->
+    <form id="loginForm" class="auth-form" novalidate>
+      <div class="form-header">
+        <h1>账号登录</h1>
+        <p>输入您的邮箱与密码，或点击下方角色快速填入演示账号。</p>
+      </div>
+
+      <!-- 快速体验：一键填入演示账号 (3 等分：老板 / 店员 / 普通用户) -->
+      <div class="demo-quick-box">
+        <div class="demo-quick-label">
+          <span>⚡ 快速体验：一键填入演示账号</span>
+          <span style="font-weight:500;opacity:0.85">免手动输入</span>
+        </div>
+        <div class="demo-chips">
+          <button type="button" class="chip-btn active-chip" data-fill="owner">
+            <span aria-hidden="true">👑</span>
+            <span>老板</span>
+          </button>
+          <button type="button" class="chip-btn" data-fill="staff">
+            <span aria-hidden="true">🧑‍🍳</span>
+            <span>店员</span>
+          </button>
+          <button type="button" class="chip-btn" data-fill="user">
+            <span aria-hidden="true">👤</span>
+            <span>普通用户</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 邮箱地址 -->
+      <div class="field-group">
+        <label class="field-label" for="loginEmail">
+          <span>EMAIL ADDRESS · 邮箱地址</span>
+          <span class="role-pill-badge" id="loginRoleBadge">👑 老板</span>
+        </label>
+        <div class="input-wrap">
+          <input
+            type="email"
+            id="loginEmail"
+            class="form-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+        <div class="field-msg" id="loginEmailMsg" role="status"></div>
+      </div>
+
+      <!-- 登录密码 (无“忘记密码？”链接) -->
+      <div class="field-group">
+        <div class="field-label">
+          <label for="loginPassword">PASSWORD · 登录密码</label>
+        </div>
+        <div class="input-wrap">
+          <input
+            type="password"
+            id="loginPassword"
+            class="form-input has-toggle"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          >
+          <button type="button" class="toggle-pwd" data-target="loginPassword" aria-label="显示或隐藏密码">👁️</button>
+        </div>
+        <div class="field-msg" id="loginPasswordMsg" role="status"></div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="loginSubmitBtn">
+        <span>进入系统 ✨</span>
+      </button>
+
+      <div class="form-footer-switch">
+        还没有账号？
+        <button type="button" class="link-sm" data-switch-to="signup">立即注册</button>
+      </div>
+    </form>
+
+    <!-- ==================== 表单 2：注册新账号 ==================== -->
+    <form id="signupForm" class="auth-form" hidden novalidate>
+      <div class="form-header">
+        <h1>注册新账号</h1>
+        <p>选择您的角色并填写以下基本信息，立即开启智能体验。</p>
+      </div>
+
+      <!-- ROLE · 选择您的角色 (3 等分：老板 / 店员 / 普通用户) -->
+      <div class="field-group">
+        <label class="field-label">ROLE · 选择您的角色</label>
+        <div class="role-selector" id="signupRoleSelector">
+          <label class="role-card selected" data-role-card="owner">
+            <input type="radio" name="signupRole" value="owner" checked>
+            <span class="radio-dot" aria-hidden="true"></span>
+            <span class="r-emo" aria-hidden="true">👑</span>
+            <span class="r-title">老板</span>
+          </label>
+          <label class="role-card" data-role-card="staff">
+            <input type="radio" name="signupRole" value="staff">
+            <span class="radio-dot" aria-hidden="true"></span>
+            <span class="r-emo" aria-hidden="true">🧑‍🍳</span>
+            <span class="r-title">店员</span>
+          </label>
+          <label class="role-card" data-role-card="user">
+            <input type="radio" name="signupRole" value="user">
+            <span class="radio-dot" aria-hidden="true"></span>
+            <span class="r-emo" aria-hidden="true">👤</span>
+            <span class="r-title">普通用户</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- FULL NAME · 您的姓名 (全宽，已移除门店名称输入框) -->
+      <div class="field-group">
+        <label class="field-label" for="signupName">FULL NAME · 您的姓名</label>
+        <div class="input-wrap">
+          <input
+            type="text"
+            id="signupName"
+            class="form-input"
+            placeholder="请输入您的姓名"
+            autocomplete="name"
+            required
+          >
+        </div>
+        <div class="field-msg" id="signupNameMsg" role="status"></div>
+      </div>
+
+      <!-- EMAIL ADDRESS · 邮箱地址 -->
+      <div class="field-group">
+        <label class="field-label" for="signupEmail">EMAIL ADDRESS · 邮箱地址</label>
+        <div class="input-wrap">
+          <input
+            type="email"
+            id="signupEmail"
+            class="form-input"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+        <div class="field-msg" id="signupEmailMsg" role="status"></div>
+      </div>
+
+      <!-- PASSWORD · 设置密码 (至少 8 位) & CONFIRM · 确认密码 (已移除密码安全强度框) -->
+      <div class="field-row">
+        <div class="field-group" style="margin-bottom:4px;">
+          <label class="field-label" for="signupPassword">PASSWORD · 设置密码 (至少 8 位)</label>
+          <div class="input-wrap">
+            <input
+              type="password"
+              id="signupPassword"
+              class="form-input has-toggle"
+              placeholder="至少 8 位字符"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="toggle-pwd" data-target="signupPassword" aria-label="显示或隐藏密码">👁️</button>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-bottom:4px;">
+          <label class="field-label" for="signupConfirm">CONFIRM · 确认密码</label>
+          <div class="input-wrap">
+            <input
+              type="password"
+              id="signupConfirm"
+              class="form-input has-toggle"
+              placeholder="再次输入密码"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="toggle-pwd" data-target="signupConfirm" aria-label="显示或隐藏确认密码">👁️</button>
+          </div>
+        </div>
+      </div>
+      <div class="field-msg" id="signupPwdMsg" role="status" style="margin-bottom:10px;"></div>
+
+      <button type="submit" class="btn-submit" id="signupSubmitBtn">
+        <span>创建账号并进入系统 ✨</span>
+      </button>
+
+      <div class="form-footer-switch">
+        已有账号？
+        <button type="button" class="link-sm" data-switch-to="login">直接登录</button>
+      </div>
+    </form>
+
+  </div>
+</main>
+
+<!-- ==================== 认证成功与进入系统确认弹窗 ==================== -->
+<div class="modal-backdrop" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
+  <div class="modal-card">
+    <div style="width:48px;height:48px;border-radius:14px;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center;font-size:22px;margin-bottom:14px;">
+      ✅
+    </div>
+    <h3 id="successModalTitle" style="font-size:20px;margin-bottom:6px;">验证成功，欢迎进入系统！</h3>
+    <p style="color:var(--muted);font-size:13.5px;margin:0 0 16px;">
+      您的账户信息与角色已确认，点击下方按钮即可跳转至主页面。
+    </p>
+
+    <div style="background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:20px;font-size:13px;display:flex;flex-direction:column;gap:7px;">
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--muted);">登录邮箱：</span>
+        <b id="summaryEmail">owner@orbyte.my</b>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--muted);">当前角色：</span>
+        <b id="summaryRole" style="color:var(--brand);">👑 老板</b>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <a href="index.html" class="btn-submit" style="text-decoration:none;text-align:center;margin-top:0;">
+        <span>🚀 立即前往 index.html</span>
+      </a>
+      <button type="button" class="icon-btn" id="stayPreviewBtn" style="justify-content:center;width:100%;">
+        留在当前页继续预览
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 底部提示条 -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function() {
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+
+  /* =====================================================
+     1. 浅色 / 深色主题管理 (与 localStorage 'orbyte_theme' 同步)
+     ===================================================== */
+  function store(k, v) {
+    try {
+      if (v === undefined) return localStorage.getItem(k);
+      localStorage.setItem(k, v);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    store('orbyte_theme', theme);
+    const isDark = theme === 'dark';
+    $('#themeIcon').textContent = isDark ? '🌞' : '🌙';
+    $('#themeText').textContent = isDark ? '浅色模式' : '深色模式';
+  }
+
+  const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(store('orbyte_theme') || (sysDark ? 'dark' : 'light'));
+
+  $('#themeToggleBtn').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    toast(next === 'dark' ? '已切换至深色模式' : '已切换至浅色模式');
+  });
+
+  /* =====================================================
+     2. Toast 提示条
+     ===================================================== */
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('on'), 2600);
+  }
+
+  /* =====================================================
+     3. 登录 / 注册 标签切换
+     ===================================================== */
+  let selectedLoginRole = 'owner';
+  let selectedSignupRole = 'owner';
+
+  const ROLE_LABELS = {
+    owner: '👑 老板',
+    staff: '🧑‍🍳 店员',
+    user: '👤 普通用户'
+  };
+
+  function switchMode(mode) {
+    const isLogin = mode === 'login';
+    $('#tabLoginBtn').setAttribute('aria-selected', String(isLogin));
+    $('#tabSignupBtn').setAttribute('aria-selected', String(!isLogin));
+    $('#loginForm').hidden = !isLogin;
+    $('#signupForm').hidden = isLogin;
+
+    $('#dotStep1').classList.toggle('active', isLogin);
+    $('#dotStep2').classList.toggle('active', !isLogin);
+    $('#stepTagText').textContent = isLogin
+      ? 'STEP 1 OF 2 · 身份认证'
+      : 'STEP 1 OF 2 · 创建新账号';
+  }
+
+  $('#tabLoginBtn').addEventListener('click', () => switchMode('login'));
+  $('#tabSignupBtn').addEventListener('click', () => switchMode('signup'));
+  $$('[data-switch-to]').forEach(btn => {
+    btn.addEventListener('click', () => switchMode(btn.dataset.switchTo));
+  });
+
+  /* =====================================================
+     4. 登录页：一键填入演示账号 (老板 / 店员 / 普通用户)
+     ===================================================== */
+  const DEMO_ACCOUNTS = {
+    owner: {
+      label: '老板',
+      email: 'owner@orbyte.my',
+      pass: 'Orbyte2026!',
+      badge: '👑 老板'
+    },
+    staff: {
+      label: '店员',
+      email: 'staff@orbyte.my',
+      pass: 'Orbyte2026!',
+      badge: '🧑‍🍳 店员'
+    },
+    user: {
+      label: '普通用户',
+      email: 'user@orbyte.my',
+      pass: 'Orbyte2026!',
+      badge: '👤 普通用户'
+    }
+  };
+
+  function fillDemoAccount(roleKey, showToastMsg = true) {
+    const acc = DEMO_ACCOUNTS[roleKey];
+    if (!acc) return;
+    selectedLoginRole = roleKey;
+    const emailEl = $('#loginEmail');
+    const passEl = $('#loginPassword');
+
+    emailEl.value = acc.email;
+    passEl.value = acc.pass;
+    $('#loginRoleBadge').textContent = acc.badge;
+
+    $$('.chip-btn').forEach(c => c.classList.toggle('active-chip', c.dataset.fill === roleKey));
+
+    [emailEl, passEl].forEach(el => {
+      el.classList.remove('flash-fill', 'invalid');
+      void el.offsetWidth;
+      el.classList.add('flash-fill', 'valid');
+    });
+
+    setFieldMsg('#loginEmailMsg', '', '');
+    setFieldMsg('#loginPasswordMsg', '', '');
+    if (showToastMsg) toast('已填入「' + acc.label + '」演示账号');
+  }
+
+  $$('[data-fill]').forEach(btn => {
+    btn.addEventListener('click', () => fillDemoAccount(btn.dataset.fill, true));
+  });
+
+  /* =====================================================
+     5. 密码明文/密文切换 (👁️)
+     ===================================================== */
+  $$('.toggle-pwd').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (!input) return;
+      const isPwd = input.type === 'password';
+      input.type = isPwd ? 'text' : 'password';
+      btn.textContent = isPwd ? '🙈' : '👁️';
+    });
+  });
+
+  /* =====================================================
+     6. 实时邮箱与密码校验
+     ===================================================== */
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  function setFieldMsg(selector, text, type) {
+    const el = $(selector);
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'field-msg' + (type ? ' ' + type : '');
+  }
+
+  function validateEmailInput(inputEl, msgSelector) {
+    const val = inputEl.value.trim();
+    if (!val) {
+      inputEl.classList.remove('valid', 'invalid');
+      setFieldMsg(msgSelector, '请输入邮箱地址', 'error');
+      return false;
+    }
+    if (!EMAIL_REGEX.test(val)) {
+      inputEl.classList.remove('valid');
+      inputEl.classList.add('invalid');
+      setFieldMsg(msgSelector, '邮箱格式不正确，请输入如 you@example.com', 'error');
+      return false;
+    }
+    inputEl.classList.remove('invalid');
+    inputEl.classList.add('valid');
+    setFieldMsg(msgSelector, '✓ 邮箱格式正确', 'ok');
+    return true;
+  }
+
+  $('#loginEmail').addEventListener('input', e => {
+    validateEmailInput(e.target, '#loginEmailMsg');
+    const v = e.target.value.toLowerCase();
+    if (v.includes('staff')) {
+      selectedLoginRole = 'staff';
+    } else if (v.includes('user')) {
+      selectedLoginRole = 'user';
+    } else {
+      selectedLoginRole = 'owner';
+    }
+    $('#loginRoleBadge').textContent = ROLE_LABELS[selectedLoginRole];
+    $$('.chip-btn').forEach(c => c.classList.toggle('active-chip', c.dataset.fill === selectedLoginRole));
+  });
+
+  $('#loginPassword').addEventListener('input', e => {
+    if (e.target.value.trim().length > 0) {
+      e.target.classList.remove('invalid');
+      e.target.classList.add('valid');
+      setFieldMsg('#loginPasswordMsg', '', '');
+    }
+  });
+
+  // 注册页角色卡片切换
+  $$('[data-role-card]').forEach(card => {
+    card.addEventListener('click', () => {
+      selectedSignupRole = card.dataset.roleCard;
+      const radio = card.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+      $$('[data-role-card]').forEach(c => c.classList.toggle('selected', c === card));
+    });
+  });
+
+  $('#signupName').addEventListener('input', e => {
+    if (e.target.value.trim()) {
+      e.target.classList.remove('invalid');
+      e.target.classList.add('valid');
+      setFieldMsg('#signupNameMsg', '', '');
+    }
+  });
+
+  $('#signupEmail').addEventListener('input', e => validateEmailInput(e.target, '#signupEmailMsg'));
+
+  function checkSignupPasswords() {
+    const pwdEl = $('#signupPassword');
+    const confEl = $('#signupConfirm');
+    const pwd = pwdEl.value;
+    const conf = confEl.value;
+
+    if (!pwd && !conf) {
+      pwdEl.classList.remove('valid', 'invalid');
+      confEl.classList.remove('valid', 'invalid');
+      setFieldMsg('#signupPwdMsg', '', '');
+      return false;
+    }
+
+    if (pwd.length < 8) {
+      pwdEl.classList.remove('valid');
+      pwdEl.classList.add('invalid');
+      setFieldMsg('#signupPwdMsg', '密码长度至少需要 8 位字符', 'error');
+      return false;
+    } else {
+      pwdEl.classList.remove('invalid');
+      pwdEl.classList.add('valid');
+    }
+
+    if (conf.length > 0) {
+      if (pwd !== conf) {
+        confEl.classList.remove('valid');
+        confEl.classList.add('invalid');
+        setFieldMsg('#signupPwdMsg', '两次输入的密码不一致', 'error');
+        return false;
+      } else {
+        confEl.classList.remove('invalid');
+        confEl.classList.add('valid');
+        setFieldMsg('#signupPwdMsg', '✓ 密码长度达标且两次输入一致', 'ok');
+        return true;
+      }
+    }
+
+    setFieldMsg('#signupPwdMsg', '', '');
+    return false;
+  }
+
+  $('#signupPassword').addEventListener('input', checkSignupPasswords);
+  $('#signupConfirm').addEventListener('input', checkSignupPasswords);
+
+  /* =====================================================
+     7. 表单提交与反馈
+     ===================================================== */
+  function showSuccessPopup(userData) {
+    store('orbyte_auth_user', JSON.stringify(userData));
+    $('#summaryEmail').textContent = userData.email;
+    $('#summaryRole').textContent = ROLE_LABELS[userData.role] || '👑 老板';
+    $('#successModal').classList.add('active');
+    toast('🎉 验证通过！已记录角色：' + (ROLE_LABELS[userData.role] || '老板'));
+  }
+
+  $('#loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const emailEl = $('#loginEmail');
+    const passEl = $('#loginPassword');
+    const isEmailOk = validateEmailInput(emailEl, '#loginEmailMsg');
+
+    if (!passEl.value.trim()) {
+      passEl.classList.add('invalid');
+      setFieldMsg('#loginPasswordMsg', '请输入登录密码', 'error');
+      return;
+    }
+    if (!isEmailOk) return;
+
+    const btn = $('#loginSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳ 正在进入系统…</span>';
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<span>进入系统 ✨</span>';
+      showSuccessPopup({
+        email: emailEl.value.trim(),
+        role: selectedLoginRole
+      });
+    }, 450);
+  });
+
+  $('#signupForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const nameEl = $('#signupName');
+    const emailEl = $('#signupEmail');
+
+    if (!nameEl.value.trim()) {
+      nameEl.classList.add('invalid');
+      setFieldMsg('#signupNameMsg', '请输入您的姓名', 'error');
+      return;
+    }
+    setFieldMsg('#signupNameMsg', '', '');
+
+    const isEmailOk = validateEmailInput(emailEl, '#signupEmailMsg');
+    const isPwdOk = checkSignupPasswords();
+
+    if (!isEmailOk || !isPwdOk) {
+      if (!$('#signupConfirm').value) {
+        $('#signupConfirm').classList.add('invalid');
+        setFieldMsg('#signupPwdMsg', '请再次输入确认密码', 'error');
+      }
+      return;
+    }
+
+    const btn = $('#signupSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳ 正在创建账号…</span>';
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<span>创建账号并进入系统 ✨</span>';
+      showSuccessPopup({
+        name: nameEl.value.trim(),
+        email: emailEl.value.trim(),
+        role: selectedSignupRole
+      });
+    }, 500);
+  });
+
+  $('#stayPreviewBtn').addEventListener('click', () => {
+    $('#successModal').classList.remove('active');
+  });
+
+  $('#successModal').addEventListener('click', e => {
+    if (e.target === $('#successModal')) $('#successModal').classList.remove('active');
+  });
+
+  // 默认预填老板账号方便立即预览测试
+  fillDemoAccount('owner', false);
+})();
+</script>
+</body>
+</html>
