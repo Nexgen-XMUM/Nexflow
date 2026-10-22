@@ -1,0 +1,93 @@
+#rescueModule { --box:var(--brand); --box-soft:var(--brand-light); --give:#b9862b; --give-soft:var(--brand-light); --fuel:#3f6572; --fuel-soft:var(--sunk); --warn:#b42318; --warn-soft:var(--sunk); --focus:var(--brand); --ink-2:var(--ink); --body:inherit; }
+#rescueModule *{ box-sizing: border-box; }
+#rescueModule{ margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+#rescueModule a{ color: inherit; }
+#rescueModule button,#rescueModule input,#rescueModule select,#rescueModule textarea{ font: inherit; color: inherit; }
+#rescueModule :focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+#rescueModule h1,#rescueModule h2,#rescueModule h3{ font-family: var(--display); margin: 0; letter-spacing: -0.01em; }
+#rescueModule .muted{ color: var(--muted); }
+#rescueModule .num{ font-variant-numeric: tabular-nums; }
+#rescueModule .top{ display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  max-width: 1180px; margin: 0 auto; padding: 28px 24px 8px; }
+#rescueModule .top h1{ font-size: clamp(30px, 5vw, 46px); font-weight: 700; line-height: 1.05; }
+#rescueModule .top p{ margin: 6px 0 0; color: var(--ink-2); max-width: 64ch; }
+#rescueModule .top nav{ display: flex; gap: 14px; align-items: center; font-weight: 600; }
+#rescueModule .clock{ font-family: var(--display); font-size: 22px; }
+#rescueModule .layout{ max-width: 1180px; margin: 0 auto; padding: 16px 24px 64px; display: grid; gap: 28px;
+  grid-template-columns: 300px minmax(0, 1fr); align-items: start; }
+@media (max-width: 860px){#rescueModule .layout{ grid-template-columns: 1fr; padding: 12px 16px 48px; }
+#rescueModule .top{ padding: 20px 16px 4px; }}
+#rescueModule .controls{ position: sticky; top: 16px; display: grid; gap: 18px; }
+@media (max-width: 860px){#rescueModule .controls{ position: static; }}
+#rescueModule .controls fieldset{ border: 0; border-top: 1px solid var(--line); margin: 0; padding: 14px 0 0; display: grid; gap: 10px; }
+#rescueModule .controls legend{ font-weight: 700; padding: 0 0 4px; }
+#rescueModule label.field{ display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); }
+#rescueModule input[type=text],#rescueModule input[type=number],#rescueModule select,#rescueModule textarea{ width: 100%; padding: 9px 11px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface); }
+#rescueModule textarea{ resize: vertical; min-height: 110px; font-size: 14px; }
+#rescueModule .seg{ display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+#rescueModule .seg label{ display: flex; gap: 6px; align-items: center; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface); font-size: 14px; cursor: pointer; }
+#rescueModule .seg input{ accent-color: var(--box); }
+#rescueModule .btn{ border: 1px solid var(--line); background: var(--surface); padding: 10px 14px; border-radius: 9px;
+  font-weight: 600; cursor: pointer; }
+#rescueModule .btn:hover{ background: var(--sunk); }
+#rescueModule .btn.primary{ background: var(--box); border-color: var(--box); color: #fff; }
+#rescueModule .btn.primary:hover{ filter: brightness(1.08); background: var(--box); }
+#rescueModule .btn.give{ background: var(--give); border-color: var(--give); color: #1d1404; }
+#rescueModule .btn.small{ padding: 6px 10px; font-size: 13px; }
+#rescueModule .btn:disabled{ opacity: .5; cursor: not-allowed; }
+#rescueModule .row{ display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+#rescueModule .status{ min-height: 1.5em; font-size: 14px; }
+#rescueModule .status.err{ color: var(--warn); }
+#rescueModule .stage{ display: grid; gap: 32px; }
+#rescueModule .banner{ background: var(--give-soft); color: var(--ink); border-left: 4px solid var(--give); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+#rescueModule section.lane h2{ font-size: 20px; margin-bottom: 4px; display: flex; gap: 10px; align-items: baseline; }
+#rescueModule section.lane h2 .step{ font-size: 13px; font-family: var(--body); font-weight: 700; color: var(--muted); }
+#rescueModule section.lane > p{ margin: 0 0 14px; color: var(--ink-2); }
+#rescueModule .sub{ display: grid; gap: 12px; margin-top: 18px; }
+#rescueModule .sub h3{ font-size: 17px; }
+#rescueModule .options{ list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: rank; }
+#rescueModule .options li{ counter-increment: rank; display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+#rescueModule .options li::before{ content: counter(rank); font-family: var(--display); font-size: 26px; font-weight: 700; color: var(--box); }
+#rescueModule .options .price{ text-align: right; font-family: var(--display); font-size: 20px; font-weight: 700; }
+#rescueModule .options .price small{ display: block; font: 12px var(--body); color: var(--muted); }
+@media (max-width: 520px){#rescueModule .options li{ grid-template-columns: 32px 1fr; }
+#rescueModule .options .price{ grid-column: 2; text-align: left; }}
+#rescueModule .bar{ height: 6px; border-radius: 3px; background: var(--box-soft); margin-top: 6px; }
+#rescueModule .bar i{ display: block; height: 100%; border-radius: 3px; background: var(--box); }
+#rescueModule table{ width: 100%; border-collapse: collapse; font-size: 14px; }
+#rescueModule th,#rescueModule td{ text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+#rescueModule th{ color: var(--muted); font-weight: 600; }
+#rescueModule td.r,#rescueModule th.r{ text-align: right; }
+#rescueModule .tablewrap{ overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+#rescueModule .tablewrap.give{ border-top: 4px solid var(--give); }
+#rescueModule .tablewrap.fuel{ border-top: 4px solid var(--fuel); }
+#rescueModule .recipients{ list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+#rescueModule .recipients li{ padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+#rescueModule .fuelnums{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+#rescueModule .fuelnums div{ background: var(--fuel-soft); border-radius: 10px; padding: 10px; }
+#rescueModule .fuelnums b{ display: block; font-family: var(--display); font-size: 20px; }
+#rescueModule .fuelnums small{ color: var(--ink-2); font-size: 12px; }
+#rescueModule .stats{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+#rescueModule .stats div{ border-left: 4px solid var(--give); padding: 2px 0 2px 10px; }
+#rescueModule .stats b{ display: block; font-family: var(--display); font-size: 24px; font-weight: 700; }
+#rescueModule .stats small{ color: var(--muted); }
+@media (max-width: 520px){#rescueModule .stats,#rescueModule .fuelnums{ grid-template-columns: 1fr; }}
+#rescueModule .note{ font-size: 13px; color: var(--muted); margin: 0; }
+#rescueModule .tag{ display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--sunk); }
+#rescueModule .tag.ok{ background: var(--box-soft); color: var(--box); }
+#rescueModule .tag.pending{ background: var(--give-soft); color: var(--give); }
+#rescueModule .tag.bad{ background: var(--warn-soft); color: var(--warn); }
+#rescueModule .future{ border: 1px dashed var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 8px; }
+#rescueModule .future ul{ margin: 0; padding-left: 20px; color: var(--ink-2); }
+#rescueModule dialog{ border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); max-width: 460px; width: calc(100% - 32px); padding: 20px; }
+#rescueModule dialog::backdrop{ background: rgba(10, 20, 16, .45); }
+#rescueModule .empty{ padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); }
+#rescueModule [hidden]{ display: none !important; }
+#rescueModule .layout { padding:0; grid-template-columns: minmax(170px, .7fr) minmax(0,1.7fr); gap:20px; }
+#rescueModule .controls { position:static; }
+#rescueModule .stage { min-width:0; }
+#rescueModule dialog { position:fixed; }
+@media(max-width:1200px) { #rescueModule .layout { grid-template-columns:1fr; } }

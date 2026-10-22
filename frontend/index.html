@@ -331,6 +331,8 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
   * { animation: none !important; transition: none !important; }
 }
 </style>
+<link rel="stylesheet" href="/app/assets/integration.css">
+<link rel="stylesheet" href="/app/assets/rescue-module.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-back" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></symbol><symbol id="i-vid" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z"/></symbol><symbol id="i-call" viewBox="0 0 24 24"><path d="M6.62 10.79a15 15 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02z"/></symbol><symbol id="i-more" viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></symbol><symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></symbol><symbol id="i-emo" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-3.5-9a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5zm7 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5zM12 17.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></symbol><symbol id="i-clip" viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6z"/></symbol><symbol id="i-cam" viewBox="0 0 24 24"><path d="M9 3 7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></symbol></svg>
@@ -354,7 +356,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
       <span id="themeIcon" aria-hidden="true">🌙</span><span class="lbl" id="themeText">深色模式</span>
     </button>
     <button type="button" class="btn-tour" id="startTourBtn">✨ 功能导览</button>
-    <button type="button" class="icon-btn" id="resetBtn">↺ <span class="lbl">重置演示</span></button>
+    <button type="button" class="icon-btn" id="resetBtn">↺ <span class="lbl">重置草稿</span></button>
   </div>
 </header>
 
@@ -370,7 +372,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
           <span class="nav-icon" aria-hidden="true">🏪</span><span class="nav-text">打烊盘点<span class="nav-sub">店员录入剩余数量</span></span>
         </button></li>
         <li><button type="button" class="nav-item" role="tab" data-tab="dash" aria-selected="false">
-          <span class="nav-icon" aria-hidden="true">📊</span><span class="nav-text">老板看板<span class="nav-sub">促销草稿与模拟审批</span></span>
+          <span class="nav-icon" aria-hidden="true">📊</span><span class="nav-text">老板看板<span class="nav-sub">经营统计与促销审批</span></span>
           <span class="pip" id="pip">待审</span>
         </button></li>
         <li><button type="button" class="nav-item" role="tab" data-tab="log" aria-selected="false">
@@ -379,24 +381,30 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
         <li><button type="button" class="nav-item" role="tab" data-tab="blind" aria-selected="false">
           <span class="nav-icon" aria-hidden="true">📦</span><span class="nav-text">盲盒与余料<span class="nav-sub">独立库存 · 只读计算</span></span>
         </button></li>
+        <li><button type="button" class="nav-item" role="tab" data-tab="customer" aria-selected="false"><span class="nav-icon">🛍️</span><span class="nav-text">顾客购买<span class="nav-sub">购买模块 · 取餐信息</span></span></button></li>
+        <li><button type="button" class="nav-item" role="tab" data-tab="rescue" aria-selected="false"><span class="nav-icon">🤝</span><span class="nav-text">打烊去向<span class="nav-sub">捐赠交接与能源建议</span></span></button></li>
       </ul>
-      <a class="nav-item" href="/app/rescue" style="text-decoration:none">
-        <span class="nav-icon" aria-hidden="true">🌿</span><span class="nav-text">打烊去向<span class="nav-sub">盲盒、捐赠、燃料与碳估算</span></span>
-      </a>
     </div>
 
     <div class="sidebar-footer" id="guide-role">
       <div class="nav-group-label">演示角色</div>
       <div class="seg" role="group" aria-label="切换演示角色">
-        <button type="button" data-role="staff" aria-pressed="false"><span class="ri" aria-hidden="true">🧑‍🍳</span><span class="rt">Siti<small>店员 · 只能提交盘点</small></span></button>
+        <button type="button" data-role="staff" aria-pressed="false"><span class="ri" aria-hidden="true">🧑‍🍳</span><span class="rt">Siti<small>店员 · 盘点与交接</small></span></button>
         <button type="button" data-role="owner" aria-pressed="true"><span class="ri" aria-hidden="true">👑</span><span class="rt">Uncle Wong<small>老板 · 可以模拟批准</small></span></button>
-        <button type="button" data-role="consumer" aria-pressed="false"><span class="ri" aria-hidden="true">🌱</span><span class="rt">消费者<small>顾客 · 查看积分与兑换</small></span></button>
+        <button type="button" data-role="consumer" aria-pressed="false"><span class="ri" aria-hidden="true">🌱</span><span class="rt">消费者<small>顾客 · 购买与积分</small></span></button>
       </div>
     </div>
   </aside>
 
   <!-- ==================== 工作区 ==================== -->
   <div class="workspace">
+    <div class="card demo-session" id="demoSession" hidden>
+      <strong>比赛演示 · 临时数据库与固定时钟</strong><p id="demoClock"></p>
+      <button type="button" class="btn btn-main" id="registerDemoLeftovers">登记本次盘点为演示批次</button>
+      <p class="muted">仅比赛合成数据：沿用本次盘点数量和商品资料，使用预设安全/过敏原演示档案；不代表实际食品安全核验，也不修改原商品目录。</p>
+      <button type="button" class="btn btn-main" id="closeDemo">推进至打烊并清算</button>
+      <span id="demoHint" role="status"></span>
+    </div>
     <ol class="steps" id="steps" aria-label="自动化五步旅程"></ol>
 
     <div class="content-grid">
@@ -430,13 +438,29 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
           <div class="panel-head">
             <div>
               <h2>📊 老板看板</h2>
-              <p>查看本次后端结果；批准与广播仅在本页模拟。</p>
+              <p>经营成果来自后端；预计售出、模拟付款、完成取餐分别展示。</p>
             </div>
           </div>
+          <div class="card integration-card">
+            <div class="promo-head"><h3>经营成果 · 后端演示账本</h3><button type="button" class="btn btn-main" id="refreshDashboard">刷新统计</button></div>
+            <p id="dashboardHint" role="status">正在读取经营数据…</p>
+            <div class="kpis" aria-label="已付款与已完成统计">
+              <div class="kpi-box"><span class="v" id="actualRevenue">暂无数据</span><span class="l">模拟已付款收入（RM）</span></div>
+              <div class="kpi-box"><span class="v" id="actualPickup">暂无数据</span><span class="l">已完成取餐食品（件）</span></div>
+              <div class="kpi-box"><span class="v" id="actualDonation">暂无数据</span><span class="l">已交接捐赠食品（件）</span></div>
+              <div class="kpi-box"><span class="v" id="actualCarbon">暂无数据</span><span class="l">已取餐及捐赠 CO₂e 估算（kg）</span></div>
+            </div>
+            <p class="muted">统计范围：当前盲盒数据库累计。模拟收入包含已付款未取餐订单；待捐赠不计入已交接。食品件数不等于订单数。CO₂e 是食物足迹估算，不是认证减排或碳积分。</p>
+            <p class="muted">购买转化率：<span id="conversionRate">暂无数据</span> · 积分兑换后复购率：<span id="repurchaseRate">暂无数据</span></p>
+            <label for="rescueShare">救援成果分享文字（演示口径）</label>
+            <textarea id="rescueShare" rows="4" readonly></textarea>
+            <button type="button" class="btn btn-main" id="copyRescue">复制成果文字</button>
+          </div>
+          <h3 class="integration-heading">本次清仓预测 · 尚未成交</h3>
           <div class="kpis" id="guide-kpis" aria-label="本次草稿与本页模拟统计">
-            <div class="kpi-box" style="--kc:#e08a2e"><span class="v" id="kRec">—</span><span class="l">本次全部售出情景金额</span></div>
-            <div class="kpi-box" style="--kc:#4f86e8"><span class="v" id="kCo2">—</span><span class="l">本次 CO₂e 估算 kg</span></div>
-            <div class="kpi-box" style="--kc:#e8b43a"><span class="v" id="kFood">—</span><span class="l">本次商品数量（件）</span></div>
+            <div class="kpi-box" style="--kc:#e08a2e"><span class="v" id="kRec">暂无数据</span><span class="l">本次全部售出情景金额</span></div>
+            <div class="kpi-box" style="--kc:#4f86e8"><span class="v" id="kCo2">暂无数据</span><span class="l">本次 CO₂e 估算 kg</span></div>
+            <div class="kpi-box" style="--kc:#e8b43a"><span class="v" id="kFood">暂无数据</span><span class="l">本次商品数量（件）</span></div>
             <div class="kpi-box" style="--kc:#d94a5a"><span class="v" id="kPromo">0</span><span class="l">本页模拟广播次数</span></div>
           </div>
           <div id="draftBox"></div>
@@ -466,6 +490,150 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
           <section id="rescuePanel" class="card" style="margin-top:18px" hidden aria-live="polite"></section>
         </section>
 
+        <section class="panel" id="tab-customer" hidden>
+          <div class="panel-head"><div><h2>🛍️ 顾客购买</h2><p>演示账户用于关联购买与积分，不构成身份认证。</p></div></div>
+          <div class="card integration-card">
+            <label for="demoCustomer">演示顾客 ID</label><input id="demoCustomer" value="demo_mei" maxlength="80" autocomplete="off">
+            <button type="button" class="btn btn-main" id="selectCustomer">使用此账户</button>
+            <p id="customerHint" role="status">当前账户：demo_mei</p>
+            <p>积分余额：<strong id="accountBalance">暂无数据</strong></p>
+            <p id="balanceHint" class="muted">等待购买负责人提供账户接口；不维护页面虚拟余额。</p>
+          </div>
+          <div class="card integration-card" id="pickupModule"><h3>取餐信息待接入</h3><p>等待购买负责人交付模块；此处不生成示例订单或虚拟积分。</p></div><div class="card" id="purchaseModule"><h3>购买模块待接入</h3><p>已预留统一入口。模块交付后在这里选择、模拟付款并查看取餐信息。</p></div>
+        </section>
+        <section class="panel" id="tab-rescue" hidden>
+          <div class="panel-head"><div><h2>🌿 打烊去向</h2><p>只有后端确认完成，经营看板才更新已完成数量。</p></div></div>
+
+          <div class="rescue-module" id="rescueModule"><div class="layout">
+  <form class="controls" id="rescue-calcForm" novalidate>
+    <fieldset>
+      <legend>盲盒库存</legend>
+      <p class="note" id="rescue-stockLine">正在读取盲盒库存…</p>
+      <div class="row">
+        <button type="button" class="btn" data-rescue-write id="rescue-seedBtn">载入今晚演示库存</button>
+        <button type="button" class="btn" data-rescue-write id="rescue-sweepBtn">打烊清算</button>
+      </div>
+      <p class="note">清算由后端按门店时间执行，结果以后端为准。</p>
+    </fieldset>
+    <fieldset>
+      <legend>取货时段</legend>
+      <div class="seg" role="radiogroup" aria-label="取货时段">
+        <label><input type="radio" name="slot" id="rescue-slot2130" value="21:30" checked> 21:30–22:00</label>
+        <label><input type="radio" name="slot" id="rescue-slot2200" value="22:00"> 22:00–22:30</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>顾客偏好</legend>
+      <label class="field">避开过敏原（逗号分隔）<input type="text" id="rescue-avoid" placeholder="wheat, egg"></label>
+      <label class="field">必须符合的饮食<input type="text" id="rescue-diets" placeholder="vegetarian"></label>
+      <label class="field">喜欢的品类
+        <select id="rescue-likes"><option value="">不限</option><option value="bread">面包</option><option value="dessert">甜点</option><option value="drink">饮料</option><option value="meal">正餐</option></select>
+      </label>
+      <label class="field">方案数量<input type="number" id="rescue-top" min="1" max="10" value="3"></label>
+    </fieldset>
+    <button type="submit" class="btn primary" id="rescue-calcBtn">计算去向</button>
+    <p class="status" id="rescue-status" role="status" aria-live="polite"></p>
+  </form>
+
+  <div class="stage">
+    <p class="banner">演示环境：接收机构是占位资料，联系文案不会发送，运输未安排，付款为模拟。只有在“待捐赠清单”里由操作人确认交接后，状态才会改变。</p>
+
+    <section class="lane" aria-labelledby="rescue-invTitle">
+      <h2 id="rescue-invTitle"><span class="step">第 1 步</span>剩余食品</h2>
+      <p id="rescue-inventoryNote">来自盲盒库存（与清仓库存分开）。“可用”是现有数量减去已预留数量。</p>
+      <div id="rescue-invList"></div>
+    </section>
+
+    <section class="lane" id="rescue-optionsLane" hidden aria-labelledby="rescue-optTitle">
+      <h2 id="rescue-optTitle"><span class="step">第 2 步</span>可以组成的盲盒</h2>
+      <p>按后端评分从高到低。各方案互为替代，不代表可以同时售出；计算不下单、不预留、不扣库存。</p>
+      <ol class="options" id="rescue-options"></ol>
+    </section>
+
+    <section class="lane" id="rescue-fallbackLane" hidden aria-labelledby="rescue-fbTitle">
+      <h2 id="rescue-fbTitle"><span class="step">第 2 步</span>组不成盲盒</h2>
+      <p id="rescue-fbReason"></p>
+      <p class="empty" id="rescue-emptyLeft" hidden>当前没有剩余库存，不需要捐赠或处理。</p>
+
+      <div class="sub" id="rescue-donateBlock" hidden>
+        <h3>可捐赠食品 <span class="tag pending">推荐，尚未联系</span></h3>
+        <div class="tablewrap give"><table>
+          <thead><tr><th>食品</th><th class="r">件数</th><th class="r">重量</th><th>说明</th></tr></thead>
+          <tbody id="rescue-donRows"></tbody>
+        </table></div>
+        <div id="rescue-recipientBlock">
+          <h3 style="margin-bottom:8px">附近演示接收机构</h3>
+          <ul class="recipients" id="rescue-recipients"></ul>
+        </div>
+        <p class="note" id="rescue-noRecipient" hidden>附近没有可接收这些品类的演示机构，后端已把这部分重量计入下方的能源估算。</p>
+        <label class="field" id="rescue-copyBlock">联系文案（演示，不会发送）
+          <textarea id="rescue-contactCopy" readonly></textarea>
+        </label>
+        <div class="row" id="rescue-copyRow"><button type="button" class="btn small" id="rescue-copyBtn">复制文案</button><span class="note">复制后需由门店人工联系机构确认。</span></div>
+        <p class="note">这里只是建议。食品真正进入后端“待捐赠清单”（打烊清算后）并由操作人确认交接，才算交出。</p>
+      </div>
+
+      <div class="sub" id="rescue-wasteBlock" hidden>
+        <h3>不可食用或资料未核验 <span class="tag bad">不进入捐赠</span></h3>
+        <div class="tablewrap fuel"><table>
+          <thead><tr><th>食品</th><th class="r">件数</th><th class="r">重量</th><th>原因</th></tr></thead>
+          <tbody id="rescue-wasteRows"></tbody>
+        </table></div>
+        <p class="note">处理建议：与可食用食品分开存放，不出售、不捐赠；交给有资质的厨余或厌氧消化处理方。处理方为未来合作，目前没有对接。</p>
+      </div>
+
+      <div class="sub" id="rescue-fuelBlock" hidden>
+        <h3>后端能源估算</h3>
+        <div class="fuelnums" id="rescue-fuelNums"></div>
+        <p class="note" id="rescue-fuelFormula"></p>
+      </div>
+    </section>
+
+    <section class="lane" aria-labelledby="rescue-donTitle">
+      <h2 id="rescue-donTitle"><span class="step">第 3 步</span>待捐赠清单</h2>
+      <p>来自后端。打烊清算后，未售出的安全食品和未领取的盲盒会出现在这里。确认交接时后端会重新检查安全并扣减库存。</p>
+      <div id="rescue-donations"></div>
+      <div class="sub" id="rescue-discardBlock" hidden>
+        <h3>已报废 <span class="tag bad">不计入捐赠</span></h3>
+        <div id="rescue-discarded"></div>
+      </div>
+    </section>
+
+    <section class="lane" aria-labelledby="rescue-statTitle">
+      <h2 id="rescue-statTitle">已确认交接统计</h2>
+      <p>来自后端 /dashboard，只统计已确认交接的捐赠；同一张捐赠单重复确认不会重复计数。</p>
+      <div class="stats" id="rescue-stats"></div>
+      <p class="note" id="rescue-statNote"></p>
+    </section>
+
+    <section class="future" aria-labelledby="rescue-futTitle">
+      <h2 id="rescue-futTitle" style="font-size:18px">未来业务（未实现）</h2>
+      <ul>
+        <li>碳交易：现在的 CO₂e 只是食物碳足迹估算，不是经认证的减排量，不能出售。要先有认证方法和第三方核证。</li>
+        <li>肥料厂、沼气厂收入：目前没有合作方，也没有报价。上面的能源数字只是估算，不代表收入。</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<dialog id="rescue-handoffDialog" aria-labelledby="rescue-hoTitle">
+  <form method="dialog" style="display:grid; gap:14px">
+    <h3 id="rescue-hoTitle">确认模拟交接</h3>
+    <p id="rescue-hoBody" style="margin:0"></p>
+    <label class="field">接收机构（演示）<input type="text" id="rescue-hoRecipient" maxlength="120"></label>
+    <label style="display:flex; gap:8px; align-items:flex-start; font-size:14px">
+      <input type="checkbox" id="rescue-hoAck"> 我已当面核对食品状态并交出（演示）。这不代表运输已完成或机构已签收。
+    </label>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn" value="cancel">取消</button>
+      <button class="btn give" value="ok" id="rescue-hoOk" disabled>确认交接</button>
+    </div>
+  </form>
+</dialog>
+
+</div>
+        </section>
+
         <!-- 页面 3：活动日志 -->
         <section class="panel" id="tab-log" hidden>
           <div class="panel-head">
@@ -477,7 +645,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
           <div class="card"><ul class="log" id="logList" aria-live="polite"></ul></div>
         </section>
 
-        <p class="foot">商品来自后端演示目录。金额、毛利、亏损和 CO₂e 使用后端结果。审批、WhatsApp、积分与兑换均为本页模拟，不实际发送、不扣库存、不产生成交；CO₂e 估算不是经认证减排量或碳积分。</p>
+        <p class="foot">商品来自后端演示目录。金额、毛利、亏损和 CO₂e 使用后端结果。审批和 WhatsApp 仅在本页模拟；购买、取餐和捐赠须以对应后端状态为准。积分只读负责人接口；CO₂e 估算不是经认证减排量或碳积分。</p>
       </main>
 
       <!-- 右侧：WhatsApp 模拟器 -->
@@ -529,7 +697,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
 <script> /* script 标签里写 JavaScript：让网页“动起来” */
 
 /* =====================================================
-   清仓与盲盒使用独立后端接口；消费者积分仅作独立页面演示
+   清仓与盲盒使用后端接口；统一工作台与模块接入见 integration.js
    ===================================================== */
 const API = ''; // /app 与接口同源，无需另起前端服务。
 async function api(path, body){
@@ -562,7 +730,6 @@ function fresh(){ // 函数：生成一份“全新的初始状态”
   return { // 返回一个对象，记录整个 demo 现在的状态
     role:'owner', tab:'pos', step:1, busy:false, // 当前角色、当前页面、当前第几步、是否正在处理中
     qty:{}, // 店员输入的剩余数量（按商品 id 记录，没填就是 0）
-    consumer:{points:0, earned:0, redeemed:0}, // 消费者积分仅保存在本页演示状态
     blind:{batches:null, result:null, error:''}, // 与清仓商品、消费者演示余额独立
     draft:null, result:null, // 待审批的草稿、审批后的结果（一开始都没有）
     kpi:{recovered:null, co2:null, qty:null, promos:0}, // 金额与碳估算仅展示最近一次后端结果
@@ -580,6 +747,7 @@ function toast(msg){ // 函数：在屏幕底部弹出一条短提示
 
 function setBusy(busy){
   state.busy = busy;
+  window.Nexflow?.busyChanged();
   renderConsumerShop();
   $$('[data-q], [data-inc], [data-dec], #quickText, [data-act="parse"], #submitBtn, #resetBtn, [data-role], #copyBox, [data-blind]').forEach(el => { el.disabled = busy; });
   $$('[data-act="approve"], [data-act="reject"]').forEach(el => { el.disabled = busy || state.role !== 'owner'; });
@@ -635,44 +803,21 @@ function setStep(n){ state.step = n; renderSteps(); } // 函数：切换到第 n
 
 function renderTabs(){ // 函数：刷新四个标签页的显示/隐藏
   $$('.tabs [data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === state.tab))); // 当前页面对应的标签标记为“选中”
-  ['pos','dash','log','blind'].forEach(k => { $('#tab-' + k).hidden = (k !== state.tab); }); // 只显示当前页面，其余隐藏
+  ['pos','dash','log','blind','customer','rescue'].forEach(k => { $('#tab-' + k).hidden = (k !== state.tab); }); // 只显示当前页面，其余隐藏
   $('#pip').classList.toggle('on', !!state.draft); // 有待审批草稿时显示红点
 } // renderTabs 结束
-function switchTab(t){ state.tab = t; renderTabs(); if(t === 'blind' && state.blind.batches === null && !state.busy) loadBlindInventory(); } // 函数：切换到指定页面
+function switchTab(t){ if(!['pos','dash','log','blind','customer','rescue'].includes(t)) return; state.tab = t; renderTabs(); window.Nexflow?.onNavigate(t); if(t === 'blind' && state.blind.batches === null && !state.busy) loadBlindInventory(); } // 函数：切换到指定页面
 
 function renderRole(){ // 函数：刷新角色切换器的选中状态
   $$('.seg [data-role]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.role === state.role))); // 当前角色的按钮标记为“按下”
   renderConsumerShop();
 } // renderRole 结束
 
-const POINTS_PER_CO2_KG = 10;
-const REDEMPTION_ITEMS = [
-  {id:'croissant', name:'牛角包', points:40},
-  {id:'chocolate_slice', name:'巧克力蛋糕片', points:30}
-];
 function renderConsumerShop(){
   const panel=$('#consumerShop');
   if(!panel) return;
   panel.hidden=state.role!=='consumer';
-  if(panel.hidden) return;
-  panel.innerHTML='<h3>🌱 前端独立积分演示</h3><p class="muted">未确认的前端样例：每次模拟批准按 CO₂e 估算的每 kg 记 10 个演示分，不代表实际减排或碳积分。此余额不连接盲盒后端；后端仅隐藏款核销奖励 10 分，100 分抵 RM1，且最多抵正价消费 30%。两套规则尚待负责人统一。</p>'+
-    '<div class="consumer-balance"><span>Mei Ling 积分余额</span><strong>'+state.consumer.points+' 分</strong></div>'+
-    '<p class="muted">累计获得 '+state.consumer.earned+' 分 · 已兑换 '+state.consumer.redeemed+' 分</p><div class="redeem-list">'+
-    REDEMPTION_ITEMS.map(item=>{
-      const product=products.find(p=>p.id===item.id);
-      const label=product?.name || item.name;
-      return '<div class="redeem-row"><div><b>'+esc(label)+'</b><div class="muted">前端样例兑换价 '+item.points+' 分</div></div><button type="button" class="btn btn-main" data-act="redeem" data-product="'+esc(item.id)+'"'+(state.busy || state.consumer.points<item.points?' disabled':'')+'>兑换</button></div>';
-    }).join('')+'</div><p class="muted">兑换只扣除本页演示积分，不会创建订单、扣库存或实际发货。</p>';
-}
-function redeemConsumerItem(id){
-  const item=REDEMPTION_ITEMS.find(x=>x.id===id);
-  if(!item || state.busy || state.role !== 'consumer') return;
-  if(state.consumer.points<item.points){ toast('积分不足，暂时无法兑换'); return; }
-  state.consumer.points-=item.points;
-  state.consumer.redeemed+=item.points;
-  renderConsumerShop();
-  const product=products.find(p=>p.id===item.id);
-  toast('已模拟兑换 '+(product?.name || item.name));
+  panel.innerHTML='<h3>顾客账户</h3><p>购买记录与积分统一在顾客购买入口查看。模拟广播不会产生积分。</p><button type="button" class="btn btn-main" data-tab="customer">进入顾客购买</button>';
 }
 
 function renderPOS(){ // 函数：画出 POS 页的商品列表
@@ -688,9 +833,9 @@ function renderPOS(){ // 函数：画出 POS 页的商品列表
 
 function renderKPI(){
   const k = state.kpi;
-  $('#kRec').textContent = k.recovered === null ? '—' : money(k.recovered);
-  $('#kCo2').textContent = k.co2 ?? '—';
-  $('#kFood').textContent = String(k.qty ?? '—');
+  $('#kRec').textContent = k.recovered === null ? '暂无数据' : money(k.recovered);
+  $('#kCo2').textContent = k.co2 ?? '暂无数据';
+  $('#kFood').textContent = String(k.qty ?? '暂无数据');
   $('#kPromo').textContent = String(k.promos);
 }
 
@@ -699,7 +844,7 @@ function renderDraft(){ // 函数：画出看板页的“待审批草稿”区�
   if(r){ // 情况一：已经批准或拒绝了，显示结果卡片
     box.innerHTML = r.rejected // 如果是被拒绝的
       ? '<div class="card done-card"><div class="big" aria-hidden="true">🛑</div><div><span class="badge">已拒绝</span><h3>这份促销没有发送</h3><p class="muted" style="margin:6px 0 0">草稿已在本页丢弃。需要的话，可以回到“打烊盘点”重新提交。</p></div></div>' // 显示“已拒绝”卡片
-      : '<div class="card done-card"><div class="big" aria-hidden="true">✅</div><div><span class="badge ok">模拟已发送</span><h3>模拟广播已完成</h3><p class="muted" style="margin:6px 0 0">草稿数量 ' + r.units + ' 件，全部售出情景金额 ' + money(r.rev) + '，估算 ' + esc(r.co2) + ' kg CO₂e。未扣库存、未实际发送；右侧为模拟消息。</p></div></div>'; // 否则显示“已发送”卡片
+      : '<div class="card done-card"><div class="big" aria-hidden="true">✅</div><div><span class="badge ok">模拟已发送</span><h3>模拟广播已完成</h3><p class="muted" style="margin:6px 0 0">草稿数量 ' + r.units + ' 件，全部售出情景金额 ' + money(r.rev) + '，估算 ' + esc(r.co2) + ' kg CO₂e。未扣库存、未实际发送；右侧为模拟消息。</p><label for="approvedPromoCopy">已审批的促销文案</label><textarea id="approvedPromoCopy" rows="3" readonly>' + esc(r.text || '') + '</textarea><button type="button" class="btn btn-main" data-copy-promo>复制 WhatsApp 文案</button></div></div>'; // 否则显示“已发送”卡片
     return; // 画完就结束
   } // if 结束
   if(!d){ // 情况二：没有草稿，显示空状态
@@ -726,7 +871,7 @@ function renderDraft(){ // 函数：画出看板页的“待审批草稿”区�
     '<div><b>' + esc(d.co2) + ' kg</b><span>CO₂e 估算</span></div>' + // 指标 3：减少的碳排放
     '<div><b>' + money(d.totals.loss_total) + '</b><span>亏损合计</span></div></div>' + // 后端亏损合计
     '<label class="f" for="copyBox">WhatsApp 文案（可以直接修改）</label>' + // 文案输入框的标签
-    '<textarea id="copyBox" rows="10">' + esc(d.text) + '</textarea>' + // 文案输入框，里面放着系统生成的文案
+    '<textarea id="copyBox" rows="10">' + esc(d.text) + '</textarea><button type="button" class="btn btn-main" data-copy-promo>复制 WhatsApp 文案</button>' + // 文案输入框，里面放着系统生成的文案
     '<div class="tools"><span class="safe">' + (d.is_fallback ? 'AI 配置或调用异常，已回退本地文案' : d.source === 'deepseek' ? 'DeepSeek AI 辅助文案' : '本地演示文案（未调用 AI）') + '</span></div>' +
     '<p class="muted">CO₂e 为估算，不是经认证减排量或碳积分。' + esc(d.carbon.note) + '</p>' + // 说明
     '<details><summary>这些数字是怎么算的？</summary><ul>' + // 可展开的公式说明
@@ -884,15 +1029,13 @@ async function approve(){
   try {
     await broadcast(text, d.items);
     state.kpi.promos += 1;
-    const pointsEarned=d.co2!==null && Number.isFinite(Number(d.co2)) ? Math.floor(Math.max(0,Number(d.co2))*POINTS_PER_CO2_KG) : 0;
-    state.consumer.points+=pointsEarned; state.consumer.earned+=pointsEarned;
     renderConsumerShop();
     addLog('Uncle Wong', d.edited ? '修改文案后模拟批准并广播' : '模拟批准并广播',
-      '仅本页动画：未实际发送、未扣库存、未产生成交。', 'CO₂e 估算 ' + d.co2 + ' kg；前端独立演示积分 +' + pointsEarned + '。', 'ok');
-    state.result = {units:d.totals.qty, rev:d.rev, co2:d.co2};
+      '仅本页动画：未实际发送、未扣库存、未产生成交。', 'CO₂e 估算 ' + d.co2 + ' kg（预测）；模拟广播不加积分。', 'ok');
+    state.result = {units:d.totals.qty, rev:d.rev, co2:d.co2, text, items:d.items};
     state.draft = null;
     setStep(6);
-    toast('模拟广播完成，前端独立演示积分 +' + pointsEarned + '，可切换消费者角色查看');
+    toast('模拟广播完成；未发送真实消息，未增加积分');
   } catch(err){
     toast('模拟展示失败，请重试：' + err.message);
   } finally {
@@ -977,8 +1120,7 @@ document.addEventListener('click', e => { // 监听整个页面的点击（这�
   if(state.busy) return;
   if(t.dataset.act === 'blind-load'){ loadBlindInventory(); return; }
   if(t.dataset.act === 'blind-calculate'){ calculateBlind(); return; }
-  if(t.dataset.role){ state.role = t.dataset.role; renderRole(); if(state.draft) renderDraft(); return; }
-  if(t.dataset.act === 'redeem'){ redeemConsumerItem(t.dataset.product); return; }
+  if(t.dataset.role){ state.role = t.dataset.role; renderRole(); if(state.draft) renderDraft(); window.Nexflow?.roleChanged(); return; }
   const id = t.dataset.inc || t.dataset.dec;
   if(id){
     const qty = quantity(state.qty[id]);
@@ -1015,7 +1157,7 @@ $('#resetBtn').addEventListener('click', () => {
   if(state.busy) return;
   state = fresh();
   $('#quickText').value = ''; $('#posHint').textContent = '';
-  clearResult(); renderAll(); resetBlindForm(); loadProducts();
+  clearResult(); renderAll(); resetBlindForm(); loadProducts(); window.Nexflow?.resetView();
 });
 
 function renderAll(){ renderSteps(); renderRole(); renderPOS(); renderKPI(); renderDraft(); renderLog(); renderTabs(); renderBlindInventory(); renderBlindResult(); } // 函数：一次性画出页面所有部分
@@ -1023,6 +1165,8 @@ resetBlindForm();
 renderAll(); // 网页打开时，立刻画出初始页面
 loadProducts(); // 再从后端取商品列表
 </script> <!-- JavaScript 结束 -->
+<script src="/app/assets/integration.js"></script>
+<script src="/app/assets/rescue-module.js"></script>
 
 <!-- 业务脚本结束 -->
 
@@ -1059,12 +1203,12 @@ loadProducts(); // 再从后端取商品列表
 
   /* 功能导览 */
   const STEPS_TOUR = [
-    {target:'#guide-sidebar', tab:'pos', place:'right', title:'左侧导航', desc:'四个工作页：打烊盘点、老板看板、活动日志、盲盒与余料。点左上角 ☰ 可以收起或展开菜单。'},
-    {target:'#guide-top-actions', tab:'pos', place:'bottom', title:'主题与工具', desc:'切换浅色/深色模式，随时重开导览，或一键重置演示数据。'},
+    {target:'#guide-sidebar', tab:'pos', place:'right', title:'左侧导航', desc:'统一工作台：盘点、经营看板、盲盒、顾客购买和取餐捐赠。点左上角 ☰ 可以收起或展开菜单。'},
+    {target:'#guide-top-actions', tab:'pos', place:'bottom', title:'主题与工具', desc:'切换浅色/深色模式，随时重开导览，或重置本页草稿（不会清除后端订单或余额）。'},
     {target:'#steps', tab:'pos', place:'bottom', title:'五步自动化旅程', desc:'触发 → 关联数据 → 决策逻辑 → 人工审批 → 可见结果。当前进行到哪一步会高亮。'},
     {target:'#guide-pos-card', tab:'pos', place:'right', title:'打烊盘点', desc:'商品从后端载入。用一句话快速输入，或用 + / − 调整数量，然后点“提交盘点”。'},
-    {target:'#guide-kpis', tab:'dash', place:'bottom', title:'老板看板', desc:'本次全部售出情景金额、CO₂e 估算与商品件数来自后端；广播次数仅为本页模拟统计。盲盒候选在独立工作页展示。'},
-    {target:'#guide-role', tab:'dash', place:'right', title:'角色切换', desc:'这是演示角色切换，不是身份认证。Siti 提交盘点，Uncle Wong 模拟批准或拒绝，消费者查看独立演示积分并模拟兑换。'},
+    {target:'#guide-kpis', tab:'dash', place:'bottom', title:'老板看板', desc:'上方是后端已付款和已完成统计；下方是本次全部售出的预测。两者不会相加。'},
+    {target:'#guide-role', tab:'dash', place:'right', title:'角色切换', desc:'这是演示角色切换，不是身份认证。Siti 提交盘点，Uncle Wong 模拟批准或拒绝，顾客查看购买模块和账户余额。'},
     {target:'#guide-phone', tab:'pos', place:'left', title:'WhatsApp 模拟器', desc:'模拟批准后，在这里播放送达、已读和虚构熟客回复；不实际发送、不扣库存、不生成订单。'}
   ];
   let idx = 0, tourOn = false;

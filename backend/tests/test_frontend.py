@@ -44,7 +44,7 @@ def test_frontend_entry_does_not_expose_repository():
         page = client.get("/app")
         assert page.status_code == 200
         assert "text/html" in page.headers["content-type"]
-        assert page.text == (Path(__file__).resolve().parents[2] / "frontend" / "index.html").read_text()
+        assert page.text.replace("\r\n", "\n") == (Path(__file__).resolve().parents[2] / "frontend" / "index.html").read_text(encoding="utf-8")
         assert "/api/products" in page.text
         assert 'id="guide-sidebar"' in page.text
         assert 'id="themeToggleBtn"' in page.text

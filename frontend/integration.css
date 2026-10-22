@@ -1,0 +1,13 @@
+.integration-card { margin-bottom:18px; }
+.integration-heading { margin:24px 0 12px; }
+.integration-card textarea,.integration-card input,#approvedPromoCopy { display:block; width:100%; padding:12px; margin:8px 0 12px; color:var(--ink); background:var(--surface); border:1px solid var(--line-strong); border-radius:10px; font:inherit; }
+.integration-card textarea { resize:vertical; line-height:1.6; }
+#dashboardHint,#balanceHint,#customerHint { overflow-wrap:anywhere; }
+[data-error="true"] { color:var(--danger,#b42318); }
+.integration-card .kpi-box .v { font-size:clamp(18px,2vw,26px); overflow-wrap:anywhere; }
+.demo-session { border-left:4px solid var(--brand); margin-bottom:18px; }
+.demo-session p { margin:6px 0 10px; }
+@media(min-width:1200px) { .content-grid { grid-template-columns:minmax(0,1fr) 310px; } }
+
+body.rescue-open .content-grid { grid-template-columns:minmax(0,1fr); }
+#phoneWrap[hidden] { display:none; }
