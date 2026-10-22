@@ -138,16 +138,21 @@ class PromoResponse(BaseModel):
     warnings: list[PromoWarning]
 
 
-def local_demo_copy(items: list[ItemResult], totals: Totals) -> str:
-    # shortcut: covers the current three products; revisit length when the catalogue grows.
+def offer_facts(items: list[ItemResult], totals: Totals) -> str:
     offers = "; ".join(
-        f"{item.qty} {item.name} at RM{item.unit_clearance_price:.2f} each"
+        f"{item.qty} {item.name}: original RM{item.unit_retail_price:.2f}, "
+        f"clearance RM{item.unit_clearance_price:.2f}/each"
         for item in items
     )
+    discount = f"{DISCOUNT_RATE * 100:f}".rstrip("0").rstrip(".")
     return (
-        f"🥐 Eh, bakery deals lah! {offers}. "
-        f"All {totals.qty} for RM{totals.clearance_total:.2f} (50% off). 😊"
+        f"{offers}. All {totals.qty} for RM{totals.clearance_total:.2f} "
+        f"({discount}% off)."
     )
+
+
+def local_demo_copy(items: list[ItemResult], totals: Totals) -> str:
+    return f"🥐 Eh, bakery deals lah! {offer_facts(items, totals)} 😊"
 
 
 def generate_copy(items: list[ItemResult], totals: Totals) -> PromoCopy:
@@ -163,14 +168,9 @@ def generate_copy(items: list[ItemResult], totals: Totals) -> PromoCopy:
             for item in items
         ]
         lines = deepseek_lines(offers)
-        facts = "; ".join(
-            f"{item.qty} {item.name} at RM{item.unit_clearance_price:.2f} each"
-            for item in items
-        )
         text = (
-            f"🥐 {lines.opening.strip()} {facts}. "
-            f"All {totals.qty} for RM{totals.clearance_total:.2f} (50% off). "
-            f"{lines.closing.strip()}"
+            f"🥐 {lines.opening} {offer_facts(items, totals)} "
+            f"{lines.closing}"
         )
         if len(text.split()) > 50:
             raise CopyUnavailable("INVALID_AI_COPY")
