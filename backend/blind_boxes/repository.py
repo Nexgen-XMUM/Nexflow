@@ -103,10 +103,14 @@ class Repository:
     @staticmethod
     def customer_order(order):
         """Return only fields intended for this local demo customer surface."""
-        return {key: order[key] for key in (
+        out = {key: order[key] for key in (
             "order_id", "user_id", "status", "pickup_start", "pickup_end", "demo_only",
             "payment", "price_sen", "allergens", "pending_points", "points_awarded"
         )}
+        # Orders created before the payment dialog never stored a discount: they paid in full.
+        out["points_discount_sen"] = order.get("points_discount_sen", 0)
+        out["paid_sen"] = order.get("paid_sen", order["price_sen"])
+        return out
 
     @staticmethod
     def customer_quote(row):
@@ -213,7 +217,23 @@ class Repository:
                     raise RuleError("STOCK_CONFLICT", "Quoted stock is unavailable; request a new quote")
                 if self.batch_snapshot(batch) != payload["batches"][batch.batch_id]:
                     raise RuleError("QUOTE_CHANGED", "Quoted batch information changed; request a new quote")
-            order = self.save_quoted_order(db, booking, payload["chosen"], fingerprint, day, now)
+            # Points discount, stock reservation and order creation share this transaction:
+            # any failure below rolls back the deduction and the reservation together.
+            chosen = payload["chosen"]
+            # 1 point = 1 sen, and this order may cover at most 30% of its quote (down to whole points).
+            if request.points_used > chosen["price_sen"] * 3 // 10:
+                raise RuleError("REDEMPTION_LIMIT", "Points cover at most 30% of this quote", 422)
+            if request.points_used:
+                changed = db.execute("UPDATE users SET points=points-? WHERE id=? AND points>=?",
+                                     (request.points_used, request.user_id, request.points_used))
+                if changed.rowcount != 1:
+                    raise RuleError("INSUFFICIENT_POINTS", "Not enough earned points")
+            paid_sen = chosen["price_sen"] - request.points_used
+            # Keep the dashboard revenue and profit on the same paid basis.
+            chosen.update({"points_discount_sen": request.points_used, "paid_sen": paid_sen,
+                           "contribution_sen": paid_sen - chosen["packaging_sen"],
+                           "gross_profit_sen": paid_sen - chosen["cost_sen"] - chosen["packaging_sen"]})
+            order = self.save_quoted_order(db, booking, chosen, fingerprint, day, now)
             db.execute("UPDATE quotes SET order_id=? WHERE id=?", (order["order_id"], request.quote_id))
             return self.customer_order(order)
 
@@ -404,7 +424,10 @@ class Repository:
             donated = [json.loads(r["payload"]) for r in db.execute("SELECT * FROM donations WHERE status='DONATED'")]
             def total(rows, key):
                 return sum(r[key] for r in rows)
-            return {"demo_only": True, "simulated_revenue_sen": total(all_paid,"price_sen"),
+            def paid_sen(row):
+                # Simulated revenue follows the amount actually charged after any points discount.
+                return row["paid_sen"] if "paid_sen" in row else row["price_sen"]
+            return {"demo_only": True, "simulated_revenue_sen": sum(paid_sen(r) for r in all_paid),
                     "picked_up_contribution_sen": total(picked,"contribution_sen"),
                     "picked_up_gross_profit_sen": total(picked,"gross_profit_sen"),
                     "picked_up_qty": total(picked,"qty"), "donated_qty": total(donated,"qty"),

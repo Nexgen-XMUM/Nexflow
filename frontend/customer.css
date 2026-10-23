@@ -232,3 +232,27 @@ footer { display: flex; align-items: center; gap: 8px; padding: 17px 4px 0; colo
 
 }
 #purchaseModule { padding: 16px; }
+
+/* 模拟付款弹窗：报价金额、积分抵扣与应付金额 */
+.pay-dialog { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(15, 23, 42, .45); }
+.pay-dialog[hidden] { display: none; }
+.pay-panel { width: min(360px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; padding: 18px; border-radius: 16px; background: #fff; box-shadow: 0 24px 60px rgba(15, 23, 42, .28); }
+.pay-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.pay-head h3 { margin: 0; color: #0f172a; font-size: 15px; }
+.pay-x { width: 26px; height: 26px; border: 0; border-radius: 8px; background: #f1f5f9; color: #475569; font-size: 12px; cursor: pointer; }
+.pay-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; color: #475569; font-size: 11px; }
+.pay-line b { color: #0f172a; font-size: 12px; }
+.pay-line input[type="checkbox"] { width: 16px; height: 16px; accent-color: #1e40af; }
+.pay-input-wrap { display: flex; align-items: center; gap: 6px; }
+.pay-input-wrap input { width: 72px; height: 28px; padding: 0 7px; border: 1px solid #cbd5e1; border-radius: 7px; color: #0f172a; font: 700 11px var(--body); }
+.pay-max { height: 28px; padding: 0 8px; border: 1px solid #bfdbfe; border-radius: 7px; background: #eff6ff; color: #1e40af; font-size: 10px; font-weight: 700; cursor: pointer; }
+.pay-max:disabled { opacity: .5; cursor: default; }
+.pay-line.total { margin-top: 4px; padding-top: 9px; border-top: 1px dashed #e2e8f0; }
+.pay-line.total b { color: #1e40af; font-size: 18px; }
+.pay-hint { margin: 8px 0 0; color: #94a3b8; font-size: 9px; line-height: 1.6; }
+.pay-error { min-height: 14px; margin: 5px 0 0; color: #b42318; font-size: 10px; line-height: 1.5; }
+.pay-actions { display: flex; gap: 8px; margin-top: 12px; }
+.pay-cancel, .pay-submit { flex: 1; height: 34px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.pay-cancel { border: 1px solid #cbd5e1; background: #fff; color: #475569; }
+.pay-submit { border: 1px solid #1e40af; background: #1e40af; color: #fff; }
+.pay-submit:disabled { opacity: .6; cursor: wait; }

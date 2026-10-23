@@ -73,6 +73,8 @@ class QuoteConfirmRequest(Model):
     quote_id: str = Field(min_length=1, max_length=80)
     user_id: str = Field(min_length=1, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
     idempotency_key: str = Field(min_length=8, max_length=100)
+    # Legacy clients omit points; 0 keeps the previous pay-in-full behaviour.
+    points_used: int = Field(default=0, strict=True, ge=0)
 
 
 class CustomerPickupRequest(ActionRequest):

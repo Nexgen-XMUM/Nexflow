@@ -530,19 +530,29 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
         <div class="account-head"><div><span class="section-label">YOUR IMPACT</span><h2>我的环保账户</h2></div><span class="leaf-mark">♧</span></div>
         <p class="account-user"><span class="user-dot">M</span><span>演示顾客账户<small id="customer-id"></small></span><span class="demo-label">演示</span></p>
         <div class="points-panel"><div class="points-caption"><span>可用积分</span><span class="points-stars">✦ ✦ ✦</span></div><div class="points-value"><strong id="balance">—</strong><span>PTS</span></div><div class="points-note demo-initial-points-note" data-demo-initial-points hidden>含演示初始积分</div><div class="points-divider"></div><div class="pending-line"><span><i></i> 待到账积分</span><b id="pending-points">—</b></div></div>
-        <div class="reward-title"><span>用积分，为下一份好味道加分</span><span>↘</span></div>
-        <form id="redeem-form" class="redeem-form">
-          <label class="field"><span class="field-label">正价金额 <small>RM</small></span><span class="input-wrap"><span class="field-icon">ＲＭ</span><input id="regular-price" inputmode="decimal" placeholder="10.00" required></span></label>
-          <label class="field"><span class="field-label">兑换积分</span><span class="input-wrap"><span class="field-icon">✦</span><input id="redeem-points" inputmode="numeric" type="number" min="1" step="1" placeholder="10" required></span></label>
-          <button id="redeem-button" type="submit" class="redeem-button">模拟兑换 <span>→</span></button>
-        </form>
-        <p id="receipt" class="receipt"></p>
-        <p class="points-footnote">100 积分 = RM1 · 每笔最多抵扣 30%<br>余额与取餐奖励从后端账本读取。</p>
+        <div class="reward-title"><span>积分可在模拟付款时抵扣</span><span>↘</span></div>
+        <p class="points-footnote">100 积分 = RM1 · 每笔最多抵扣本单报价的 30%<br>余额与取餐奖励从后端账本读取。</p>
         <div class="impact-note"><span>✳</span><p><b>好食物不该被浪费</b><small>CO₂e 仅作估算，不是经认证减排或碳积分。</small></p></div>
       </aside>
     </section>
     <section class="card orders-card"><div class="orders-head"><div><span class="section-label">ORDER HISTORY</span><h2>我的订单</h2></div><button id="refresh" class="refresh-button" type="button"><span>↻</span> 刷新订单</button></div><div id="orders" class="orders muted">载入中…</div></section>
     <footer><span class="footer-mark">O</span><span>Orbyte Smart Yield</span><span class="footer-separator">·</span><span>Hackathon Demo</span><span class="footer-spacer"></span><span>报价、付款与积分均为本地模拟</span></footer>
+    <div class="pay-dialog" id="pay-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="pay-title">
+      <div class="pay-panel">
+        <div class="pay-head"><h3 id="pay-title">模拟付款</h3><button type="button" class="pay-x" id="pay-close" aria-label="关闭付款弹窗">✕</button></div>
+        <div class="pay-line"><span>本单报价</span><b id="pay-price">—</b></div>
+        <div class="pay-line"><span>当前可用积分</span><b id="pay-points">—</b></div>
+        <label class="pay-line"><span>使用积分抵扣</span><input type="checkbox" id="pay-use-points"></label>
+        <div id="pay-points-row" hidden>
+          <div class="pay-line"><span>使用积分</span><span class="pay-input-wrap"><input type="number" id="pay-use-value" min="0" step="1" value="0"><button type="button" class="pay-max" id="pay-max">使用可用上限</button></span></div>
+          <div class="pay-line"><span>抵扣金额</span><b id="pay-discount">RM0.00</b></div>
+        </div>
+        <div class="pay-line total"><span>应付</span><b id="pay-total">—</b></div>
+        <p class="pay-hint">100 积分 = RM1，每笔最多抵扣本单报价的 30%。</p>
+        <p class="pay-error" id="pay-error" role="status"></p>
+        <div class="pay-actions"><button type="button" class="pay-cancel" id="pay-cancel">取消</button><button type="button" class="pay-submit" id="pay-submit">确认模拟付款</button></div>
+      </div>
+    </div>
   </div>
         </section>
         <section class="panel" id="tab-rescue" hidden>
