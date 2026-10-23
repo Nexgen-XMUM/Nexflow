@@ -23,8 +23,15 @@
   function renderQuote(q){quoteState=q;$('offer').classList.remove('empty');$('offer').innerHTML=`<div>报价编号 <code>${esc(q.quote_id.slice(0,8))}</code> · ${q.stock_reserved?'库存已预留':'尚未预留库存'}</div><strong>${money(q.price_sen)}</strong><div>盲盒约 ${q.qty_range.min}–${q.qty_range.max} 件</div><div>已申报过敏原：${q.allergens.length?q.allergens.map(esc).join(', '):'无'}</div><div class="warning">报价到 ${esc(new Date(q.expires_at).toLocaleTimeString('zh-CN',{timeZone:'Asia/Kuala_Lumpur',hour:'2-digit',minute:'2-digit'}))} 失效。内容不会在页面公开。</div><div class="offer-actions"><button id="confirm-button">确认报价并模拟付款</button><button id="discard-button" class="secondary">放弃此报价</button></div>`;$('confirm-button').onclick=confirmQuote;$('discard-button').onclick=discardQuote;}
   async function makeQuote(event){event.preventDefault();if($('quote-button').disabled || confirmUncertain)return;if(activeQuote()){notice('先确认当前报价，或选择“放弃此报价”后再获取新报价。',true);return;}notice('');$('quote-button').disabled=true;
     try{let pending=read(keys.quote);if(!pending){const date=$('pickup-date').value,slot=$('pickup-slot').value;if(!date)throw new Error('请选择取餐日期');const [pickup_start,pickup_end]=isoSlot(date,slot);pending={body:{user_id:USER,idempotency_key:idempotency(),pickup_start,pickup_end,mode:'standard',preferences:{likes:$('likes').value.split(',').map(x=>x.trim()).filter(Boolean),avoid_allergens:$('allergens').value.split(',').map(x=>x.trim()).filter(Boolean),required_diets:[],dislikes:[]}}};save(keys.quote,pending);}
+      // Only the explicit competition session may prepare synthetic stock automatically.
+      if(window.Nexflow?.getContext?.().demoTime){
+        const inventory=await api('/inventory');
+        if(inventory.batches.length===0){
+          try{await api('/demo-seed',{});}catch(e){if(e.status!==409)throw e;}
+        }
+      }
       const q=await api('/quotes',pending.body);clear(keys.quote);save('smart-yield-customer-active-quote',q);renderQuote(q);notice('报价已生成。确认前不会占用库存。');
-    }catch(e){if(e.code && e.status<500)clear(keys.quote);notice(`${e.message}。可以重试，系统会使用同一请求编号。`,true);}finally{$('quote-button').disabled=false;}}
+    }catch(e){const rejected=e.code && e.status<500;if(rejected)clear(keys.quote);const message=({'NO_FEASIBLE_COMBINATION':'目前库存无法组成盲盒，请稍后再试；选填留空已按不限偏好处理。','NO_STOCK':'当前盲盒已售完，请稍后再试。'})[e.code]||e.message;notice(message+(rejected?'':'。网络异常，可直接重试原请求。'),true);}finally{$('quote-button').disabled=false;}}
   function activeQuote(){return read('smart-yield-customer-active-quote')||quoteState;}
   async function confirmQuote(){if($('confirm-button').disabled)return;const q=activeQuote();if(!q)return;notice('');$('confirm-button').disabled=true;confirmUncertain=true;
     let pending=read(keys.confirm);if(!pending){pending={body:{quote_id:q.quote_id,user_id:USER,idempotency_key:idempotency()}};save(keys.confirm,pending);}
