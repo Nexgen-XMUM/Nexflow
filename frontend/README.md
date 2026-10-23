@@ -3,6 +3,7 @@
 正式页面：frontend/index.html，由 FastAPI `/app` 提供。原生 HTML/CSS/JavaScript，无需前端构建。
 
 - 盘点、老板看板、活动日志、盲盒与余料、顾客购买、打烊去向使用同一页面内导航。
+- 角色窗口由网址决定：`/app#customer` 只显示顾客购买；`/app#staff` 显示店员区域（打烊盘点、活动日志、盲盒余料、打烊去向）；`/app#boss` 显示全部。`#pos`、`#dash` 等旧标签网址仍按原行为打开对应页面。
 - Kaiden 救援模块已封装到 rescue-module.js / rescue-module.css，元素 ID 使用 rescue- 前缀，避免覆盖主页面状态与样式。
 - `/app/rescue` 兼容跳转 `/app#rescue`；`/app/customer` 跳转 `/app#customer`。旧 rescue.html 仅保留作原模块参考，路由不再直接提供它。
 - integration.js 读取后端 /api/blind-boxes/dashboard，缺失指标显示暂无数据；真实返回 0 则显示 0。

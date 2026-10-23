@@ -783,6 +783,32 @@ function fresh(){ // 函数：生成一份“全新的初始状态”
 let state = fresh(); // state：整个 demo 的“当前状态”，所有页面都根据它来显示
 const roleName = () => state.role === 'owner' ? 'Uncle Wong' : state.role === 'consumer' ? 'Mei Ling' : 'Siti'; // 根据当前角色返回名字
 
+/* ================== 角色窗口：网址决定角色和可见区域 ================== */
+const ROLE_BY_HASH = {customer:'consumer', staff:'staff', boss:'owner'}; // #customer → 顾客，#staff → 店员，#boss → 老板
+const ROLE_HASH = {consumer:'customer', staff:'staff', owner:'boss'}; // 反向映射：角色 → 网址
+const ROLE_TABS = { // 每个角色能看到的区域
+  consumer:['customer'], // 顾客：只有顾客购买
+  staff:['pos','log','blind','rescue'], // 店员：打烊盘点、活动日志、盲盒余料、打烊去向
+  owner:['pos','dash','log','blind','customer','rescue'] // 老板：显示全部
+};
+const roleHomeTab = () => state.role === 'consumer' ? 'customer' : state.role === 'staff' ? 'pos' : 'dash'; // 角色默认打开的区域
+let rolePage = null; // 当前角色窗口（customer/staff/boss）；普通标签页网址时为空
+
+function updateRoleVisibility(){ // 只显示当前角色可见的导航项
+  const allowed = ROLE_TABS[state.role] || ROLE_TABS.owner;
+  $$('.tabs [data-tab]').forEach(b => { const li = b.closest('li'); if(li) li.hidden = !allowed.includes(b.dataset.tab); });
+}
+function enterRoleWindow(page){ // 进入角色窗口：切换角色、收窄可见区域、同步网址
+  const role = ROLE_BY_HASH[page];
+  if(!role) return;
+  rolePage = page;
+  state.role = role;
+  renderRole();
+  updateRoleVisibility();
+  if(state.draft) renderDraft();
+  window.Nexflow?.roleChanged();
+}
+
 let toastTimer; // 记住提示条的计时器，方便重复触发时取消上一个
 function toast(msg){ // 函数：在屏幕底部弹出一条短提示
   const t = $('#toast'); t.textContent = msg; t.classList.add('on'); // 设置提示文字并显示出来
@@ -850,7 +876,11 @@ function renderTabs(){ // 函数：刷新四个标签页的显示/隐藏
   ['pos','dash','log','blind','customer','rescue'].forEach(k => { $('#tab-' + k).hidden = (k !== state.tab); }); // 只显示当前页面，其余隐藏
   $('#pip').classList.toggle('on', !!state.draft); // 有待审批草稿时显示红点
 } // renderTabs 结束
-function switchTab(t){ if(!['pos','dash','log','blind','customer','rescue'].includes(t)) return; state.tab = t; renderTabs(); window.Nexflow?.onNavigate(t); if(t === 'blind' && state.blind.batches === null && !state.busy) loadBlindInventory(); } // 函数：切换到指定页面
+function switchTab(t){ // 函数：切换到指定页面
+  if(!['pos','dash','log','blind','customer','rescue'].includes(t)) return; // 不存在的页面直接忽略
+  if(!ROLE_TABS[state.role].includes(t)) t = roleHomeTab(); // 当前角色看不到的页面，退回该角色的默认页面
+  state.tab = t; renderTabs(); window.Nexflow?.onNavigate(t); if(t === 'blind' && state.blind.batches === null && !state.busy) loadBlindInventory(); // 记录页面、刷新显示、通知集成层同步网址
+}
 
 function renderRole(){ // 函数：刷新角色切换器的选中状态
   $$('.seg [data-role]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.role === state.role))); // 当前角色的按钮标记为“按下”
@@ -1164,7 +1194,7 @@ document.addEventListener('click', e => { // 监听整个页面的点击（这�
   if(state.busy) return;
   if(t.dataset.act === 'blind-load'){ loadBlindInventory(); return; }
   if(t.dataset.act === 'blind-calculate'){ calculateBlind(); return; }
-  if(t.dataset.role){ state.role = t.dataset.role; renderRole(); if(state.draft) renderDraft(); window.Nexflow?.roleChanged(); return; }
+  if(t.dataset.role){ enterRoleWindow(ROLE_HASH[t.dataset.role]); return; } // 演示角色按钮：进入对应角色窗口（网址随之切换）
   const id = t.dataset.inc || t.dataset.dec;
   if(id){
     const qty = quantity(state.qty[id]);
@@ -1206,7 +1236,14 @@ $('#resetBtn').addEventListener('click', () => {
 
 function renderAll(){ renderSteps(); renderRole(); renderPOS(); renderKPI(); renderDraft(); renderLog(); renderTabs(); renderBlindInventory(); renderBlindResult(); } // 函数：一次性画出页面所有部分
 resetBlindForm();
+(function initRoleWindow(){ // 首屏按网址直接显示对应角色窗口，避免先闪出全部菜单
+  const page = window.location.hash.slice(1);
+  if(!ROLE_BY_HASH[page]) return;
+  rolePage = page; state.role = ROLE_BY_HASH[page];
+})();
 renderAll(); // 网页打开时，立刻画出初始页面
+updateRoleVisibility(); // 按当前角色收起不可见的导航项
+if(rolePage) switchTab(roleHomeTab()); // 角色窗口直接打开默认区域
 loadProducts(); // 再从后端取商品列表
 </script> <!-- JavaScript 结束 -->
 <script src="/app/assets/integration.js"></script>

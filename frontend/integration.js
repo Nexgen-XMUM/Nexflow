@@ -83,12 +83,15 @@
     }
   }
 
-  function navigate(tab) {
-    if (!tabs.includes(tab)) tab = 'pos';
-    switchTab(tab);
+  const ROLE_PAGES = {customer:'consumer', staff:'staff', boss:'owner'};
+  function navigate(target) {
+    if (ROLE_PAGES[target]) { enterRoleWindow(target); return; }
+    if (!tabs.includes(target)) target = 'pos';
+    switchTab(target);
   }
   function onNavigate(tab) {
-    if (window.location.hash !== '#' + tab) window.history.replaceState(null,'','#' + tab);
+    const hash = '#' + (rolePage || tab);
+    if (window.location.hash !== hash) window.history.replaceState(null,'',hash);
     // Hide the phone only for the wide rescue workspace. Other page state stays mounted.
     node('phoneWrap').hidden = ['rescue','customer'].includes(tab);
     document.body.classList.toggle('rescue-open', ['rescue','customer'].includes(tab));
@@ -102,7 +105,8 @@
     node('closeDemo').disabled = sessionBusy || state.busy || state.role === 'consumer' || !!demoTime?.includes('T22:31');
     node('registerDemoLeftovers').disabled = sessionBusy || state.busy || state.role === 'consumer' || leftoversRegistered || !!demoTime?.includes('T22:31');
     purchase?.onContextChanged?.(context());
-    navigate(state.role === 'consumer' ? 'customer' : state.role === 'owner' ? 'dash' : 'pos');
+    const home = state.role === 'consumer' ? 'customer' : state.role === 'owner' ? 'dash' : 'pos';
+    switchTab(home); // 切到该角色的默认区域；不经过 navigate，避免重复进入角色窗口
   }
 
   async function copyText(text, field) {
@@ -184,7 +188,11 @@
 
   window.Nexflow = {getContext:context, navigate, onNavigate, roleChanged, refreshDashboard, refreshBalance,
     registerPurchase, changed, copyText,
-    resetView() { document.body.dataset.role = state.role; paintSession(); window.NexflowRescue?.refresh(); navigate('pos'); refreshDashboard(); refreshBalance(); },
+    resetView() {
+      if (rolePage) enterRoleWindow(rolePage); // 重置后仍留在同一个角色窗口
+      else { document.body.dataset.role = state.role; navigate('pos'); }
+      paintSession(); window.NexflowRescue?.refresh(); refreshDashboard(); refreshBalance();
+    },
     shareText, busyChanged:paintSession};
   node('refreshDashboard').onclick = refreshDashboard;
   node('copyRescue').onclick = () => copyText(node('rescueShare').value,node('rescueShare'));
