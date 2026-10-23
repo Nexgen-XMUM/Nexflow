@@ -4,7 +4,7 @@
   const node = id => document.getElementById(id);
   const tabs = ['pos','dash','log','blind','customer','rescue'];
   let dashboard = null, dashboardVersion = 0, balanceVersion = 0;
-  let userId = 'demo_mei', purchase = null, demoTime = null, sessionBusy = false;
+  let userId = 'demo_mei_ling', purchase = null, demoTime = null, sessionBusy = false;
   let mounted = false, leftoversRegistered = false;
   const available = (n, integer = false) => typeof n === 'number' && Number.isFinite(n) && n >= 0 && (!integer || Number.isSafeInteger(n));
   const value = (data, key, integer = false) => available(data?.[key], integer) ? data[key] : null;
@@ -90,8 +90,8 @@
   function onNavigate(tab) {
     if (window.location.hash !== '#' + tab) window.history.replaceState(null,'','#' + tab);
     // Hide the phone only for the wide rescue workspace. Other page state stays mounted.
-    node('phoneWrap').hidden = tab === 'rescue';
-    document.body.classList.toggle('rescue-open', tab === 'rescue');
+    node('phoneWrap').hidden = ['rescue','customer'].includes(tab);
+    document.body.classList.toggle('rescue-open', ['rescue','customer'].includes(tab));
     if (tab === 'dash') refreshDashboard();
     if (tab === 'customer') refreshBalance();
     if (tab === 'rescue') window.NexflowRescue?.refresh();

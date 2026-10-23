@@ -49,6 +49,12 @@ def test_frontend_entry_does_not_expose_repository():
         assert 'id="guide-sidebar"' in page.text
         assert 'id="themeToggleBtn"' in page.text
         assert 'id="tab-blind"' in page.text
+        assert 'id="quote-form"' in page.text
+        assert 'id="redeem-form"' in page.text
+        for asset in ('customer.js', 'customer.css'):
+            response = client.get('/app/assets/' + asset)
+            assert response.status_code == 200
+            assert response.text == (Path(__file__).resolve().parents[2] / 'frontend' / asset).read_text()
         assert 'id="consumerShop"' in page.text
         assert '/api/blind-boxes/inventory' in page.text
         assert '/api/blind-boxes/calculate' in page.text

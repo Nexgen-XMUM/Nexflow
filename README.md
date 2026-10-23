@@ -3,7 +3,7 @@ Automate the Routine. Empower the People.
 
 ## 本地统一电脑版整合（2026-10-22）
 
-当前工作包在 main c4841d6 基础上统一正式 `/app`、经营看板和 Kaiden 救援模块。购买与积分接口按负责人交付后再接入，当前不宣称全流程已完成。
+当前工作包在 main c4841d6 基础上统一正式 `/app`、经营看板和 Kaiden 救援模块。顾客购买与积分接口已接入正式页面，使用方式见 frontend/README.md。
 
 已有 Python 依赖时运行 `.\.venv\Scripts\python.exe -X utf8 -m backend.desktop_demo`，打开 http://127.0.0.1:8000/app；使用本地文案、临时数据库和固定应用时钟，支持白天演示清算与捐赠交接。
 

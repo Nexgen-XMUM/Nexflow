@@ -396,7 +396,7 @@ def create_app() -> FastAPI:
 
     @application.get("/app/assets/{asset}", include_in_schema=False)
     def frontend_asset(asset: str):
-        if asset not in {"integration.js", "integration.css", "rescue-module.js", "rescue-module.css"}:
+        if asset not in {"integration.js", "integration.css", "rescue-module.js", "rescue-module.css", "customer.js", "customer.css"}:
             raise HTTPException(status_code=404, detail="Asset not found")
         return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / asset)
 
