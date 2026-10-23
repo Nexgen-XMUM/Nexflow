@@ -63,15 +63,21 @@ async function page() {
     if (!nodes.has(key)) nodes.set(key, {
       innerHTML: '', textContent: '', value: '', disabled: false, dataset: {}, children: [],
       classList: { add() {}, remove() {}, toggle() {} }, setAttribute() {},
+      // 导航项的可见性用 closest('li') 判断；假节点同样实现，避免与真实 DOM 行为不同。
+      closest() { return null; },
       addEventListener(type, fn) { this[type] = fn; },
       append(...children) { this.children.push(...children); }, appendChild(child) { this.append(child); }
     });
     return nodes.get(key);
   }
+  const location = { hash: '' };
   const ctx = vm.createContext({
     document: { querySelector: node, querySelectorAll: () => [node('#resetBtn'), node('#submitBtn')],
       createElement: () => node(Symbol()), addEventListener: (type, fn) => { events[type] = fn; } },
-    window: { matchMedia: () => ({ matches: true }), innerWidth: 1280 },
+    // 角色窗口由网址决定：内联脚本在初始化时读取 window.location.hash，
+    // 切换页面时用 history.replaceState 回写。假浏览器必须提供这两个 API。
+    window: { matchMedia: () => ({ matches: true }), innerWidth: 1280,
+      location, history: { replaceState(_state, _title, hash) { location.hash = hash; } } },
     setTimeout: fn => { queueMicrotask(fn); return 1; }, clearTimeout() {}, AbortSignal,
     fetch: async (url, options) => {
       calls.push({ url, options });

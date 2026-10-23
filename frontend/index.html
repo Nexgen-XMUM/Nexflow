@@ -373,16 +373,16 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
           <span class="nav-icon" aria-hidden="true">🏪</span><span class="nav-text">打烊盘点<span class="nav-sub">店员录入剩余数量</span></span>
         </button></li>
         <li><button type="button" class="nav-item" role="tab" data-tab="dash" aria-selected="false">
-          <span class="nav-icon" aria-hidden="true">📊</span><span class="nav-text">老板看板<span class="nav-sub">经营统计与促销审批</span></span>
+          <span class="nav-icon" aria-hidden="true">📊</span><span class="nav-text">老板看板<span class="nav-sub">经营概览与促销审批</span></span>
           <span class="pip" id="pip">待审</span>
         </button></li>
         <li><button type="button" class="nav-item" role="tab" data-tab="log" aria-selected="false">
-          <span class="nav-icon" aria-hidden="true">📜</span><span class="nav-text">活动日志<span class="nav-sub">谁在什么时候做了什么</span></span>
+          <span class="nav-icon" aria-hidden="true">📜</span><span class="nav-text">活动日志<span class="nav-sub">今天的操作记录</span></span>
         </button></li>
         <li><button type="button" class="nav-item" role="tab" data-tab="blind" aria-selected="false">
-          <span class="nav-icon" aria-hidden="true">📦</span><span class="nav-text">盲盒与余料<span class="nav-sub">独立库存 · 只读计算</span></span>
+          <span class="nav-icon" aria-hidden="true">📦</span><span class="nav-text">盲盒与余料<span class="nav-sub">盲盒库存与清仓建议</span></span>
         </button></li>
-        <li><button type="button" class="nav-item" role="tab" data-tab="customer" aria-selected="false"><span class="nav-icon">🛍️</span><span class="nav-text">顾客购买<span class="nav-sub">购买模块 · 取餐信息</span></span></button></li>
+        <li><button type="button" class="nav-item" role="tab" data-tab="customer" aria-selected="false"><span class="nav-icon">🛍️</span><span class="nav-text">顾客购买<span class="nav-sub">报价、取餐与积分</span></span></button></li>
         <li><button type="button" class="nav-item" role="tab" data-tab="rescue" aria-selected="false"><span class="nav-icon">🤝</span><span class="nav-text">打烊去向<span class="nav-sub">捐赠交接与能源建议</span></span></button></li>
       </ul>
     </div>
@@ -399,14 +399,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
 
   <!-- ==================== 工作区 ==================== -->
   <div class="workspace">
-    <div class="card demo-session" id="demoSession" hidden>
-      <strong>比赛演示 · 临时数据库与固定时钟</strong><p id="demoClock"></p>
-      <button type="button" class="btn btn-main" id="registerDemoLeftovers">登记本次盘点为演示批次</button>
-      <p class="muted">仅比赛合成数据：沿用本次盘点数量和商品资料，使用预设安全/过敏原演示档案；不代表实际食品安全核验，也不修改原商品目录。</p>
-      <button type="button" class="btn btn-main" id="closeDemo">推进至打烊并清算</button>
-      <span id="demoHint" role="status"></span>
-    </div>
-    <ol class="steps" id="steps" aria-label="自动化五步旅程"></ol>
+    <ol class="steps" id="steps" aria-label="今日营业流程"></ol>
 
     <div class="content-grid">
       <main>
@@ -432,40 +425,111 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
             </div>
             <ul class="pipe" id="pipe" aria-live="polite"></ul>
           </div>
+          <section class="card flow-card" id="leftoversFlowCard">
+            <div class="flow-head">
+              <div>
+                <h3>余货进入处理流程</h3>
+                <p>盘点数量确认后，把今晚的剩余商品登记为今日余货，用来生成清仓促销和安排捐赠交接。</p>
+              </div>
+            </div>
+            <div class="flow-actions">
+              <button type="button" class="btn btn-main" id="registerLeftoversAction">确认余货进入处理流程</button>
+              <span class="flow-note">确认后可在「打烊去向」查看捐赠与处理建议。</span>
+            </div>
+            <p class="flow-hint" id="leftoversFlowHint" role="status"></p>
+          </section>
         </section>
 
-        <!-- 页面 2：老板看板 -->
+        <!-- 页面 2：经营看板 -->
         <section class="panel" id="tab-dash" hidden>
-          <div class="panel-head">
+          <div class="panel-head dash-head">
             <div>
-              <h2>📊 老板看板</h2>
-              <p>经营成果来自后端；预计售出、模拟付款、完成取餐分别展示。</p>
+              <h2>经营概览</h2>
+              <p>轻松了解今天的销售与余货处理情况。</p>
+            </div>
+            <div class="dash-tools">
+              <button type="button" class="btn btn-quiet" id="refreshDashboard">刷新数据</button>
             </div>
           </div>
-          <div class="card integration-card">
-            <div class="promo-head"><h3>经营成果 · 后端演示账本</h3><button type="button" class="btn btn-main" id="refreshDashboard">刷新统计</button></div>
-            <p id="dashboardHint" role="status">正在读取经营数据…</p>
-            <div class="kpis" aria-label="已付款与已完成统计">
-              <div class="kpi-box"><span class="v" id="actualRevenue">暂无数据</span><span class="l">模拟已付款收入（RM）</span></div>
-              <div class="kpi-box"><span class="v" id="actualPickup">暂无数据</span><span class="l">已完成取餐食品（件）</span></div>
-              <div class="kpi-box"><span class="v" id="actualDonation">暂无数据</span><span class="l">已交接捐赠食品（件）</span></div>
-              <div class="kpi-box"><span class="v" id="actualCarbon">暂无数据</span><span class="l">已取餐及捐赠 CO₂e 估算（kg）</span></div>
-            </div>
-            <p class="muted">统计范围：当前盲盒数据库累计。模拟收入包含已付款未取餐订单；待捐赠不计入已交接。食品件数不等于订单数。CO₂e 是食物足迹估算，不是认证减排或碳积分。</p>
-            <p class="muted">购买转化率：<span id="conversionRate">暂无数据</span> · 积分兑换后复购率：<span id="repurchaseRate">暂无数据</span></p>
-            <label for="rescueShare">救援成果分享文字（演示口径）</label>
-            <textarea id="rescueShare" rows="4" readonly></textarea>
-            <button type="button" class="btn btn-main" id="copyRescue">复制成果文字</button>
-          </div>
-          <h3 class="integration-heading">本次清仓预测 · 尚未成交</h3>
-          <div class="kpis" id="guide-kpis" aria-label="本次草稿与本页模拟统计">
-            <div class="kpi-box" style="--kc:#e08a2e"><span class="v" id="kRec">暂无数据</span><span class="l">本次全部售出情景金额</span></div>
-            <div class="kpi-box" style="--kc:#4f86e8"><span class="v" id="kCo2">暂无数据</span><span class="l">本次 CO₂e 估算 kg</span></div>
-            <div class="kpi-box" style="--kc:#e8b43a"><span class="v" id="kFood">暂无数据</span><span class="l">本次商品数量（件）</span></div>
-            <div class="kpi-box" style="--kc:#d94a5a"><span class="v" id="kPromo">0</span><span class="l">本页模拟广播次数</span></div>
-          </div>
-          <div id="draftBox"></div>
 
+          <p class="dash-notice" role="note"><span class="dash-notice-icon" aria-hidden="true">i</span>演示环境 · 以下交易与交接数据用于产品体验。</p>
+          <p class="dash-status" id="dashboardHint" role="status">正在读取经营数据…</p>
+
+          <section class="dash-group">
+            <div class="dash-group-head">
+              <h3>今日经营</h3>
+              <span>已完成的数据，按门店累计统计</span>
+            </div>
+            <div class="dash-kpis" aria-label="已付款与已完成统计">
+              <article class="dash-kpi dash-kpi-lead">
+                <span class="dash-kpi-label">已付款金额</span>
+                <span class="dash-kpi-value" id="actualRevenue">暂无数据</span>
+                <span class="dash-kpi-foot">含已付款、尚未取餐的订单</span>
+              </article>
+              <article class="dash-kpi">
+                <span class="dash-kpi-label">已取餐</span>
+                <span class="dash-kpi-value" id="actualPickup">暂无数据</span>
+                <span class="dash-kpi-foot">单位：件 · 已到店取走</span>
+              </article>
+              <article class="dash-kpi">
+                <span class="dash-kpi-label">已完成捐赠交接</span>
+                <span class="dash-kpi-value" id="actualDonation">暂无数据</span>
+                <span class="dash-kpi-foot">单位：件 · 待交接不计入</span>
+              </article>
+              <article class="dash-kpi">
+                <span class="dash-kpi-label">食品碳足迹估算</span>
+                <span class="dash-kpi-value" id="actualCarbon">暂无数据</span>
+                <span class="dash-kpi-foot">单位：kg CO₂e · 按演示系数估算，非认证减排量</span>
+              </article>
+            </div>
+            <div class="dash-rates">
+              <div class="dash-rate"><span>购买转化率</span><b id="conversionRate">暂无数据</b></div>
+              <div class="dash-rate"><span>积分兑换后复购率</span><b id="repurchaseRate">暂无数据</b></div>
+              <p class="dash-rates-note">暂时没有可靠样本的指标显示“暂无数据”，不做推算。</p>
+            </div>
+          </section>
+
+          <section class="dash-group">
+            <div class="dash-group-head">
+              <h3>本次清仓预测</h3>
+              <span>按当前盘点估算，尚未成交</span>
+            </div>
+            <div class="dash-kpis dash-kpis-compact" id="guide-kpis" aria-label="本次盘点与本页模拟统计">
+              <article class="dash-kpi">
+                <span class="dash-kpi-label">全部售出情景金额</span>
+                <span class="dash-kpi-value" id="kRec">暂无数据</span>
+                <span class="dash-kpi-foot">情景估算，不是已成交金额</span>
+              </article>
+              <article class="dash-kpi">
+                <span class="dash-kpi-label">碳足迹估算</span>
+                <span class="dash-kpi-value" id="kCo2">暂无数据</span>
+                <span class="dash-kpi-foot">单位：kg CO₂e · 估算值</span>
+              </article>
+              <article class="dash-kpi">
+                <span class="dash-kpi-label">本次余货件数</span>
+                <span class="dash-kpi-value" id="kFood">暂无数据</span>
+                <span class="dash-kpi-foot">单位：件 · 来自本次盘点</span>
+              </article>
+              <article class="dash-kpi">
+                <span class="dash-kpi-label">模拟广播次数</span>
+                <span class="dash-kpi-value" id="kPromo">0</span>
+                <span class="dash-kpi-foot">单位：次 · 不会真实发送</span>
+              </article>
+            </div>
+            <div id="draftBox"></div>
+          </section>
+
+          <details class="dash-share">
+            <summary>分享今日成果</summary>
+            <div class="dash-share-body">
+              <label class="sr-only" for="rescueShare">分享文案</label>
+              <textarea id="rescueShare" rows="4" readonly placeholder="刷新数据后可生成今日成果分享文案"></textarea>
+              <div class="dash-share-actions">
+                <button type="button" class="btn btn-quiet" id="copyRescue">复制分享内容</button>
+                <span class="dash-share-note">文案按演示口径生成，可直接粘贴到群组或动态。</span>
+              </div>
+            </div>
+          </details>
         </section>
 
         <section class="panel" id="tab-blind" hidden>
@@ -557,6 +621,20 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
         </section>
         <section class="panel" id="tab-rescue" hidden>
           <div class="panel-head"><div><h2>🌿 打烊去向</h2><p>只有后端确认完成，经营看板才更新已完成数量。</p></div></div>
+
+          <section class="card flow-card" id="finishDayCard">
+            <div class="flow-head">
+              <div>
+                <h3>结束营业并清算</h3>
+                <p>结束当日营业后，未售出的安全食品会进入待捐赠清单，再由店员逐项确认交接。</p>
+              </div>
+            </div>
+            <div class="flow-actions">
+              <button type="button" class="btn btn-main" id="finishDayAction">结束当日营业并清算</button>
+              <span class="flow-note">清算结果以系统返回为准；确认交接后经营看板才会更新已完成数量。</span>
+            </div>
+            <p class="flow-hint" id="finishDayHint" role="status"></p>
+          </section>
 
           <div class="rescue-module" id="rescueModule"><div class="layout">
   <form class="controls" id="rescue-calcForm" novalidate>
@@ -699,7 +777,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
           <div class="card"><ul class="log" id="logList" aria-live="polite"></ul></div>
         </section>
 
-        <p class="foot">商品来自后端演示目录。金额、毛利、亏损和 CO₂e 使用后端结果。审批和 WhatsApp 仅在本页模拟；购买、取餐和捐赠须以对应后端状态为准。积分只读负责人接口；CO₂e 估算不是经认证减排量或碳积分。</p>
+        <p class="foot">商品来自演示商品目录，金额、毛利、亏损与 CO₂e 均为系统计算结果。审批与 WhatsApp 消息仅在本页模拟；购买、取餐和捐赠以实际确认状态为准。积分读取账户数据；CO₂e 为估算，不是经认证减排量或碳积分。</p>
       </main>
 
       <!-- 右侧：WhatsApp 模拟器 -->
@@ -766,9 +844,9 @@ async function api(path, body){
 }
 
 let products = []; // 商品列表：由 loadProducts() 从 GET /api/products 填入
-const STEPS = [ // 五步旅程的名称（英文, 中文）
-  ['Trigger','触发'], ['Connected data','关联数据'], ['Decision logic','决策逻辑'], // 第 1~3 步
-  ['Human approval','人工审批'], ['Visible outcome','可见结果'] // 第 4~5 步
+const STEPS = [ // 五步营业流程（说明, 名称）；只改文案，不改 setStep 的推进逻辑
+  ['完成打烊盘点','记录余货'], ['拿到清仓价格','生成促销'], ['确认价格与文案','老板确认'], // 第 1~3 步
+  ['通知熟客','群发促销'], ['销售与交接','今日结果'] // 第 4~5 步
 ]; // 五步名称结束
 
 /* ================== 工具函数 ================== */
@@ -1297,9 +1375,9 @@ loadProducts(); // 再从后端取商品列表
   const STEPS_TOUR = [
     {target:'#guide-sidebar', tab:'pos', place:'right', title:'左侧导航', desc:'统一工作台：盘点、经营看板、盲盒、顾客购买和取餐捐赠。点左上角 ☰ 可以收起或展开菜单。'},
     {target:'#guide-top-actions', tab:'pos', place:'bottom', title:'主题与工具', desc:'切换浅色/深色模式，随时重开导览，或重置本页草稿（不会清除后端订单或余额）。'},
-    {target:'#steps', tab:'pos', place:'bottom', title:'五步自动化旅程', desc:'触发 → 关联数据 → 决策逻辑 → 人工审批 → 可见结果。当前进行到哪一步会高亮。'},
-    {target:'#guide-pos-card', tab:'pos', place:'right', title:'打烊盘点', desc:'商品从后端载入。用一句话快速输入，或用 + / − 调整数量，然后点“提交盘点”。'},
-    {target:'#guide-kpis', tab:'dash', place:'bottom', title:'老板看板', desc:'上方是后端已付款和已完成统计；下方是本次全部售出的预测。两者不会相加。'},
+    {target:'#steps', tab:'pos', place:'bottom', title:'今日营业流程', desc:'记录余货 → 生成促销 → 老板确认 → 群发促销 → 今日结果。当前进行到哪一步会高亮。'},
+    {target:'#guide-pos-card', tab:'pos', place:'right', title:'打烊盘点', desc:'商品自动载入。用一句话快速输入，或用 + / − 调整数量，然后点“提交盘点”。'},
+    {target:'#guide-kpis', tab:'dash', place:'bottom', title:'本次清仓预测', desc:'按当前盘点估算的全部售出金额、碳足迹和件数；这些是情景估算，不代表已经成交。'},
     {target:'#guide-role', tab:'dash', place:'right', title:'角色切换', desc:'这是演示角色切换，不是身份认证。Siti 提交盘点，Uncle Wong 模拟批准或拒绝，顾客查看购买模块和账户余额。'},
     {target:'#guide-phone', tab:'pos', place:'left', title:'WhatsApp 模拟器', desc:'模拟批准后，在这里播放送达、已读和虚构熟客回复；不实际发送、不扣库存、不生成订单。'}
   ];

@@ -31,7 +31,7 @@
         }
       }
       const q=await api('/quotes',pending.body);clear(keys.quote);save('smart-yield-customer-active-quote',q);renderQuote(q);notice('报价已生成。确认前不会占用库存。');
-    }catch(e){const rejected=e.code && e.status<500;if(rejected)clear(keys.quote);const message=({'NO_FEASIBLE_COMBINATION':'目前库存无法组成盲盒，请稍后再试；选填留空已按不限偏好处理。','NO_STOCK':'当前盲盒已售完，请稍后再试。'})[e.code]||e.message;notice(message+(rejected?'':'。网络异常，可直接重试原请求。'),true);}finally{$('quote-button').disabled=false;}}
+    }catch(e){const rejected=e.code && e.status<500;if(rejected)clear(keys.quote);const message=({'NO_FEASIBLE_COMBINATION':'目前库存无法组成盲盒，请稍后再试；选填留空已按不限偏好处理。','NO_STOCK':'当前盲盒已售完，请稍后再试。','QUOTE_EXPIRED':'报价已失效，请重新获取'})[e.code]||e.message;notice(message+(rejected?'':'。网络异常，可直接重试原请求。'),true);}finally{$('quote-button').disabled=false;}}
   function activeQuote(){return read('smart-yield-customer-active-quote')||quoteState;}
 
   // 1 积分 = 1 sen；单笔最多抵扣本单报价的 30%，向下取整到整积分。
@@ -106,6 +106,9 @@
       await refreshAccount();
       await window.Nexflow?.changed('顾客账本更新');
     }catch(e){
+      // 报价在当前服务里已不存在（例如演示服务重启、临时库更换）或已过期：
+      // 清掉浏览器里残留的旧报价与待确认状态，提示重新报价，避免卡死。
+      if(e.code==='QUOTE_NOT_FOUND'||e.code==='QUOTE_EXPIRED'){resetStaleQuote();return;}
       // 4xx 是明确拒绝：后端事务已回滚，可改用新请求重新支付。
       confirmUncertain=!e.code||e.status>=500;
       if(!confirmUncertain)clear(keys.confirm);
@@ -113,6 +116,16 @@
       $('pay-submit').disabled=false;
       $('pay-use-points').disabled=confirmUncertain;$('pay-use-value').disabled=confirmUncertain;$('pay-max').disabled=confirmUncertain;
     }
+  }
+  function resetStaleQuote(){ // 报价已失效：清理旧报价与待确认付款，允许重新报价
+    clear('smart-yield-customer-active-quote');clear(keys.quote);clear(keys.confirm);
+    quoteState=null;confirmUncertain=false;
+    $('pay-submit').disabled=false;
+    $('pay-use-points').disabled=false;$('pay-use-value').disabled=false;$('pay-max').disabled=false;
+    closePayment();
+    $('offer').classList.add('empty');
+    $('offer').textContent='报价会显示在这里。';
+    notice('报价已失效，请重新获取',true);
   }
   function discardQuote(){if(confirmUncertain){notice('付款结果未明，先重试原付款以避免重复下单。',true);return;}clear('smart-yield-customer-active-quote');clear(keys.quote);clear(keys.confirm);quoteState=null;$('offer').classList.add('empty');$('offer').textContent='报价会显示在这里。';notice('已放弃报价，没有创建订单。');}
   function status(s){return ({RESERVED:'待取餐',PICKED_UP:'已取餐',NO_SHOW:'未按时取餐'}[s]||s);}
