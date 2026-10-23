@@ -6,6 +6,7 @@ from threading import Lock
 from typing import Annotated
 
 from fastapi import Body, HTTPException
+from fastapi.responses import FileResponse
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -14,6 +15,9 @@ from backend.blind_boxes.repository import Repository
 from backend.blind_boxes.router import repository
 from backend.main import PromoItem, create_app, load_products
 from backend.blind_boxes.schemas import Batch
+
+# 展示外壳页面与主工作台放在同一目录，由 FastAPI 直接返回，无需额外静态服务器。
+SHOWCASE = Path(__file__).resolve().parents[1] / "frontend"
 
 
 def create_demo_app(database: Path, day=None):
@@ -36,6 +40,16 @@ def create_demo_app(database: Path, day=None):
     def status():
         return {"demo_only": True, "temporary_database": True, "now": session["now"].isoformat(),
                 "leftovers_registered": registration["result"] is not None}
+
+    # 展示外壳：欢迎页 → 登录/注册展示页 → 正式工作台 /app。
+    # 只挂在比赛演示入口上，普通服务（uvicorn backend.main:app）的路由保持不变。
+    @application.get("/", include_in_schema=False)
+    def welcome_page():
+        return FileResponse(SHOWCASE / "welcome_page.html")
+
+    @application.get("/login", include_in_schema=False)
+    def login_signup_page():
+        return FileResponse(SHOWCASE / "login_signup_page.html")
 
     @application.get("/api/demo/session", tags=["Competition demo only"])
     def demo_session():
