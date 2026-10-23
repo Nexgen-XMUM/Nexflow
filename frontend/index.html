@@ -134,6 +134,7 @@ body.sidebar-collapsed .seg .rt { display: none; }
 .quick { display: flex; gap: 10px; margin-bottom: 18px; background: var(--sunk); padding: 8px; border-radius: 12px; border: 1px solid var(--line); }
 .quick input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 8px; border: 1px solid transparent; background: var(--surface); color: var(--ink); }
 .quick input:focus { border-color: var(--brand); outline: none; }
+.photo-preview { display: block; max-width: 100%; max-height: 240px; margin: -8px 0 18px; border-radius: 12px; border: 1px solid var(--line); }
 .btn { border: 1px solid var(--line); border-radius: 10px; padding: 10px 18px; font-weight: 700; font-size: 14px; background: var(--sunk); color: var(--ink); transition: background .18s ease; }
 .btn:hover:not(:disabled) { background: var(--sunk-hover); }
 .btn:disabled { opacity: .55; cursor: not-allowed; }
@@ -426,7 +427,11 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
             <div class="quick">
               <input id="quickText" type="text" placeholder="12 croissants, 5 chocolate slices" data-i18n-aria="pos.quickAria" aria-label="快速输入剩余商品">
               <button type="button" class="btn btn-main" data-act="parse" data-i18n="pos.parse">识别</button>
+              <button type="button" class="btn" data-act="photo" data-i18n="pos.photoBtn">📷 拍照盘点（AI Demo）</button>
+              <input type="file" id="photoInput" accept="image/*" capture="environment" hidden>
+              <select id="photoSample" class="btn" hidden data-i18n-aria="pos.sampleAria" aria-label="用样图盘点"><option value="" data-i18n="pos.sample">🖼 用样图盘点</option></select>
             </div>
+            <img id="photoPreview" class="photo-preview" alt="" hidden>
             <div class="rows" id="posRows"></div>
             <div class="submit-bar">
               <span class="hint" id="posHint" role="status"></span>
@@ -923,7 +928,7 @@ function setBusy(busy){
   state.busy = busy;
   window.Nexflow?.busyChanged();
   renderConsumerShop();
-  $$('[data-q], [data-inc], [data-dec], #quickText, [data-act="parse"], #submitBtn, #resetBtn, [data-role], #copyBox, [data-blind]').forEach(el => { el.disabled = busy; });
+  $$('[data-q], [data-inc], [data-dec], #quickText, [data-act="parse"], [data-act="photo"], #submitBtn, #resetBtn, [data-role], #copyBox, [data-blind]').forEach(el => { el.disabled = busy; });
   $$('[data-act="approve"], [data-act="reject"]').forEach(el => { el.disabled = busy || state.role !== 'owner'; });
 }
 
@@ -1299,6 +1304,57 @@ function parseQuick(){
   renderPOS();
 }
 
+/* ================== POS：拍照盘点（AI Demo） ================== */
+const BREAD_AI = 'http://127.0.0.1:8100'; // 面包识别 Demo（SDC Hack/bread_demo）单独运行，不经过 NexFlow 后端
+
+// YOLO 品种名按商品 id/别名对应，转成快速输入文本；对应不上的品种只提示，不进入盘点
+function photoQuickText(counts){
+  const matched = [], unmatched = [];
+  for(const c of counts){
+    const label = c.label.toLowerCase();
+    const p = products.find(p => [p.id, ...p.aliases].some(a => a.toLowerCase() === label));
+    (p ? matched : unmatched).push(c.count + ' ' + c.label);
+  }
+  return {text: matched.join(', '), unmatched};
+}
+
+// 样图下拉：Demo 在跑时才显示，选项来自 bread_demo/demo_images
+async function loadPhotoSamples(){
+  try{
+    const names = await (await fetch(BREAD_AI + '/api/images', {signal:AbortSignal.timeout(3000)})).json();
+    for(const n of names) $('#photoSample').add(new Option(n.replace(/\.\w+$/, ''), n));
+    $('#photoSample').hidden = !names.length;
+  }catch{} // Demo 没启动：只保留拍照按钮
+}
+
+// file=上传/拍的照片；sample=demo_images 里的样图文件名
+async function photoCount(file, sample){
+  if((!file && !sample) || state.busy) return;
+  setBusy(true);
+  $('#posHint').textContent = T('pos.photoBusy');
+  const preview = $('#photoPreview');
+  if(preview.src.startsWith('blob:')) URL.revokeObjectURL(preview.src);
+  preview.src = sample ? BREAD_AI + '/images/' + encodeURIComponent(sample) : URL.createObjectURL(file);
+  preview.hidden = false;
+  try{
+    const url = BREAD_AI + '/api/detect' + (sample ? '?name=' + encodeURIComponent(sample) : '');
+    const res = await fetch(url, {method:'POST', body:sample ? null : file, signal:AbortSignal.timeout(30000)});
+    const d = await res.json().catch(() => null);
+    if(!res.ok || !d) throw new Error(d?.detail || T('common.httpError', {status:res.status}));
+    const {text, unmatched} = photoQuickText(d.counts);
+    const others = unmatched.length ? unmatched.join(', ') : '—';
+    if(!text){ $('#posHint').textContent = T('pos.photoNone', {n:d.total, others}); return; }
+    $('#quickText').value = text;
+    setBusy(false); // parseQuick 在忙碌时不执行
+    parseQuick();
+    if(!$('#posHint').textContent) $('#posHint').textContent = T('pos.photoDone', {text, others});
+  }catch(e){
+    $('#posHint').textContent = T('pos.photoError', {msg:e.message});
+  }finally{
+    setBusy(false);
+  }
+}
+
 /* ================== 事件（用户点击、输入时触发） ================== */
 document.addEventListener('click', e => { // 监听整个页面的点击（这种写法叫“事件委托”，动态生成的按钮也能响应）
   const t = e.target.closest('button'); if(!t) return; // 找到被点的按钮，如果点的不是按钮就结束
@@ -1318,6 +1374,7 @@ document.addEventListener('click', e => { // 监听整个页面的点击（这�
   }
   switch(t.dataset.act){ // 根据按钮的 data-act 决定做什么
     case 'parse': parseQuick(); break; // “识别”按钮
+    case 'photo': $('#photoInput').click(); break; // “拍照盘点”按钮：打开相机/选图
     case 'submit': submitEOD(); break; // “提交盘点”按钮
     case 'approve': approve(); break; // “批准并群发”按钮
     case 'reject': reject(); break; // “拒绝”按钮
@@ -1339,6 +1396,9 @@ document.addEventListener('input', e => {
   if(e.target.id === 'quickText'){ clearResult(); $('#posHint').textContent = ''; }
 });
 $('#quickText').addEventListener('keydown', e => { if(e.key === 'Enter') parseQuick(); }); // 在快速输入框按回车，等同于点“识别”
+$('#photoInput').addEventListener('change', e => { photoCount(e.target.files[0]); e.target.value = ''; }); // 清空以便同一张图可再选
+$('#photoSample').addEventListener('change', e => { photoCount(null, e.target.value); e.target.value = ''; }); // 选完复位，同一张样图可再选
+loadPhotoSamples();
 $('#resetBtn').addEventListener('click', () => {
   if(state.busy) return;
   state = fresh();
