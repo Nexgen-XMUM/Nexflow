@@ -1,84 +1,23 @@
-# Bread Detection using YOLO
+# newfea：NexFlow 面包盘点网站
 
-## Project Overview
+在线地址（打开就能用，不用启动任何东西）：
+https://claude.ai/artifact/KVU5mgHJNZ9AeTJPiX3Rbr
 
-This project uses YOLO object detection to identify and count different types of bread in images.
+- 你训练的 YOLO 模型（bread_finetune，15 个品种）直接在浏览器里识别，没有后端
+- 页面里有 5 张训练集的原尺寸完整图片，文件名是标注的真实数量，模型 5 张全部数对
+- 店员核对、改数量后点“确认盘点”，记录保存在网站上
+- 使用网页不消耗 Claude token
 
-The model is trained using a bread detection dataset and can be used as part of a bakery management system.
+## 文件
+| 文件 | 用途 |
+|---|---|
+| `index.html` | 整个网站（页面 + 识别逻辑） |
+| `model.b64.txt` | 模型（ONNX 转成 base64 文本，网页启动时还原） |
+| `ort-wasm-simd.wasm` | 浏览器里运行模型的引擎（onnxruntime-web 1.17.3） |
+| `images/` | 5 张样图 |
 
-## Features
+## 本地预览（可选，在线版不需要）
+在本文件夹打开终端，运行 `python -m http.server 8200`，然后浏览器打开 http://127.0.0.1:8200
+本地预览时确认记录只显示在当前页面，不会保存。直接双击 index.html 打不开模型。
 
-- Detect different types of bread.
-- Identify bread locations using bounding boxes.
-- Display predicted classes and confidence scores.
-- Support bread counting based on detection results.
-- Use GPU acceleration when a compatible NVIDIA GPU and CUDA-enabled PyTorch are available.
-
-## Technologies
-
-- Python
-- Ultralytics YOLO
-- PyTorch
-- OpenCV
-
-## Project Structure
-
-```text
-your-project/
-├── bread.py
-├── README.md
-├── requirements.txt
-└── .gitignore
-```
-
-## Installation
-
-Create and activate a Python virtual environment, then install the dependencies:
-
-```bash
-python -m venv .venv
-```
-
-Windows:
-
-```bat
-.venv\Scripts\activate
-```
-
-Install dependencies:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-## Dataset
-
-The model uses a dataset formatted for YOLO object detection.
-
-The dataset configuration file (`data.yaml`) specifies the paths to training, validation, and test images, as well as the class names.
-
-The dataset is not included in this repository.
-
-## Training
-
-Run the training script:
-
-```bash
-python bread.py
-```
-
-Make sure the dataset paths and training configuration in `bread.py` are correct before training.
-
-## Model Weights
-
-Trained model weights such as `best.pt` and `last.pt` are generated during training.
-
-These files are not included in this repository by default. Keep them in the appropriate local model directory.
-
-## License and Dataset Attribution
-
-Check the original dataset's license and attribution requirements before redistributing the dataset or its contents.
-
-## Project Status
-
-This project is under development.
+数据集署名：Roboflow Universe — breaddetector/bread-detector（CC BY 4.0）。
