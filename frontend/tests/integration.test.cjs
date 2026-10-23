@@ -30,6 +30,9 @@ function page(options = {}) {
     api:async (route,body)=>{calls.push(route);bodies.push({route,body});return typeof response==='function'?response(route,body):response;},
     switchTab(tab){state.tab=tab;window.Nexflow.onNavigate(tab);},toast:text=>messages.push(text),
     renderBlindInventory(){},renderBlindResult(){},addLog(){},roleName:()=>state.role});
+  // 模块现在依赖 i18n.js：在 VM 里加载同一份字典并固定为中文，断言保持原样。
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'../i18n.js'),'utf8'), ctx);
+  vm.runInContext("window.NexFlowI18N.setLang('zh-CN',{silent:true})", ctx);
   vm.runInContext(source,ctx);
   return {node,state,window,ctx,messages,events,calls,api:window.Nexflow,bodies,
     setResponse(data){response=data;},setConfirm(fn){window.confirm=fn;}};

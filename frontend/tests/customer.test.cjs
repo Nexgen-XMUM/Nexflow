@@ -8,6 +8,9 @@ function page(demoTime=null){
   let handler=async url=>({user_id:'demo_mei_ling',points:0,pending_points:0,orders:[]}), changed=0;
   const context={document:{getElementById:node,querySelector:()=>node('pickup')},window:{Nexflow:{getContext:()=>({demoTime}),registerPurchase(){},async changed(){changed++;}}},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},crypto:{randomUUID:()=>String(calls.length)},CSS:{escape:x=>x},Intl,Date,AbortSignal,
     fetch:async(url,opts)=>{calls.push({url,body:opts.body&&JSON.parse(opts.body)});const data=await handler(url,opts);return {ok:true,json:async()=>data};}};
+    // 模块现在依赖 i18n.js：在 VM 里加载同一份字典并固定为中文，断言保持原样。
+    vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../i18n.js'),'utf8'),context);
+    vm.runInNewContext("window.NexFlowI18N.setLang('zh-CN',{silent:true})",context);
   vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../customer.js'),'utf8'),context);
   return {node,calls,storage,setHandler:f=>handler=f,changed:()=>changed};
 }

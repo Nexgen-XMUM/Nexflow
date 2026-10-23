@@ -2,6 +2,8 @@
 (() => {
   'use strict';
   const node = id => document.getElementById(id) || null;
+  // 三语言文案：i18n.js 先于本文件加载；测试环境没有该全局时退回键名，避免抛错。
+  const t = (key, vars) => (window.NexFlowI18N ? window.NexFlowI18N.t(key, vars) : key);
   // 业务卡片可能整体被删除：所有 DOM 写入都走空安全工具，避免空引用异常。
   const setText = (el, next) => { if (el) el.textContent = next; };
   const setValue = (el, next) => { if (el) el.value = next; };
@@ -61,48 +63,48 @@
   const endDayOpen = () => canFinishDay() && !!demoTime && !isClosed();
 
   /* ---------------- 业务提示：默认文案 + 本次操作的结果 ---------------- */
-  const status = {leftovers:{message:'',error:false}, endDay:{message:'',error:false}};
+  const status = {leftovers:{key:'', vars:null, error:false}, endDay:{key:'', vars:null, error:false}};
   let signature = null;
 
   function baseline(key) {
     if (key === 'leftovers') {
       if (!demoTime || !canOperate()) return '';
       if (leftoversRegistered) {
-        const qty = Number.isSafeInteger(registeredQty) ? ' ' + registeredQty + ' 件' : '';
-        return '今晚的余货已经确认' + qty + '。顾客可以购买，打烊后没卖完的会出现在待交接清单里。';
+        const qty = Number.isSafeInteger(registeredQty) ? t('store.baseQty', {n:registeredQty}) : '';
+        return t('store.baseRegistered', {qty});
       }
-      if (isClosed()) return '今天的营业已经结束，不能再确认余货。';
-      if (!draftItems().length) return '提交盘点后，这里会显示今晚的余货数量。';
-      return '本次盘点 ' + draftItems().length + ' 个商品、共 ' + draftQty() +
-        ' 件。确认后会进入清仓促销和捐赠交接流程。';
+      if (isClosed()) return t('store.baseClosed');
+      if (!draftItems().length) return t('store.baseNeedDraft');
+      return t('store.baseReady', {items:draftItems().length, qty:draftQty()});
     }
     if (!demoTime) return '';
     if (!canOperate()) return '';
-    if (!canFinishDay()) return '结束营业由老板操作；请切换到 Uncle Wong 演示角色。';
+    if (!canFinishDay()) return t('store.finishOwnerOnly');
     if (isClosed()) {
-      return '今天的营业已经结束（门店时间 ' + storeTimeText() + '）。' +
-        (leftoversRegistered ? '没卖完的余货已经进入待交接清单。' : '今天没有确认余货，所以没有可捐赠的批次。');
+      return t('store.endDayClosed', {time:storeTimeText()}) +
+        (leftoversRegistered ? t('store.endDayWith') : t('store.endDayWithout'));
     }
-    return leftoversRegistered
-      ? '结束营业后，没卖完的余货会进入待交接清单，需要逐项确认交接。'
-      : '还没确认余货；现在结束营业不会产生可捐赠的批次。';
+    return leftoversRegistered ? t('store.endDayReady') : t('store.endDayNoLeftovers');
   }
 
   function paintHints() {
-    setHint(ui.leftoversHint(), status.leftovers.message || baseline('leftovers'), status.leftovers.error);
-    setHint(ui.endDayHint(), status.endDay.message || baseline('endDay'), status.endDay.error);
+    const left = status.leftovers.key ? t(status.leftovers.key, status.leftovers.vars) : baseline('leftovers');
+    const end = status.endDay.key ? t(status.endDay.key, status.endDay.vars) : baseline('endDay');
+    setHint(ui.leftoversHint(), left, status.leftovers.error);
+    setHint(ui.endDayHint(), end, status.endDay.error);
   }
   // 业务状态一变就清空上一次的结果提示，避免旧错误盖住新状态。
   function syncSignature() {
     const next = [demoTime, leftoversRegistered, isClosed(), draftQty(), state.role].join('|');
     if (signature !== null && next !== signature) {
-      status.leftovers = {message:'',error:false};
-      status.endDay = {message:'',error:false};
+      status.leftovers = {key:'', vars:null, error:false};
+      status.endDay = {key:'', vars:null, error:false};
     }
     signature = next;
   }
-  function setStatus(key, message, error = false) {
-    status[key] = {message: message || '', error: !!error};
+  // 提示以“键 + 变量”保存，切换语言后重新渲染仍是当前语言，而不是旧语言的快照。
+  function setStatus(key, messageKey, vars, error = false) {
+    status[key] = {key: messageKey || '', vars: vars || null, error: !!error};
     paintHints();
   }
 
@@ -111,46 +113,53 @@
     const revenue = value(data,'simulated_revenue_sen',true);
     const pickup = value(data,'picked_up_qty',true), donation = value(data,'donated_qty',true);
     const carbon = value(data,'estimated_co2e_kg');
-    return '【Nexflow 今日成果】今天已收到 ' +
-      (revenue === null ? '暂无数据' : 'RM' + (revenue/100).toFixed(2)) +
-      '（含已付款、还没取餐的订单）；顾客已取走 ' + label(pickup) + (pickup === null ? '' : ' 件') +
-      '；已交给公益机构 ' + label(donation) + (donation === null ? '' : ' 件') +
-      '；这些取走和交接的食物，约减少碳排放 ' + label(carbon) + (carbon === null ? '' : ' kg') +
-      '（估算）。数字来自演示账本：预计售出、待取餐和待捐赠都不算已完成；碳排是估算，不是认证减排量或碳积分。';
+    return '【' + t('dash.sharePrefix') + '】' + t('dash.shareBody', {
+      revenue: revenue === null ? t('common.noData') : 'RM' + (revenue/100).toFixed(2),
+      pickup: pickup === null ? t('common.noData') : t('common.items', {n:pickup}),
+      donation: donation === null ? t('common.noData') : t('common.items', {n:donation}),
+      carbon: carbon === null ? t('common.noData') : carbon + ' kg'
+    });
   }
 
   function paintDashboard() {
     const revenue = value(dashboard,'simulated_revenue_sen',true);
-    setText(node('actualRevenue'), revenue === null ? '暂无数据' : 'RM' + (revenue/100).toFixed(2));
+    setText(node('actualRevenue'), revenue === null ? t('common.noData') : 'RM' + (revenue/100).toFixed(2));
     setText(node('actualPickup'), label(value(dashboard,'picked_up_qty',true)));
     setText(node('actualDonation'), label(value(dashboard,'donated_qty',true)));
     setText(node('actualCarbon'), label(value(dashboard,'estimated_co2e_kg')));
     for (const [id,key] of [['conversionRate','conversion_rate'],['repurchaseRate','redemption_repurchase_rate']]) {
       const n = value(dashboard,key);
-      setText(node(id), n === null || n > 1 ? '暂无数据' : (n*100).toFixed(1) + '%');
+      setText(node(id), n === null || n > 1 ? t('common.noData') : (n*100).toFixed(1) + '%');
     }
     setValue(node('rescueShare'), shareText(dashboard));
     setDisabled(node('copyRescue'), !dashboard);
+  }
+
+  // 看板状态行同样以“键 + 变量”保存，切换语言后可重新渲染。
+  let dashHint = {key:'dash.hintLoading', vars:null, error:false};
+  function paintDashHint() {
+    const el = node('dashboardHint');
+    setHint(el, t(dashHint.key, dashHint.vars), dashHint.error);
   }
 
   async function refreshDashboard() {
     const version = ++dashboardVersion;
     dashboard = null; paintDashboard();
     setDisabled(node('refreshDashboard'), true);
-    const hint = node('dashboardHint');
-    if (hint) hint.dataset.error = 'false';
-    setText(hint, '正在加载今天的经营数据…');
+    dashHint = {key:'dash.hintLoading', vars:null, error:false};
+    paintDashHint();
     try {
       const result = await api('/api/blind-boxes/dashboard');
       if (version !== dashboardVersion) return;
-      if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error('经营数据格式无效');
+      if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error(t('dash.badFormat'));
       dashboard = result; paintDashboard();
-      setText(hint, '已更新为最新数据。没有数据的地方会显示“暂无数据”。');
+      dashHint = {key:'dash.hintOk', vars:null, error:false};
+      paintDashHint();
     } catch (err) {
       if (version !== dashboardVersion) return;
       dashboard = null; paintDashboard();
-      if (hint) hint.dataset.error = 'true';
-      setText(hint, '经营数据没有加载出来：' + err.message + '。可以点“刷新数据”再试一次。');
+      dashHint = {key:'dash.hintFail', vars:{err:err.message}, error:true};
+      paintDashHint();
     } finally {
       if (version === dashboardVersion) setDisabled(node('refreshDashboard'), false);
     }
@@ -159,23 +168,23 @@
   async function refreshBalance() {
     const version = ++balanceVersion, selected = userId;
     const hint = node('balanceHint');
-    setText(node('accountBalance'), '暂无数据');
+    setText(node('accountBalance'), t('common.noData'));
     if (hint) hint.dataset.error = 'false';
     if (!purchase?.getBalance) {
-      setText(hint, '等待购买负责人提供账户接口；不维护页面虚拟余额。');
+      setText(hint, t('shop.balanceWaiting'));
       return;
     }
-    setText(hint, '正在读取购买模块账户余额…');
+    setText(hint, t('shop.balanceReading'));
     try {
       const result = await purchase.getBalance(selected);
       if (version !== balanceVersion) return;
-      if (result?.user_id !== selected || !available(result.points,true)) throw new Error('账户余额缺失或账户不匹配');
-      setText(node('accountBalance'), result.points + ' 分');
-      setText(hint, '来自购买模块账户接口；广播和预测不会增加余额。');
+      if (result?.user_id !== selected || !available(result.points,true)) throw new Error(t('shop.balanceMissing'));
+      setText(node('accountBalance'), t('common.points', {n:result.points}));
+      setText(hint, t('shop.balanceFromApi'));
     } catch (err) {
       if (version !== balanceVersion) return;
       if (hint) hint.dataset.error = 'true';
-      setText(hint, '余额读取失败：' + err.message + '。再次选择此账户可重试。');
+      setText(hint, t('shop.balanceFail', {err:err.message}));
     }
   }
 
@@ -207,15 +216,21 @@
     switchTab(home); // 切到该角色的默认区域；不经过 navigate，避免重复进入角色窗口
   }
 
+  // 演示账户提示：切换语言后仍然显示当前语言（选定账户后改用通用措辞）。
+  function paintCustomerHint() {
+    const fixed = userId === 'demo_mei_ling';
+    setText(node('customerHint'), t(fixed ? 'shop.currentAccountDemo' : 'shop.currentAccount', { id: userId }));
+  }
+
   async function copyText(text, field) {
-    if (!text?.trim()) { toast('暂无可复制内容，请先生成或刷新数据'); return false; }
+    if (!text?.trim()) { toast(t('toast.copyEmpty')); return false; }
     try {
       await navigator.clipboard.writeText(text);
-      toast('已复制，可粘贴分享；未发送消息');
+      toast(t('toast.copied'));
       return true;
     } catch {
       if (field) { field.focus(); field.select(); }
-      toast(field ? '无法自动复制，已选中文字，请按 Ctrl+C 手动复制' : '无法自动复制，请从页面文案手动复制');
+      toast(field ? t('toast.copyManual') : t('toast.copyManualPage'));
       return false;
     }
   }
@@ -224,7 +239,7 @@
     state.blind.result = null; state.blind.batches = null;
     window.NexflowRescue?.invalidate();
     renderBlindInventory(); renderBlindResult();
-    addLog(roleName(), '更新演示业务状态', String(kind || 'module'), '', 'info');
+    addLog(roleName(), t('logEntry.updated'), String(kind || 'module'), '', 'info');
     await Promise.all([refreshDashboard(), refreshBalance()]);
   }
 
@@ -247,7 +262,7 @@
       demoTime = result.demo_only === true && typeof result.now === 'string' ? result.now : null;
       leftoversRegistered = result.leftovers_registered === true;
       if (!leftoversRegistered) registeredQty = null;
-      status.leftovers = {message:'',error:false}; status.endDay = {message:'',error:false}; signature = null;
+      status.leftovers = {key:'',vars:null,error:false}; status.endDay = {key:'',vars:null,error:false}; signature = null;
     } catch {
       demoTime = null; leftoversRegistered = false; registeredQty = null;
     }
@@ -258,26 +273,25 @@
 
   async function confirmLeftovers() {
     if (sessionBusy || state.busy) return;
-    if (!canOperate()) { setStatus('leftovers', baseline('leftovers'), true); return; }
-    if (!demoTime) { setStatus('leftovers', '当前不是比赛演示会话，无法把盘点登记为演示批次。', true); return; }
-    if (leftoversRegistered) { setStatus('leftovers', '今晚的余货已经确认过了，不需要重复登记。', false); return; }
-    if (isClosed()) { setStatus('leftovers', '今天的营业已经结束，不能再确认余货；请重启演示会话。', true); return; }
+    if (!canOperate()) { setStatus('leftovers', 'store.baseConsumerLeftovers', null, true); return; }
+    if (!demoTime) { setStatus('leftovers', 'store.notDemo', null, true); return; }
+    if (leftoversRegistered) { setStatus('leftovers', 'store.leftoversDone', null, false); return; }
+    if (isClosed()) { setStatus('leftovers', 'store.closedLeftovers', null, true); return; }
     const items = draftItems();
-    if (!items.length) { setStatus('leftovers', '请先提交盘点并生成促销草稿，再确认今晚的余货。', true); return; }
+    if (!items.length) { setStatus('leftovers', 'store.needDraft', null, true); return; }
     const payload = items.map(item => ({item:item.item, qty:item.qty}));
     const before = draftQty();
     sessionBusy = true;
-    setStatus('leftovers', '正在把本次盘点的 ' + before + ' 件余货登记为今晚批次…', false);
+    setStatus('leftovers', 'store.registering', {n:before}, false);
     paintSession();
     try {
       const result = await api('/api/demo/leftovers', payload);
       leftoversRegistered = true;
       registeredQty = Number.isSafeInteger(result?.registered_qty) ? result.registered_qty : before;
-      setStatus('leftovers', '已确认 ' + registeredQty + ' 件余货。顾客可以购买，打烊后没卖完的会进入待交接清单。', false);
-      await changed('确认今晚余货');
+      setStatus('leftovers', 'store.registered', {n:registeredQty}, false);
+      await changed(t('logEntry.kindLeftovers'));
     } catch (err) {
-      setStatus('leftovers', '确认余货失败：' + err.message +
-        '。可以再点一次重试；同一份盘点不会重复入库（若已在顾客购买中生成过演示库存，请重启演示会话后重新登记）。', true);
+      setStatus('leftovers', 'store.registerFail', {err:err.message}, true);
     } finally {
       sessionBusy = false; paintSession();
     }
@@ -286,27 +300,26 @@
   async function endBusinessDay() {
     if (sessionBusy || state.busy) return;
     if (!canOperate()) return;
-    if (!canFinishDay()) { setStatus('endDay', baseline('endDay'), true); return; }
-    if (!demoTime) { setStatus('endDay', '当前不是比赛演示会话，无法推进打烊清算。', true); return; }
-    if (isClosed()) { setStatus('endDay', '今天的营业已经结束了；再点也不会重复生成待交接单。', false); return; }
+    if (!canFinishDay()) { setStatus('endDay', 'store.finishOwnerOnly', null, true); return; }
+    if (!demoTime) { setStatus('endDay', 'store.notDemoFinish', null, true); return; }
+    if (isClosed()) { setStatus('endDay', 'store.alreadyClosed', null, false); return; }
     // 结束营业不可撤销，先让老板确认一次；取消时不发任何请求。
-    const message = '结束当日营业并清算？\n\n· 没卖完的安全食品会进入待交接清单\n' +
-      '· 未取餐的订单也会转入待交接\n· 结束后不能再确认余货';
+    const message = t('store.confirmClose');
     if (typeof window.confirm === 'function' && !window.confirm(message)) {
-      setStatus('endDay', '已取消，营业继续；没有产生任何清算记录。', false);
+      setStatus('endDay', 'store.closeCancelled', null, false);
       return;
     }
     sessionBusy = true;
-    setStatus('endDay', '正在结束营业并清算未取餐订单与未售余货…', false);
+    setStatus('endDay', 'store.closing', null, false);
     paintSession();
     try {
       const result = await api('/api/demo/close', {});
       if (result?.demo_only === true && typeof result.now === 'string') demoTime = result.now;
       if (result?.leftovers_registered === true) leftoversRegistered = true;
-      await changed('结束营业并清算');
+      await changed(t('logEntry.kindClose'));
       navigate('rescue');
     } catch (err) {
-      setStatus('endDay', '结束营业失败：' + err.message + '。可以再点一次重试；重复结束不会重复生成待交接单。', true);
+      setStatus('endDay', 'store.closeFail', {err:err.message}, true);
     } finally {
       sessionBusy = false; paintSession();
     }
@@ -327,6 +340,8 @@
 
   window.Nexflow = {getContext:context, navigate, onNavigate, roleChanged, refreshDashboard, refreshBalance,
     registerPurchase, changed, copyText, confirmLeftovers, endBusinessDay,
+    // 切换语言后重画本文件负责的动态文案（不重新请求、不重建订单）
+    relabel() { paintDashboard(); paintDashHint(); paintSession(); paintCustomerHint(); },
     resetView() {
       const page = currentRolePage();
       if (page && typeof enterRoleWindow === 'function') enterRoleWindow(page); // 重置后仍留在同一个角色窗口
@@ -340,9 +355,9 @@
     const selected = String(node('demoCustomer')?.value ?? '').trim();
     const hint = node('customerHint');
     if (!/^[A-Za-z0-9_-]{1,80}$/.test(selected)) {
-      setText(hint, '账户 ID 只允许 1–80 位字母、数字、下划线或短横线。'); return;
+      setText(hint, t('shop.accountIdRule')); return;
     }
-    userId = selected; setText(hint, '当前账户：' + userId);
+    userId = selected; paintCustomerHint();
     refreshBalance(); purchase?.onContextChanged?.(context());
   });
   bind(ui.endDayBtn(), endBusinessDay);
@@ -357,9 +372,14 @@
   window.addEventListener('hashchange', () => navigate(window.location.hash.slice(1)));
   window.addEventListener('load', async () => {
     document.body.dataset.role = state.role;
+    paintCustomerHint();
     await loadSession();
     navigate(window.location.hash.slice(1));
     if (state.tab !== 'dash') refreshDashboard();
     refreshBalance();
   });
+  // 切换语言：只重画本模块负责的文案，不重新请求数据、不重建业务状态。
+  if (window.NexFlowI18N) {
+    window.NexFlowI18N.onChange(() => { paintDashboard(); paintDashHint(); paintSession(); paintCustomerHint(); purchase?.relabel?.(); });
+  }
 })();

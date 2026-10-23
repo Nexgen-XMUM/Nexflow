@@ -1,10 +1,61 @@
 /* ==========================================================================
    NexFlow · 接入层样式
+   0) 语言切换器（顶栏，键盘可用）
    1) 业务流程卡片（确认余货 / 结束营业并清算）
    2) 经营概览看板（KPI 层级、空状态、演示提示、分享成果）
    3) 仍在使用的旧接入样式（顾客面板、余额提示）
    所有数值由 integration.js 写入，这里只负责版面与样式。
    ========================================================================== */
+
+/* ============ 0. 语言切换器 ============ */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 10px 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-secondary);
+  flex: none;
+}
+.lang-switch:hover { border-color: var(--line-strong); background: var(--sunk); }
+.lang-switch:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
+.lang-icon { font-size: 14px; line-height: 1; flex: none; }
+.lang-switch select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 0 16px 0 0;
+  max-width: 148px;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 5px center, right 1px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.lang-switch select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+@media (max-width: 960px) {
+  .lang-switch { padding: 0 8px; }
+  .lang-switch select { max-width: 104px; font-size: 12.5px; }
+}
+
+/* 三语言排版：马来语与英语标签更长，导航与角色名称允许换行，不裁切文字 */
+.sidebar .nav-item { white-space: normal; }
+.sidebar .nav-text { min-width: 0; }
+.sidebar .nav-text > span:first-child { display: block; line-height: 1.3; }
+.sidebar .nav-sub { white-space: normal; overflow-wrap: anywhere; line-height: 1.35; margin-top: 1px; }
+.sidebar .seg button { white-space: normal; }
+.sidebar .seg .rt { min-width: 0; }
+.sidebar .seg .rt small { overflow-wrap: anywhere; line-height: 1.35; }
+body.sidebar-collapsed .sidebar .nav-text,
+body.sidebar-collapsed .sidebar .seg .rt { display: none; }
 
 /* ============ 1. 业务流程卡片 ============ */
 .flow-card { margin-top: 18px; }

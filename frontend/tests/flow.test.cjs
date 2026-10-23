@@ -84,6 +84,9 @@ async function page() {
       return { ok: true, json: async () => url.endsWith('/products') ? responses.products : responses.single };
     }
   });
+    // 内联脚本现在依赖 i18n.js：在 VM 里加载同一份字典并固定为中文，断言保持原样。
+    vm.runInContext(fs.readFileSync(path.join(root,'frontend/i18n.js'),'utf8'), ctx);
+    vm.runInContext("window.NexFlowI18N.setLang('zh-CN',{silent:true})", ctx);
   vm.runInContext(script, ctx);
   await new Promise(setImmediate);
   return { ctx, node, events, calls, run: code => vm.runInContext(code, ctx) };

@@ -86,6 +86,9 @@ async function page(routes) {
       return typeof route === 'function' ? route(options) : ok(route);
     },
   });
+    // 模块现在依赖 i18n.js：在 VM 里加载同一份字典并固定为中文，断言保持原样。
+    vm.runInContext(fs.readFileSync(path.join(root,'frontend/i18n.js'),'utf8'), ctx);
+    vm.runInContext("window.NexFlowI18N.setLang('zh-CN',{silent:true})", ctx);
   vm.runInContext(script, ctx);
   p.run = (code) => vm.runInContext(code.replace(/\b(calculate|openHandoff|handoff|loadDonations)\(/g,'window.NexflowRescue.$1('), ctx);
   p.settle = () => new Promise(setImmediate);
