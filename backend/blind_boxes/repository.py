@@ -8,10 +8,10 @@ from datetime import datetime, timedelta, time
 from pathlib import Path
 from uuid import uuid4
 
-from .algorithm import candidates, select
+from .algorithm import candidates, select, eligible
 from .calculator import calculate
 from .pickup import LOCAL, RuleError, validate_slot, assert_pickup
-from .schemas import Batch, Preferences
+from .schemas import Batch, Preferences, OrderRequest
 
 
 class Repository:
@@ -32,6 +32,7 @@ class Repository:
                 "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, points INTEGER NOT NULL DEFAULT 0 CHECK(points>=0), frozen_until TEXT, penalty_at TEXT)",
                 "CREATE TABLE IF NOT EXISTS donations (id TEXT PRIMARY KEY, source_order TEXT UNIQUE, status TEXT NOT NULL, created TEXT NOT NULL, recipient TEXT, payload TEXT NOT NULL)",
                 "CREATE TABLE IF NOT EXISTS redemptions (request_key TEXT PRIMARY KEY, user_id TEXT NOT NULL, fingerprint TEXT NOT NULL, created TEXT NOT NULL, payload TEXT NOT NULL)",
+                "CREATE TABLE IF NOT EXISTS quotes (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, request_key TEXT UNIQUE NOT NULL, fingerprint TEXT NOT NULL, expires TEXT NOT NULL, payload TEXT NOT NULL, order_id TEXT UNIQUE)",
             ):
                 db.execute(statement)
             yield db
@@ -99,6 +100,134 @@ class Repository:
                 "pickup_start": row["start"], "pickup_end": row["end"], "demo_only": True,
                 "payment": "simulated_paid", **json.loads(row["payload"])}
 
+    @staticmethod
+    def customer_order(order):
+        """Return only fields intended for this local demo customer surface."""
+        return {key: order[key] for key in (
+            "order_id", "user_id", "status", "pickup_start", "pickup_end", "demo_only",
+            "payment", "price_sen", "allergens", "pending_points", "points_awarded"
+        )}
+
+    @staticmethod
+    def customer_quote(row):
+        quote = json.loads(row["payload"])
+        request, chosen = quote["request"], quote["chosen"]
+        return {"quote_id": row["id"], "demo_only": True, "status": "QUOTED",
+                "price_sen": chosen["price_sen"], "qty_range": {"min": 2, "max": 4},
+                "allergens": chosen["allergens"], "pickup_start": request["pickup_start"],
+                "pickup_end": request["pickup_end"], "expires_at": row["expires"],
+                "stock_reserved": False}
+
+    @staticmethod
+    def check_buyer(db, user_id, now):
+        db.execute("INSERT OR IGNORE INTO users(id) VALUES (?)", (user_id,))
+        user = db.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
+        if user["frozen_until"] and datetime.fromisoformat(user["frozen_until"]) > now:
+            raise RuleError("USER_FROZEN", "Demo user is temporarily frozen")
+        day = now.astimezone(LOCAL).date().isoformat()
+        count = db.execute("SELECT count(*) FROM orders WHERE user_id=? AND day=?", (user_id, day)).fetchone()[0]
+        if count >= 2:
+            raise RuleError("DAILY_LIMIT", "Maximum two boxes per demo user per day")
+        return day
+
+    @staticmethod
+    def batch_snapshot(batch):
+        return batch.model_dump(mode="json", exclude={"on_hand", "reserved"})
+
+    def quote(self, request, now, rng=None):
+        rng = rng or random.SystemRandom()
+        self.sweep(now)
+        fingerprint = self.fingerprint(request)
+        with self.transaction() as db:
+            old = db.execute("SELECT * FROM quotes WHERE request_key=?", (request.idempotency_key,)).fetchone()
+            if old:
+                if old["fingerprint"] != fingerprint:
+                    raise RuleError("IDEMPOTENCY_CONFLICT", "Key already used for a different quote request")
+                if old["order_id"]:
+                    raise RuleError("QUOTE_ALREADY_CONFIRMED", "This quote already has an order")
+                if datetime.fromisoformat(old["expires"]) <= now:
+                    raise RuleError("QUOTE_EXPIRED", "Quote expired; request a new quote")
+                return self.customer_quote(old)
+            validate_slot(request.pickup_start, request.pickup_end, now, booking=True)
+            self.check_buyer(db, request.user_id, now)
+            batches = self.batches(db)
+            result = candidates(batches, request.preferences, request.pickup_end, now)
+            if not result["candidates"]:
+                raise RuleError(result["reason"], "No eligible box available")
+            chosen = dict(select(result["candidates"], request.mode, rng))
+            chosen.update({"hidden": rng.random() < chosen["hidden_probability"],
+                "preferences": request.preferences.model_dump(), "search_truncated": result["search_truncated"],
+                "points_awarded": 0})
+            chosen["pending_points"] = 10 if chosen["hidden"] else 0
+            selected = {line["batch_id"] for line in chosen["lines"]}
+            payload = {"request": request.model_dump(mode="json"), "chosen": chosen,
+                "batches": {b.batch_id: self.batch_snapshot(b) for b in batches if b.batch_id in selected}}
+            quote_id = uuid4().hex
+            # The quote fixes the randomly selected contents but does not reserve stock.
+            db.execute("INSERT INTO quotes VALUES (?,?,?,?,?,?,NULL)", (quote_id, request.user_id,
+                request.idempotency_key, fingerprint, request.pickup_end.isoformat(), json.dumps(payload)))
+            return self.customer_quote(db.execute("SELECT * FROM quotes WHERE id=?", (quote_id,)).fetchone())
+
+    def save_quoted_order(self, db, request, chosen, fingerprint, day, now):
+        for line in chosen["lines"]:
+            changed = db.execute("UPDATE batches SET reserved=reserved+? WHERE id=? AND on_hand-reserved>=?",
+                (line["qty"], line["batch_id"], line["qty"]))
+            if changed.rowcount != 1:
+                raise RuleError("STOCK_CONFLICT", "Quoted stock is unavailable; request a new quote")
+        order_id = uuid4().hex
+        db.execute("INSERT INTO orders VALUES (?,?,?,?,?,'RESERVED',?,?,?,NULL,?)", (
+            order_id, request.user_id, request.idempotency_key, fingerprint, day, now.isoformat(),
+            request.pickup_start.isoformat(), request.pickup_end.isoformat(), json.dumps(chosen)))
+        return self.order_response(db.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone())
+
+    def confirm_quote(self, request, now):
+        self.sweep(now)
+        fingerprint = "quote:" + self.fingerprint(request)
+        with self.transaction() as db:
+            old = db.execute("SELECT * FROM orders WHERE request_key=?", (request.idempotency_key,)).fetchone()
+            if old:
+                if old["fingerprint"] != fingerprint:
+                    raise RuleError("IDEMPOTENCY_CONFLICT", "Key already used for a different request")
+                return self.customer_order(self.order_response(old))
+            row = db.execute("SELECT * FROM quotes WHERE id=? AND user_id=?", (request.quote_id, request.user_id)).fetchone()
+            if not row:
+                raise RuleError("QUOTE_NOT_FOUND", "Quote not found for this demo user", 404)
+            if row["order_id"]:
+                raise RuleError("QUOTE_ALREADY_CONFIRMED", "Use the original confirmation key to read this order")
+            if datetime.fromisoformat(row["expires"]) <= now:
+                raise RuleError("QUOTE_EXPIRED", "Quote expired; request a new quote")
+            payload = json.loads(row["payload"])
+            original = OrderRequest.model_validate(payload["request"])
+            booking = original.model_copy(update={"idempotency_key": request.idempotency_key})
+            validate_slot(booking.pickup_start, booking.pickup_end, now, booking=True)
+            day = self.check_buyer(db, request.user_id, now)
+            current = {b.batch_id: b for b in self.batches(db)}
+            for line in payload["chosen"]["lines"]:
+                batch = current.get(line["batch_id"])
+                if batch is None:
+                    raise RuleError("STOCK_CONFLICT", "Quoted stock is unavailable; request a new quote")
+                reason = eligible(batch, booking.preferences, booking.pickup_end, now)
+                if reason and reason != "OUT_OF_STOCK":
+                    raise RuleError("QUOTE_UNAVAILABLE", "Quoted batch no longer meets safety or preference requirements")
+                if batch.on_hand - batch.reserved < line["qty"]:
+                    raise RuleError("STOCK_CONFLICT", "Quoted stock is unavailable; request a new quote")
+                if self.batch_snapshot(batch) != payload["batches"][batch.batch_id]:
+                    raise RuleError("QUOTE_CHANGED", "Quoted batch information changed; request a new quote")
+            order = self.save_quoted_order(db, booking, payload["chosen"], fingerprint, day, now)
+            db.execute("UPDATE quotes SET order_id=? WHERE id=?", (order["order_id"], request.quote_id))
+            return self.customer_order(order)
+
+    def customer_account(self, user_id):
+        # Demo identity only; no phone, payment or authentication data is involved.
+        with self.transaction() as db:
+            user = db.execute("SELECT points,frozen_until FROM users WHERE id=?", (user_id,)).fetchone()
+            orders = [self.customer_order(self.order_response(row)) for row in db.execute(
+                "SELECT * FROM orders WHERE user_id=? ORDER BY created DESC,id", (user_id,))]
+            pending = sum(o["pending_points"] for o in orders)
+            return {"demo_only": True, "user_id": user_id, "points": user["points"] if user else 0,
+                    "pending_points": pending, "frozen_until": user["frozen_until"] if user else None,
+                    "orders": orders}
+
     def order(self, request, now, rng=None):
         rng = rng or random.SystemRandom()
         self.sweep(now)
@@ -162,11 +291,13 @@ class Repository:
             if changed.rowcount != 1:
                 raise RuleError("STOCK_CONFLICT", "Cannot consume unavailable reserved stock")
 
-    def pickup(self, oid, now):
+    def pickup(self, oid, now, user_id=None):
         with self.transaction() as db:
             row = db.execute("SELECT * FROM orders WHERE id=?", (oid,)).fetchone()
             if not row:
                 raise RuleError("ORDER_NOT_FOUND", "Order not found", 404)
+            if user_id is not None and row["user_id"] != user_id:
+                raise RuleError("ORDER_NOT_FOUND", "Order not found for this demo user", 404)
             if row["status"] == "PICKED_UP":
                 return self.order_response(row)
             if row["status"] != "RESERVED":

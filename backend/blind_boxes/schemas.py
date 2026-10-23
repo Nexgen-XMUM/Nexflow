@@ -69,6 +69,16 @@ class ActionRequest(Model):
     order_id: str = Field(min_length=1, max_length=80)
 
 
+class QuoteConfirmRequest(Model):
+    quote_id: str = Field(min_length=1, max_length=80)
+    user_id: str = Field(min_length=1, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
+    idempotency_key: str = Field(min_length=8, max_length=100)
+
+
+class CustomerPickupRequest(ActionRequest):
+    user_id: str = Field(min_length=1, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
+
+
 class DonationAction(Model):
     donation_id: str = Field(min_length=1, max_length=80)
     recipient: str = Field(min_length=1, max_length=120)
