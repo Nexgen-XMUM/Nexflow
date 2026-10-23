@@ -1,0 +1,235 @@
+{
+  "date": "2026-10-23T00:12:24.546390+08:00",
+  "commit": "a3fd0e99957527ee83c8c8e9bfd61752f8f20efe",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "checks": {
+    "python_syntax_files": 23,
+    "json_files": 13,
+    "dependencies": {
+      "fastapi": "0.156.4",
+      "pydantic": "2.14.1",
+      "starlette": "1.9.0",
+      "uvicorn": "0.54.0",
+      "python-dotenv": "1.2.1",
+      "pytest": "9.1.1",
+      "httpx": "0.28.1"
+    },
+    "resources": {
+      "/app": 200,
+      "/docs": 200,
+      "/openapi.json": 200,
+      "/app/assets/integration.js": 200,
+      "/app/assets/integration.css": 200,
+      "/app/assets/rescue-module.js": 200,
+      "/app/assets/rescue-module.css": 200
+    },
+    "static_protection": {
+      "/app/assets/.env": 404,
+      "/backend/.env": 404,
+      "/data/users.json": 404
+    },
+    "redirects": {
+      "/app/": "/app",
+      "/app/rescue": "/app#rescue",
+      "/app/customer": "/app#customer"
+    },
+    "promo": {
+      "currency": "MYR",
+      "discount_rate": "0.50",
+      "items": [
+        {
+          "qty": 10,
+          "retail_total": "60.00",
+          "cost_total": "20.00",
+          "clearance_total": "30.00",
+          "gross_profit_total": "10.00",
+          "loss_total": "0.00",
+          "estimated_co2e_kg": "2",
+          "item": "croissant",
+          "name": "Butter Croissant",
+          "unit_retail_price": "6.00",
+          "unit_cost_price": "2.00",
+          "unit_clearance_price": "3.00"
+        }
+      ],
+      "totals": {
+        "qty": 10,
+        "retail_total": "60.00",
+        "cost_total": "20.00",
+        "clearance_total": "30.00",
+        "gross_profit_total": "10.00",
+        "loss_total": "0.00",
+        "estimated_co2e_kg": "2"
+      },
+      "carbon": {
+        "is_estimate": true,
+        "note": "Based on product weight and the supplied CO2e factor; not certified emissions reductions or carbon credits."
+      },
+      "promo": {
+        "text": "🥐 Eh, bakery deals lah! 10 Butter Croissant: original RM6.00, clearance RM3.00/each. All 10 for RM30.00 (50% off). 😊",
+        "source": "local_demo",
+        "is_fallback": false,
+        "fallback_reason": null
+      },
+      "warnings": []
+    },
+    "bad_quantity": {
+      "error": {
+        "code": "INVALID_REQUEST",
+        "message": "Request must be a non-empty array of items with positive integer quantities.",
+        "details": [
+          {
+            "location": [
+              "body",
+              0,
+              "qty"
+            ],
+            "code": "int_type"
+          }
+        ]
+      }
+    },
+    "overstock": {
+      "error": {
+        "code": "INSUFFICIENT_STOCK",
+        "message": "Requested quantity exceeds available stock.",
+        "details": [
+          {
+            "index": 0,
+            "item": "croissant",
+            "available_qty": 18
+          }
+        ]
+      }
+    },
+    "registration": {
+      "imported": 1,
+      "demo_only": true,
+      "registered_qty": 10,
+      "batch_ids": [
+        "demo-leftovers-2026-10-23-croissant"
+      ],
+      "source": "eod_leftovers",
+      "safety_note": "Synthetic demo profiles only, not actual food safety verification"
+    },
+    "calculate_options": 1,
+    "allergen_fallback": "NO_OPTIONS",
+    "purchase_pickup_api": {
+      "status": "PICKED_UP",
+      "qty": 2,
+      "price_sen": 570
+    },
+    "final_dashboard": {
+      "demo_only": true,
+      "simulated_revenue_sen": 570,
+      "picked_up_contribution_sen": 520,
+      "picked_up_gross_profit_sen": 120,
+      "picked_up_qty": 2,
+      "donated_qty": 8,
+      "picked_up_weight_g": 160,
+      "donated_weight_g": 640,
+      "estimated_co2e_kg": 2.0,
+      "carbon_note": "Food-footprint estimate only, not verified avoided emissions or carbon credits.",
+      "conversion_rate": null,
+      "redemption_repurchase_rate": null,
+      "unavailable_reason": "No verified visitor or regular-order attribution data",
+      "users": [
+        {
+          "id": "audit_user",
+          "points": 10,
+          "frozen_until": null
+        }
+      ]
+    },
+    "invalid_inventory": {
+      "error": {
+        "code": "INVENTORY_UNAVAILABLE",
+        "message": "Inventory data is unavailable or invalid.",
+        "details": []
+      }
+    },
+    "normal_app": {
+      "/app": 200,
+      "/api/inventory": 200,
+      "/api/blind-boxes/dashboard": 200,
+      "/api/demo/session": 404
+    },
+    "real_http": {
+      "/app": {
+        "status": 200,
+        "bytes": 97010
+      },
+      "/docs": {
+        "status": 200,
+        "bytes": 1014
+      },
+      "/openapi.json": {
+        "status": 200,
+        "bytes": 18895
+      },
+      "/api/products": {
+        "status": 200,
+        "bytes": 324
+      },
+      "/api/inventory": {
+        "status": 200,
+        "bytes": 278
+      },
+      "/api/demo/session": {
+        "status": 200,
+        "bytes": 107
+      },
+      "/app/assets/integration.js": {
+        "status": 200,
+        "bytes": 11972
+      },
+      "/app/assets/rescue-module.js": {
+        "status": 200,
+        "bytes": 17064
+      }
+    },
+    "real_http_donation_flow": {
+      "demo_only": true,
+      "simulated_revenue_sen": 0,
+      "picked_up_contribution_sen": 0,
+      "picked_up_gross_profit_sen": 0,
+      "picked_up_qty": 0,
+      "donated_qty": 10,
+      "picked_up_weight_g": 0,
+      "donated_weight_g": 800,
+      "estimated_co2e_kg": 2.0,
+      "carbon_note": "Food-footprint estimate only, not verified avoided emissions or carbon credits.",
+      "conversion_rate": null,
+      "redemption_repurchase_rate": null,
+      "unavailable_reason": "No verified visitor or regular-order attribution data",
+      "users": []
+    }
+  },
+  "probes": {
+    "charities_invalid_json": {
+      "http": 500,
+      "body": "Internal Server Error"
+    },
+    "charities_wrong_shape": {
+      "http": 500,
+      "body": "Internal Server Error"
+    },
+    "reversed_calculator_slot": {
+      "http": 200,
+      "status": "OPTIONS"
+    },
+    "blank_recipient": {
+      "http": 200,
+      "recipient": "   "
+    },
+    "unsupported_claim_synonyms": {
+      "accepted": true,
+      "opening": "Jom lah, doorstep service!",
+      "closing": "Enjoy a gift! 😊"
+    },
+    "long_catalogue_name": {
+      "word_count": 77,
+      "source": "local_demo"
+    }
+  }
+}
