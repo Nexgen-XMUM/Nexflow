@@ -13,7 +13,8 @@ from fastapi.routing import APIRoute
 from . import charity
 from .pickup import LOCAL, RuleError, clock
 from .repository import Repository
-from .schemas import Batch, CalculateRequest, SuggestRequest, OrderRequest, ActionRequest, DonationAction, RedeemRequest
+from .schemas import (Batch, CalculateRequest, SuggestRequest, OrderRequest, ActionRequest,
+                      DonationAction, RedeemRequest, QuoteConfirmRequest, CustomerPickupRequest)
 
 
 class DomainRoute(APIRoute):
@@ -112,6 +113,18 @@ def calculate(request: CalculateRequest, repo: Repo, now: Now):
     return repo.calculate(request, now, config.get("store"), config.get("charities", []))
 
 
+@router.post("/quotes")
+def quote(request: OrderRequest, repo: Repo, now: Now):
+    """Create a sealed customer quote; contents stay server-side and stock is not reserved."""
+    return repo.quote(request, now)
+
+
+@router.post("/quotes/confirm")
+def confirm_quote(request: QuoteConfirmRequest, repo: Repo, now: Now):
+    """Confirm the stored quote without another random draw or client-supplied price."""
+    return repo.confirm_quote(request, now)
+
+
 @router.post("/orders")
 def order(request: OrderRequest, repo: Repo, now: Now):
     return repo.order(request, now)
@@ -120,6 +133,16 @@ def order(request: OrderRequest, repo: Repo, now: Now):
 @router.get("/orders/{order_id}")
 def get_order(order_id: str, repo: Repo):
     return repo.get_order(order_id)
+
+
+@router.get("/customer/account")
+def customer_account(user_id: str, repo: Repo):
+    return repo.customer_account(user_id)
+
+
+@router.post("/customer/pickup")
+def customer_pickup(request: CustomerPickupRequest, repo: Repo, now: Now):
+    return repo.customer_order(repo.pickup(request.order_id, now, user_id=request.user_id))
 
 
 @router.post("/pickup")

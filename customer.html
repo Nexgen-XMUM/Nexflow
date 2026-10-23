@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Smart Rescue Box · 顾客演示</title>
+  <link rel="stylesheet" href="/customer.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/customer" aria-label="Smart Yield 首页">
+      <span class="brand-mark">O<span></span></span>
+      <span class="brand-copy"><b>orbyte</b><small>SMART YIELD</small></span>
+    </a>
+    <div class="topbar-right"><span class="location"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg> Kuala Lumpur</span><span class="demo-chip"><i></i> DEMO MODE</span><span class="avatar">M</span></div>
+  </header>
+  <main class="page">
+    <div class="page-kicker"><span>顾客体验</span><b>/</b><span>Smart Rescue Box</span></div>
+    <section class="hero">
+      <div class="hero-copy"><span class="hero-tag"><span>✦</span> GOOD FOOD, SECOND CHANCE</span>
+        <h1>今晚的好味道，<br><em>刚好遇见你。</em></h1>
+        <p>发现附近面包店的惊喜盲盒。拯救新鲜好食物，也让今晚多一点小惊喜。</p>
+        <div class="hero-meta"><span><b>01</b> 选取餐时段</span><span class="meta-line"></span><span><b>02</b> 确认惊喜报价</span><span class="meta-line"></span><span><b>03</b> 到店取餐</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true"><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-spark spark-a">✳</div><div class="art-spark spark-b">✦</div><div class="art-box"><span class="box-ribbon"></span><span class="box-bow">✦</span><span class="box-croissant">🥐</span><span class="box-label">BAKERY<br>SURPRISE</span></div><div class="art-sticker">SAVE<br><b>GOOD</b><br>FOOD</div></div>
+      <div class="hero-footnote"><span>↗</span> 每一个盲盒，都是减少浪费的小小行动</div>
+    </section>
+    <nav class="steps" aria-label="购买步骤"><div class="step active"><span class="step-no">1</span><span><b>获取报价</b><small>挑选取餐时段</small></span></div><span class="step-connector"></span><div class="step"><span class="step-no">2</span><span><b>确认订单</b><small>安心模拟付款</small></span></div><span class="step-connector"></span><div class="step"><span class="step-no">3</span><span><b>到店取餐</b><small>核销并获得积分</small></span></div><span class="step-note"><i></i> 轻松三步，减少食物浪费</span></nav>
+    <div id="notice" class="notice" role="status" aria-live="polite"></div>
+    <section class="content-grid">
+      <article class="card quote-card">
+        <div class="card-heading"><div><span class="section-label">TONIGHT'S PICK</span><h2>找到你的惊喜盲盒</h2><p>先选时间和口味偏好，我们会为你锁定一份报价。</p></div><span class="heading-icon">✧</span></div>
+        <form id="quote-form" class="quote-form">
+          <label class="field"><span class="field-label">取餐日期</span><span class="input-wrap"><span class="field-icon">▦</span><input id="pickup-date" type="date" required></span></label>
+          <label class="field"><span class="field-label">取餐时段</span><span class="input-wrap"><span class="field-icon">◷</span><select id="pickup-slot"><option value="21:30">21:30 – 22:00</option><option value="22:00">22:00 – 22:30</option></select><span class="select-caret">⌄</span></span></label>
+          <label class="field"><span class="field-label">喜欢的口味 <small>选填</small></span><span class="input-wrap"><span class="field-icon">♡</span><input id="likes" placeholder="例如 bread, dessert"></span></label>
+          <label class="field"><span class="field-label">需要避开的过敏原 <small>选填</small></span><span class="input-wrap"><span class="field-icon">◇</span><input id="allergens" placeholder="例如 peanut, milk"></span></label>
+          <div class="privacy-note"><span>♧</span><span><b>惊喜内容暂时保密</b><small>确认报价前不会揭晓盲盒内容，也不会预留库存。</small></span></div>
+          <button id="quote-button" type="submit" class="primary-button">为我寻找盲盒 <span>→</span></button>
+        </form>
+        <div id="offer" class="offer empty"><span class="offer-empty-icon">✧</span><b>你的惊喜报价会出现在这里</b><span>选好时段，开启今晚的小小惊喜。</span></div>
+      </article>
+      <aside class="card account-card">
+        <div class="account-head"><div><span class="section-label">YOUR IMPACT</span><h2>我的环保账户</h2></div><span class="leaf-mark">♧</span></div>
+        <p class="account-user"><span class="user-dot">M</span><span>演示顾客账户<small id="customer-id"></small></span><span class="demo-label">演示</span></p>
+        <div class="points-panel"><div class="points-caption"><span>可用积分</span><span class="points-stars">✦ ✦ ✦</span></div><div class="points-value"><strong id="balance">—</strong><span>PTS</span></div><div class="points-divider"></div><div class="pending-line"><span><i></i> 待到账积分</span><b id="pending-points">—</b></div></div>
+        <div class="reward-title"><span>用积分，为下一份好味道加分</span><span>↘</span></div>
+        <form id="redeem-form" class="redeem-form">
+          <label class="field"><span class="field-label">正价金额 <small>RM</small></span><span class="input-wrap"><span class="field-icon">ＲＭ</span><input id="regular-price" inputmode="decimal" placeholder="10.00" required></span></label>
+          <label class="field"><span class="field-label">兑换积分</span><span class="input-wrap"><span class="field-icon">✦</span><input id="redeem-points" inputmode="numeric" type="number" min="1" step="1" placeholder="10" required></span></label>
+          <button id="redeem-button" type="submit" class="redeem-button">模拟兑换 <span>→</span></button>
+        </form>
+        <p id="receipt" class="receipt"></p>
+        <p class="points-footnote">100 积分 = RM1 · 每笔最多抵扣 30%<br>余额与取餐奖励从后端账本读取。</p>
+        <div class="impact-note"><span>✳</span><p><b>好食物不该被浪费</b><small>碳排减量积分目前独立于本账户，数据仅作环保估算。</small></p></div>
+      </aside>
+    </section>
+    <section class="card orders-card"><div class="orders-head"><div><span class="section-label">ORDER HISTORY</span><h2>我的订单</h2></div><button id="refresh" class="refresh-button" type="button"><span>↻</span> 刷新订单</button></div><div id="orders" class="orders muted">载入中…</div></section>
+    <footer><span class="footer-mark">O</span><span>Orbyte Smart Yield</span><span class="footer-separator">·</span><span>Hackathon Demo</span><span class="footer-spacer"></span><span>报价、付款与积分均为本地模拟</span></footer>
+  </main>
+  <script src="/customer.js" defer></script>
+</body>
+</html>

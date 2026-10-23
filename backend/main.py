@@ -10,7 +10,7 @@ from backend.ai_copy import CopyUnavailable, deepseek_lines
 from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, StringConstraints
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -381,6 +381,24 @@ def create_app() -> FastAPI:
     @application.get("/app", include_in_schema=False)
     def frontend():
         return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / "index.html")
+
+    @application.get("/app/rescue", include_in_schema=False)
+    def rescue_page():
+        return RedirectResponse("/app#rescue", status_code=307)
+
+    @application.get("/app/", include_in_schema=False)
+    def frontend_slash():
+        return RedirectResponse("/app", status_code=307)
+
+    @application.get("/app/customer", include_in_schema=False)
+    def customer_page():
+        return RedirectResponse("/app#customer", status_code=307)
+
+    @application.get("/app/assets/{asset}", include_in_schema=False)
+    def frontend_asset(asset: str):
+        if asset not in {"i18n.js", "integration.js", "integration.css", "rescue-module.js", "rescue-module.css", "customer.js", "customer.css"}:
+            raise HTTPException(status_code=404, detail="Asset not found")
+        return FileResponse(Path(__file__).resolve().parents[1] / "frontend" / asset)
 
     application.post(
         "/api/generate-promo",

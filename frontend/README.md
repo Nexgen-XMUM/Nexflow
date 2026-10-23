@@ -1,112 +1,62 @@
-# Nexflow 前后端联调
+# 统一电脑版工作台
 
-页面沿用 `index.html` 的原生 HTML/CSS/JavaScript，无需 Node 构建或安装前端依赖。
-正式入口 `/app` 已整合根目录 `orbyte smart yield.html` 的新增卡片样式和消费者入口；根目录文件保留为原稿，不直接提供给浏览器。
-清仓商品来自后端共享 JSON；盲盒来自独立 SQLite 批次。金额、CO₂e 和初始文案使用后端响应。
+正式页面：frontend/index.html，由 FastAPI `/app` 提供。原生 HTML/CSS/JavaScript，无需前端构建。
 
-## 启动
+- 盘点、老板看板、活动日志、盲盒与余料、顾客购买、打烊去向使用同一页面内导航。
+- 角色窗口由网址决定：`/app#customer` 只显示顾客购买；`/app#staff` 显示店员区域（打烊盘点、活动日志、盲盒余料、打烊去向）；`/app#boss` 显示全部。`#pos`、`#dash` 等旧标签网址仍按原行为打开对应页面。
+- Kaiden 救援模块已封装到 rescue-module.js / rescue-module.css，元素 ID 使用 rescue- 前缀，避免覆盖主页面状态与样式。
+- `/app/rescue` 兼容跳转 `/app#rescue`；`/app/customer` 跳转 `/app#customer`。旧 rescue.html 仅保留作原模块参考，路由不再直接提供它。
+- integration.js 读取后端 /api/blind-boxes/dashboard，缺失指标显示暂无数据；真实返回 0 则显示 0。
+- 本次预测与模拟付款收入、已取餐件数、已交接捐赠件数分别展示；CO₂e 仅为估算。
+- 已移除 state.consumer 的独立积分与广播加分。顾客模块已接入主页面：报价、确认模拟付款、取餐和积分兑换均复用后端。
+- WhatsApp 促销和后端成果文字可复制；自动复制失败时选中文本供手动复制。
 
-从仓库根目录运行已有虚拟环境中的后端。下面使用临时盲盒数据库，避免演示和定时清算影响已有本地库存：
+## 启动和交接
 
-```bash
-NEXFLOW_DEMO_DIR=$(mktemp -d)
-AI_PROVIDER=local_demo DEEPSEEK_API_KEY='' BLIND_BOX_DB_PATH="$NEXFLOW_DEMO_DIR/blind.sqlite3" .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+[新人启动说明](../docs/desktop-integration/quickstart.md)、[三分钟演示](../docs/desktop-integration/demo-script.md)、[项目转接文档](../docs/desktop-integration/project-handoff.md)、[购买模块适配约定](../docs/desktop-integration/purchase-adapter.md)。
+
+已有依赖时，在仓库根目录：
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 -m backend.desktop_demo
 ```
 
-打开 <http://127.0.0.1:8000/app>。页面与 API 同源，`API = ''`，无需代理或 CORS 配置。
-不要双击 HTML 或从仓库根目录启动静态文件服务器。
-原来的 `python3 demo.py` 后端调试工具仍保留，在其本机地址后加 `/app` 也能打开本页面。
+打开 <http://127.0.0.1:8000/app>。比赛入口强制 local_demo，使用临时库和固定应用时钟。成功盘点后可显式登记相同余货为合成演示批次，再从打烊去向完成交接；不需要改用另一组独立样本。常规真实时间服务仍为 `uvicorn backend.main:app`。不要双击 HTML，不要从仓库根目录公开静态文件。
 
-如必须分开运行静态前端，服务目录只设为 `frontend/`，并修改页面的 `API` 为后端地址；
-后端进程设置 `CORS_ALLOWED_ORIGINS` 为精确前端来源，例如 `http://127.0.0.1:5173`。
-后端启动时自动加载 `backend/.env`，已有进程环境变量优先。`localhost` 与 `127.0.0.1` 是不同来源。
-上述配置只影响当前进程，不修改 `.env`，不调用收费模型。按 Ctrl+C 关闭服务；临时数据库路径保存在该终端的 `NEXFLOW_DEMO_DIR` 中。
+## 保留的接口与行为
 
-## 当前接口
+清仓用 GET /api/products 和 POST /api/generate-promo，数量必须为合法非负整数，零数量不提交；金额、亏损、碳估算和文案取后端结果。10 个 Butter Croissant 仍返回原价60、成本20、清仓30、毛利10、CO₂e 估算2 kg。输入 19 个会报超库存；修改后可重试。
 
-- `GET /api/products`：`{"products":[{"id":"croissant","name":"Butter Croissant","aliases":["croissant","croissants"],"on_hand":18}]}`。
-  示例只展示一项，实际返回共享库存的所有商品；不包含成本、售价和客户信息。
-- `GET /api/inventory`：已有的售价查询，提供 `currency` 和商品 `id/name/retail_price/on_hand`，没有成本。
-  当前录入页无需售价，使用带别名的 `/api/products` 即可；报价统一取生成结果。
-- `POST /api/generate-promo`：发送 `[{"item":"croissant","qty":10}]`，不发送角色、价格或零数量项。
-  使用 `items`、`totals`、`carbon`、`promo`、`warnings` 渲染。
-- HTTP 422／503 的 `error.message` 显示在录入页；网络失败或 30 秒超时后恢复操作；切页时还会显示全局错误提示。
-  商品加载失败时点击“重置演示”重新加载。
+保留本地文案、DeepSeek 成功和失败回退的来源标识；保留 422/503、网络失败、30 秒请求时限、重复提交拦截、失败清空旧结果和恢复按钮。
+盲盒只读计算仍读取独立批次，不预留、不扣库存、不发积分；sen 仅转成 RM 展示。没有方案时显示后端余料建议、拒绝原因和能源估算。
+Kaiden 的清算和交接继续使用现有 /api/blind-boxes/*，确认完成后刷新主看板。推荐不算完成，待交接不算已捐赠。
 
-金额为两位小数字符串，币种 MYR；CO₂e 为十进制字符串、单位 kg CO₂e。
-固定半价，可能低于成本；页面显示毛利、亏损合计和警告。
-录入列表只显示名称与库存，统一包装图标仅作装饰；不编造中文名、重量或成本。
-情景金额按本次数量全部售出计算，不代表已成交营收。
-CO₂e 是估算，不是认证减排或碳积分；默认使用本地文案；后端可配置 DeepSeek。页面区分本地模式、AI 文案和失败回退。
+## 验证
 
-## 演示验收
-
-1. 输入 Butter Croissant（牛角包）10 个：原价 RM60.00、成本 RM20.00、清仓金额 RM30.00、毛利 RM10.00、CO₂e 估算 2 kg。
-2. 快速输入 `10 croissants, 2 chocolate slices, 1 sourdough`：RM45.00、3.725 kg CO₂e。
-3. 输入 19 个牛角包：显示超库存错误；修正为 10 后可以重试。
-4. 输入 `1.5`、`-1`：明确报错，不会改成 15 或 1。
-5. 切换店员：模拟批准／拒绝按钮禁用；切回老板可编辑文案并模拟广播。
-6. 模拟批准不改变情景金额、不扣库存、不实际发送消息；只有本页模拟次数增加。
-7. 生成期间不能重复提交或重置；切换到活动日志后，返回结果不会强行跳页。
-8. 停掉后端再提交：清掉旧草稿和金额，显示错误，按钮恢复；重新启动后可重试。
-
-角色切换不构成身份认证。审批、广播、送达、已读、回复和日志均为本页模拟，刷新重置。
-页面入口只提供指定 HTML，不公开数据目录。生成接口仍包含成本，仅供受控本地演示。
-
-## 盲盒与余料
-
-打开左侧“盲盒与余料”。首次打开读取 `GET /api/blind-boxes/inventory`，显示名称、批次、可用件数、原价和安全截止时间。
-空数据库明确显示空库存，不会拿清仓商品填充。在另一个终端明确导入当天合成库存：
-
-```bash
-curl -X POST http://127.0.0.1:8000/api/blind-boxes/demo-seed
-```
-
-重复导入返回 409，不会重置库存。点击“刷新盲盒库存”，选择规划日期、时段及可选筛选条件，再点击“计算盲盒方案”。
-页面先刷新批次名称，再发送 `POST /api/blind-boxes/calculate`，请求示例（日期换成规划日期）：
-
-```json
-{
-  "pickup_start": "2026-10-22T21:30:00+08:00",
-  "pickup_end": "2026-10-22T22:00:00+08:00",
-  "preferences": {"avoid_allergens": [], "required_diets": []},
-  "top": 3
-}
-```
-
-- `OPTIONS`：按批次对应商品名称和数量，展示后端的 `retail_sen`、`price_sen`、`packaging_sen` 和 `estimated_co2e_kg`。
-  100 sen = RM1；页面只转换展示单位，不重新计算定价。候选互为替代，不表示可同时售出。
-- `NO_OPTIONS`：展示后端总原因、逐批次拒绝原因、`fallback` 余料统计和 `choices` 建议。
-  机构为演示数据，直线距离、能源及 CO₂e 为估算；没有真实联系机构、交接食品或发送消息。
-- 计算不下单、不预留、不扣库存、不加积分。计算器允许营业时间外规划，下单限制没有改变。
-  后端每分钟清算；22:30 后可用库存可能转入待捐赠，安全期限也会影响结果。不要修改机器时间绕过限制。
-
-建议检查：
-
-1. 新数据库先计算空库存，确认提示；导入当天演示批次后计算，应出现候选商品和 RM 价格。
-2. 在批次仍安全时填 `wheat`：演示面包和蛋糕被排除，剩余饮料无法单独组成含主食的盒子，展示捐赠建议。
-3. 规划日期选在批次安全截止之后：展示安全期限拒绝及生物能源估算。这只修改请求日期，不改变系统时间。
-4. 停掉服务后计算：旧建议清空、错误可见、按钮恢复；以相同进程配置重启后可重试。
-
-消费者卡片沿用前端独立积分样例，刷新重置，不连接后端积分账户。
-前端每 kg CO₂e 估算记 10 演示分、40/30 分换商品，与后端隐藏款核销奖励 10 分、100 分抵 RM1 的规则不同。
-两套规则尚未统一，不能据此前端余额执行真实兑换；待决策项见 [本轮汇报](../docs/blind-box-integration/summary.md)。
-
-## 检查
-
-```bash
-AI_PROVIDER=local_demo DEEPSEEK_API_KEY='' .venv/bin/python -m pytest backend/tests -q
+```powershell
+.\.venv\Scripts\python.exe -X utf8 -m pytest backend/tests -q -p no:cacheprovider
 node --test frontend/tests/*.test.cjs
 ```
 
-测试无需安装前端依赖；接口映射测试使用仓库 `.venv` 中的 Python TestClient 读取真实响应，并强制本地文案模式。AI 成功与失败回退仅用模拟响应验证，不调用供应商。
-盲盒映射测试使用临时数据库，覆盖候选、捐赠、生物能源、空库存、失败恢复、重复请求和积分隔离。
+测试不调用收费模型。浏览器和跨电脑的实际验收情况见 [验收记录](../docs/desktop-integration/acceptance.md)。
 
-## 团队
+## 顾客购买验收（2026-10-23）
 
-| 角色 | 成员 |
-|---|---|
-| 队长 / 整合 / 前端| （YEO JIN HONG） |
-| 前端 | （填名字） |
-| 后端 / 整合 / HACKER | （QIU BO CHUAN） |
-| 提案 / 演示 | （填名字） |
+正式入口 `/app#customer`，`/app/customer` 兼容跳转。复用根目录顾客设计，样式限制在购买区域。
+固定演示账户为 `demo_mei_ling`，不提供身份认证或多账户切换。
+
+```bash
+.venv/bin/python -m backend.desktop_demo
+```
+
+此现有启动器强制本地文案、临时数据库及明确的应用演示时间，不修改机器时间。
+比赛演示启动后可直接进入顾客购买，选填留空按不限偏好处理。首次报价若库存从未导入，自动准备合成演示批次；已有库存（包括售罄批次）不会重置。
+若需演示盘点到销售，先完成盘点并登记余货，顾客报价会沿用这些批次。
+进入顾客购买，选择当天 21:30 时段，获取报价、确认模拟付款、模拟取餐，再查看老板看板。
+报价不预留库存；确认后预留；取餐后扣库存。所有金额、订单状态和积分均来自后端。
+只有隐藏款核销才奖励积分；普通订单核销后余额为 0 属于正常情况，不保证每单加分。
+100 分抵 RM1，最多抵正价金额 30%；积分不足明确报错。
+
+报价确认和兑换发生网络异常时保留原请求编号，重试不会重复创建业务。
+浏览器存储只用于待确认请求，不是积分账本；重启临时服务后旧报价可能失效，可按错误提示放弃并重新报价。
+付款、订单与账户均为本地演示，无真实支付或消息发送。
