@@ -133,6 +133,7 @@ button:disabled { opacity: .55; cursor: wait; }
 .points-value { display: flex; align-items: baseline; gap: 7px; margin-top: 3px; }
 .points-value strong { font: 700 31px/1.2 var(--display); letter-spacing: -.03em; }
 .points-value span { color: #bfdbfe; font-size: 9px; font-weight: 700; letter-spacing: .1em; }
+.points-panel .demo-initial-points-note { margin-top: 2px; color: #bfdbfe; font-size: 9px; }
 .points-divider { height: 1px; margin: 10px 0; background: #ffffff24; }
 .pending-line { color: #dbeafe; font-size: 9px; }
 .pending-line span { display: flex; align-items: center; gap: 6px; }

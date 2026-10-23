@@ -11,3 +11,4 @@
 
 body.rescue-open .content-grid { grid-template-columns:minmax(0,1fr); }
 #phoneWrap[hidden] { display:none; }
+.demo-initial-points-note { font-size:11px; color:var(--muted); }

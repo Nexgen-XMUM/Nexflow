@@ -23,6 +23,10 @@ def create_demo_app(database: Path, day=None):
     demo_day = day or datetime.now(LOCAL).date()
     session = {"now": datetime.combine(demo_day, time(21, 35), LOCAL)}
     repo = Repository(database)
+    # 比赛演示初始积分：固定演示账户在新建临时库时获得 100 分，方便展示积分兑换。
+    # 每次启动都会新建临时数据库，因此重启后恢复 100 分；刷新页面、重复读取账户
+    # 或兑换都不会再次赠送。普通服务不调用此方法。
+    repo.seed_demo_points("demo_mei_ling", 100)
     registration = {"fingerprint": None, "result": None}
     registration_lock = Lock()
     application = create_app()

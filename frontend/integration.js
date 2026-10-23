@@ -143,6 +143,8 @@
       leftoversRegistered = result.leftovers_registered === true;
     } catch { demoTime = null; }
     paintSession();
+    // “含演示初始积分”只在比赛演示会话出现；普通服务没有初始赠送。
+    (document.querySelectorAll?.('[data-demo-initial-points]') || []).forEach(el => { el.hidden = !demoTime; });
   }
   async function closeDemo() {
     if (sessionBusy || state.busy || !demoTime || state.role === 'consumer') return;

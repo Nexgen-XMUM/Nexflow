@@ -368,6 +368,16 @@ class Repository:
         with self.transaction() as db:
             return [{**dict(row), "payload": json.loads(row["payload"])} for row in db.execute("SELECT * FROM donations ORDER BY created,id")]
 
+    def seed_demo_points(self, user_id, points):
+        """Competition demo only: starting points for the fixed demo account.
+
+        Only fills a missing account when the launcher creates a fresh temporary
+        database. Existing rows are never topped up, so page refreshes, repeated
+        account reads and redemptions cannot re-grant points.
+        """
+        with self.transaction() as db:
+            db.execute("INSERT INTO users(id, points) VALUES (?, ?) ON CONFLICT(id) DO NOTHING", (user_id, points))
+
     def redeem(self, request, now):
         fingerprint = self.fingerprint(request)
         with self.transaction() as db:

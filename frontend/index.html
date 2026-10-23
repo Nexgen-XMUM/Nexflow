@@ -497,7 +497,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
             <label for="demoCustomer">演示顾客 ID</label><input id="demoCustomer" value="demo_mei_ling" disabled maxlength="80" autocomplete="off">
             <button type="button" class="btn btn-main" id="selectCustomer" disabled>使用此账户</button>
             <p id="customerHint" role="status">当前账户：demo_mei_ling（固定演示账户）</p>
-            <p>积分余额：<strong id="accountBalance">暂无数据</strong></p>
+            <p>积分余额：<strong id="accountBalance">暂无数据</strong> <span class="demo-initial-points-note" data-demo-initial-points hidden>含演示初始积分</span></p>
             <p id="balanceHint" class="muted">账户余额从后端读取，不维护页面虚拟余额。</p>
           </div>
           <div id="pickupModule" hidden></div><div id="purchaseModule">
@@ -529,7 +529,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
       <aside class="card account-card">
         <div class="account-head"><div><span class="section-label">YOUR IMPACT</span><h2>我的环保账户</h2></div><span class="leaf-mark">♧</span></div>
         <p class="account-user"><span class="user-dot">M</span><span>演示顾客账户<small id="customer-id"></small></span><span class="demo-label">演示</span></p>
-        <div class="points-panel"><div class="points-caption"><span>可用积分</span><span class="points-stars">✦ ✦ ✦</span></div><div class="points-value"><strong id="balance">—</strong><span>PTS</span></div><div class="points-divider"></div><div class="pending-line"><span><i></i> 待到账积分</span><b id="pending-points">—</b></div></div>
+        <div class="points-panel"><div class="points-caption"><span>可用积分</span><span class="points-stars">✦ ✦ ✦</span></div><div class="points-value"><strong id="balance">—</strong><span>PTS</span></div><div class="points-note demo-initial-points-note" data-demo-initial-points hidden>含演示初始积分</div><div class="points-divider"></div><div class="pending-line"><span><i></i> 待到账积分</span><b id="pending-points">—</b></div></div>
         <div class="reward-title"><span>用积分，为下一份好味道加分</span><span>↘</span></div>
         <form id="redeem-form" class="redeem-form">
           <label class="field"><span class="field-label">正价金额 <small>RM</small></span><span class="input-wrap"><span class="field-icon">ＲＭ</span><input id="regular-price" inputmode="decimal" placeholder="10.00" required></span></label>
