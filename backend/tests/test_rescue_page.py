@@ -18,15 +18,21 @@ BODY = {"pickup_start": NOW.isoformat(), "pickup_end": (NOW + timedelta(minutes=
 
 def test_rescue_page_served_and_linked():
     client = TestClient(create_app())
-    page = client.get("/app/rescue")
+    alias = client.get("/app/rescue", follow_redirects=False)
+    assert alias.status_code == 307 and alias.headers["location"] == "/app#rescue"
+    page = client.get("/app")
     assert page.status_code == 200 and "text/html" in page.headers["content-type"]
-    for text in ("/api/blind-boxes", "/donations/handoff", "推荐，尚未联系", "不进入捐赠", "未来业务（未实现）",
-                 "不是经认证的减排量"):
+    for text in ('id="rescueModule"', 'data-tab="rescue"', 'id="rescue-hoAck"', "推荐，尚未联系",
+                 "不进入捐赠", "未来业务（未实现）", "不是经认证的减排量"):
         assert text in page.text
-    # No fake delivery, carbon trade or plant-revenue actions.
+    module = client.get("/app/assets/rescue-module.js")
+    assert module.status_code == 200
+    assert "/api/blind-boxes" in module.text and "/donations/handoff" in module.text
     for text in ("已送达", "模拟交易", "tradeBtn", "fuelBtn", "localStorage"):
-        assert text not in page.text
-    assert 'href="/app/rescue"' in client.get("/app").text
+        assert text not in module.text
+    for asset in ("integration.js", "integration.css", "rescue-module.css"):
+        assert client.get("/app/assets/" + asset).status_code == 200
+    assert client.get("/app/assets/rescue.html").status_code == 404
 
 
 @pytest.fixture

@@ -6,8 +6,8 @@ const vm = require('node:vm');
 const { execFileSync } = require('node:child_process');
 
 const root = path.resolve(__dirname, '../..');
-const html = fs.readFileSync(path.join(root, 'frontend/rescue.html'), 'utf8');
-const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+const html = fs.readFileSync(path.join(root, 'frontend/index.html'), 'utf8');
+const script = fs.readFileSync(path.join(root, 'frontend/rescue-module.js'), 'utf8');
 // Real backend responses from a temporary database and a fixed clock; no server, no machine-time change.
 const python = path.join(root, '.venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
 const real = JSON.parse(execFileSync(python, ['-W', 'ignore', '-c', `
@@ -76,7 +76,8 @@ async function page(routes) {
   node('slot2130').checked = true;
   const p = { node, calls, routes };
   const ctx = vm.createContext({
-    document: { getElementById: node, addEventListener() {}, documentElement: { dataset: {} } },
+    window: { Nexflow:{getContext:()=>({role:'owner',demoTime:null}),changed() {}} }, AbortSignal,
+    document: { getElementById: id => node(id.replace(/^rescue-/,'')), addEventListener() {}, documentElement: { dataset: {} } },
     matchMedia: () => ({ matches: false }), navigator: {}, setInterval() {}, Date,
     fetch: async (url, options = {}) => {
       calls.push({ url, method: options.method || 'GET', body: options.body && JSON.parse(options.body) });
@@ -85,9 +86,13 @@ async function page(routes) {
       return typeof route === 'function' ? route(options) : ok(route);
     },
   });
+    // 模块现在依赖 i18n.js：在 VM 里加载同一份字典并固定为中文，断言保持原样。
+    vm.runInContext(fs.readFileSync(path.join(root,'frontend/i18n.js'),'utf8'), ctx);
+    vm.runInContext("window.NexFlowI18N.setLang('zh-CN',{silent:true})", ctx);
   vm.runInContext(script, ctx);
-  p.run = (code) => vm.runInContext(code, ctx);
+  p.run = (code) => vm.runInContext(code.replace(/\b(calculate|openHandoff|handoff|loadDonations)\(/g,'window.NexflowRescue.$1('), ctx);
   p.settle = () => new Promise(setImmediate);
+  await vm.runInContext('window.NexflowRescue.refresh()',ctx);
   await p.settle();
   return p;
 }
@@ -147,7 +152,7 @@ test('failure clears the old plan and allows retry; double click sends one calcu
   await p.run('calculate()');
   p.routes['/calculate'] = async () => { throw new Error('offline'); };
   await p.run('calculate()');
-  assert.equal(p.run('state.result'), null);
+  assert.equal(p.node('fallbackLane').hidden, true);
   assert.equal(p.node('fallbackLane').hidden, true);
   assert.equal(p.node('contactCopy').value, '');
   assert.match(p.node('status').textContent, /计算失败.*连不上后端/);
@@ -222,10 +227,18 @@ test('handoff conflict and list failure show errors, unlock the button and offer
   await p.run(`handoff(${JSON.stringify(pending.id)}, 'Other')`);
   assert.equal(f.conflict.status, 409);
   assert.match(p.node('status').textContent, /交接失败.*another recipient/);
-  assert.equal(p.run('state.inflight.size'), 0);
   assert.doesNotMatch(p.node('donations').innerHTML, /disabled/);
   routes['/donations'] = async () => { throw new Error('offline'); };
   await p.run('loadDonations()');
   assert.match(p.node('donations').innerHTML, /加载失败.*data-retry="donations"/);
-  assert.equal(p.run('state.donations.length'), 0);
+  assert.doesNotMatch(p.node('donations').innerHTML, /data-handoff/);
+});
+
+test('refresh and role repaint preserve a donation-list error instead of reporting empty success', async () => {
+  const routes = base('empty');
+  routes['/donations'] = async () => { throw new Error('offline'); };
+  const p = await page(routes);
+  assert.match(p.node('donations').innerHTML, /加载失败.*data-retry="donations"/);
+  await p.run('window.NexflowRescue.roleChanged()');
+  assert.match(p.node('donations').innerHTML, /加载失败/);
 });

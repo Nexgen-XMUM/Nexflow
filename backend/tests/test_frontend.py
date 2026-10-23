@@ -44,11 +44,21 @@ def test_frontend_entry_does_not_expose_repository():
         page = client.get("/app")
         assert page.status_code == 200
         assert "text/html" in page.headers["content-type"]
-        assert page.text == (Path(__file__).resolve().parents[2] / "frontend" / "index.html").read_text()
+        assert page.text.replace("\r\n", "\n") == (Path(__file__).resolve().parents[2] / "frontend" / "index.html").read_text(encoding="utf-8")
         assert "/api/products" in page.text
         assert 'id="guide-sidebar"' in page.text
         assert 'id="themeToggleBtn"' in page.text
         assert 'id="tab-blind"' in page.text
+        assert 'id="quote-form"' in page.text
+        # 积分兑换已并入模拟付款弹窗：不再有独立兑换表单，但抵扣开关和金额必须仍在页面上。
+        assert 'id="pay-dialog"' in page.text
+        assert 'id="pay-use-points"' in page.text
+        assert 'id="pay-submit"' in page.text
+        assert 'id="redeem-form"' not in page.text
+        for asset in ('customer.js', 'customer.css'):
+            response = client.get('/app/assets/' + asset)
+            assert response.status_code == 200
+            assert response.text == (Path(__file__).resolve().parents[2] / 'frontend' / asset).read_text()
         assert 'id="consumerShop"' in page.text
         assert '/api/blind-boxes/inventory' in page.text
         assert '/api/blind-boxes/calculate' in page.text

@@ -63,21 +63,30 @@ async function page() {
     if (!nodes.has(key)) nodes.set(key, {
       innerHTML: '', textContent: '', value: '', disabled: false, dataset: {}, children: [],
       classList: { add() {}, remove() {}, toggle() {} }, setAttribute() {},
+      // 导航项的可见性用 closest('li') 判断；假节点同样实现，避免与真实 DOM 行为不同。
+      closest() { return null; },
       addEventListener(type, fn) { this[type] = fn; },
       append(...children) { this.children.push(...children); }, appendChild(child) { this.append(child); }
     });
     return nodes.get(key);
   }
+  const location = { hash: '' };
   const ctx = vm.createContext({
     document: { querySelector: node, querySelectorAll: () => [node('#resetBtn'), node('#submitBtn')],
       createElement: () => node(Symbol()), addEventListener: (type, fn) => { events[type] = fn; } },
-    window: { matchMedia: () => ({ matches: true }), innerWidth: 1280 },
+    // 角色窗口由网址决定：内联脚本在初始化时读取 window.location.hash，
+    // 切换页面时用 history.replaceState 回写。假浏览器必须提供这两个 API。
+    window: { matchMedia: () => ({ matches: true }), innerWidth: 1280,
+      location, history: { replaceState(_state, _title, hash) { location.hash = hash; } } },
     setTimeout: fn => { queueMicrotask(fn); return 1; }, clearTimeout() {}, AbortSignal,
     fetch: async (url, options) => {
       calls.push({ url, options });
       return { ok: true, json: async () => url.endsWith('/products') ? responses.products : responses.single };
     }
   });
+    // 内联脚本现在依赖 i18n.js：在 VM 里加载同一份字典并固定为中文，断言保持原样。
+    vm.runInContext(fs.readFileSync(path.join(root,'frontend/i18n.js'),'utf8'), ctx);
+    vm.runInContext("window.NexFlowI18N.setLang('zh-CN',{silent:true})", ctx);
   vm.runInContext(script, ctx);
   await new Promise(setImmediate);
   return { ctx, node, events, calls, run: code => vm.runInContext(code, ctx) };
@@ -153,7 +162,7 @@ test('pending request blocks duplicate/reset and respects navigation; failure cl
     assert.equal(p.run('state.result'), null);
     assert.equal(p.run('state.busy'), false);
     assert.equal(p.node('#submitBtn').disabled, false);
-    assert.equal(p.node('#kRec').textContent, '—');
+    assert.equal(p.node('#kRec').textContent, '暂无数据');
     assert.doesNotMatch(p.node('#draftBox').innerHTML, /RM30\.00/);
     assert.ok(p.node('#posHint').textContent);
   }
@@ -258,7 +267,7 @@ test('official page includes new design and reads independent blind inventory wi
   }
   assert.doesNotMatch(p.node('#promotionBox').innerHTML, /undefined|NaN/);
   assert.equal(p.node('#rescuePanel').hidden, true);
-  assert.equal(p.run('state.consumer.points'), 0);
+  assert.equal(p.run('"consumer" in state'), false);
   assert.ok(p.calls.slice(1).every(c => ['/api/blind-boxes/inventory','/api/blind-boxes/calculate'].includes(c.url)));
 });
 
@@ -324,14 +333,13 @@ test('blind failure clears previous advice, unlocks retry, and pending results r
   assert.equal(p.run('state.blind.result'), null);
 });
 
-test('consumer points stay an independent demo and do not call backend redemption', async () => {
+test('consumer entry no longer maintains or redeems an independent business balance', async () => {
   const p = await page();
-  p.run('state.role="consumer"; state.consumer.points=50; renderConsumerShop()');
-  assert.match(p.node('#consumerShop').innerHTML, /前端独立积分演示/);
-  assert.match(p.node('#consumerShop').innerHTML, /尚待负责人统一/);
-  assert.match(p.node('#consumerShop').innerHTML, /100 分抵 RM1/);
-  p.run('redeemConsumerItem("croissant")');
-  assert.equal(p.run('state.consumer.points'), 10);
+  p.run('state.role="consumer"; renderConsumerShop()');
+  assert.match(p.node('#consumerShop').innerHTML, /顾客账户/);
+  assert.match(p.node('#consumerShop').innerHTML, /data-tab="customer"/);
+  assert.equal(p.run('"consumer" in state'), false);
+  assert.doesNotMatch(script, /POINTS_PER_CO2_KG|REDEMPTION_ITEMS|state\.consumer/);
   assert.equal(p.calls.length, 1);
   assert.equal(p.run('state.blind.result'), null);
 });
