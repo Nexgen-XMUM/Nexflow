@@ -63,21 +63,30 @@ async function page() {
     if (!nodes.has(key)) nodes.set(key, {
       innerHTML: '', textContent: '', value: '', disabled: false, dataset: {}, children: [],
       classList: { add() {}, remove() {}, toggle() {} }, setAttribute() {},
+      // 导航项的可见性用 closest('li') 判断；假节点同样实现，避免与真实 DOM 行为不同。
+      closest() { return null; },
       addEventListener(type, fn) { this[type] = fn; },
       append(...children) { this.children.push(...children); }, appendChild(child) { this.append(child); }
     });
     return nodes.get(key);
   }
+  const location = { hash: '' };
   const ctx = vm.createContext({
     document: { querySelector: node, querySelectorAll: () => [node('#resetBtn'), node('#submitBtn')],
       createElement: () => node(Symbol()), addEventListener: (type, fn) => { events[type] = fn; } },
-    window: { matchMedia: () => ({ matches: true }), innerWidth: 1280 },
+    // 角色窗口由网址决定：内联脚本在初始化时读取 window.location.hash，
+    // 切换页面时用 history.replaceState 回写。假浏览器必须提供这两个 API。
+    window: { matchMedia: () => ({ matches: true }), innerWidth: 1280,
+      location, history: { replaceState(_state, _title, hash) { location.hash = hash; } } },
     setTimeout: fn => { queueMicrotask(fn); return 1; }, clearTimeout() {}, AbortSignal,
     fetch: async (url, options) => {
       calls.push({ url, options });
       return { ok: true, json: async () => url.endsWith('/products') ? responses.products : responses.single };
     }
   });
+    // 内联脚本现在依赖 i18n.js：在 VM 里加载同一份字典并固定为中文，断言保持原样。
+    vm.runInContext(fs.readFileSync(path.join(root,'frontend/i18n.js'),'utf8'), ctx);
+    vm.runInContext("window.NexFlowI18N.setLang('zh-CN',{silent:true})", ctx);
   vm.runInContext(script, ctx);
   await new Promise(setImmediate);
   return { ctx, node, events, calls, run: code => vm.runInContext(code, ctx) };

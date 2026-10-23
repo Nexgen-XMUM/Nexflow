@@ -1,14 +1,179 @@
-.integration-card { margin-bottom:18px; }
-.integration-heading { margin:24px 0 12px; }
-.integration-card textarea,.integration-card input,#approvedPromoCopy { display:block; width:100%; padding:12px; margin:8px 0 12px; color:var(--ink); background:var(--surface); border:1px solid var(--line-strong); border-radius:10px; font:inherit; }
-.integration-card textarea { resize:vertical; line-height:1.6; }
-#dashboardHint,#balanceHint,#customerHint { overflow-wrap:anywhere; }
-[data-error="true"] { color:var(--danger,#b42318); }
-.integration-card .kpi-box .v { font-size:clamp(18px,2vw,26px); overflow-wrap:anywhere; }
-.demo-session { border-left:4px solid var(--brand); margin-bottom:18px; }
-.demo-session p { margin:6px 0 10px; }
-@media(min-width:1200px) { .content-grid { grid-template-columns:minmax(0,1fr) 310px; } }
+/* ==========================================================================
+   NexFlow · 接入层样式
+   0) 语言切换器（顶栏，键盘可用）
+   1) 业务流程卡片（确认余货 / 结束营业并清算）
+   2) 经营概览看板（KPI 层级、空状态、演示提示、分享成果）
+   3) 仍在使用的旧接入样式（顾客面板、余额提示）
+   所有数值由 integration.js 写入，这里只负责版面与样式。
+   ========================================================================== */
 
-body.rescue-open .content-grid { grid-template-columns:minmax(0,1fr); }
-#phoneWrap[hidden] { display:none; }
-.demo-initial-points-note { font-size:11px; color:var(--muted); }
+/* ============ 0. 语言切换器 ============ */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 10px 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-secondary);
+  flex: none;
+}
+.lang-switch:hover { border-color: var(--line-strong); background: var(--sunk); }
+.lang-switch:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
+.lang-icon { font-size: 14px; line-height: 1; flex: none; }
+.lang-switch select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 0 16px 0 0;
+  max-width: 148px;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 5px center, right 1px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.lang-switch select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+@media (max-width: 960px) {
+  .lang-switch { padding: 0 8px; }
+  .lang-switch select { max-width: 104px; font-size: 12.5px; }
+}
+
+/* 三语言排版：马来语与英语标签更长，导航与角色名称允许换行，不裁切文字 */
+.sidebar .nav-item { white-space: normal; }
+.sidebar .nav-text { min-width: 0; }
+.sidebar .nav-text > span:first-child { display: block; line-height: 1.3; }
+.sidebar .nav-sub { white-space: normal; overflow-wrap: anywhere; line-height: 1.35; margin-top: 1px; }
+.sidebar .seg button { white-space: normal; }
+.sidebar .seg .rt { min-width: 0; }
+.sidebar .seg .rt small { overflow-wrap: anywhere; line-height: 1.35; }
+body.sidebar-collapsed .sidebar .nav-text,
+body.sidebar-collapsed .sidebar .seg .rt { display: none; }
+
+/* ============ 1. 业务流程卡片 ============ */
+.flow-card { margin-top: 18px; }
+#tab-rescue .flow-card { margin: 0 0 18px; }
+.flow-head h3 { font-size: 17px; }
+.flow-head p { margin: 5px 0 0; font-size: 13px; color: var(--muted); max-width: 62ch; line-height: 1.55; }
+.flow-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
+.flow-actions .btn { padding: 11px 20px; }
+.flow-note { font-size: 11.5px; color: var(--muted); }
+.flow-hint { margin: 11px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere; }
+.flow-hint:empty { display: none; }
+.flow-hint[data-error="true"] { color: var(--chili); font-weight: 600; }
+
+/* ============ 2. 经营概览 ============ */
+#tab-dash .panel-head { align-items: flex-start; }
+#tab-dash .panel-head h2 { font-size: 26px; }
+.dash-head { margin-bottom: 14px; }
+.dash-tools { display: flex; align-items: center; gap: 10px; }
+
+/* 次级按钮：白底描边，避免所有按钮都是同一种蓝色实心 */
+.btn.btn-quiet { background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink-secondary); box-shadow: none; }
+.btn.btn-quiet:hover:not(:disabled) { background: var(--sunk); border-color: var(--brand-border); color: var(--brand); }
+.btn.btn-quiet:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* 演示环境提示：全局只出现一次，不重复写在每张卡片上 */
+.dash-notice { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; padding: 9px 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: var(--amber-bg); color: var(--amber-ink); border: 1px solid rgba(146, 64, 14, 0.16); }
+.dash-notice-icon { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; font-family: var(--display); font-size: 10px; font-weight: 700; line-height: 1; }
+html[data-theme="dark"] .dash-notice { border-color: rgba(245, 158, 11, 0.3); }
+
+/* 状态行：加载中 / 成功 / 失败 */
+.dash-status { margin: 0 0 4px; font-size: 12.5px; color: var(--muted); line-height: 1.5; overflow-wrap: anywhere; }
+.dash-status[data-error="true"] { margin: 12px 0 4px; padding: 10px 14px; border-radius: 11px; font-size: 13px; font-weight: 600; color: var(--chili); background: var(--chili-bg); border: 1px solid rgba(220, 38, 38, 0.28); }
+
+/* 分组：经营数据 / 清仓预测 */
+.dash-group { margin-top: 22px; }
+.dash-group:first-of-type { margin-top: 18px; }
+.dash-group-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.dash-group-head h3 { font-size: 16.5px; letter-spacing: -0.01em; }
+.dash-group-head span { font-size: 12.5px; color: var(--muted); }
+
+/* KPI 卡片 */
+#tab-dash .dash-kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
+#tab-dash .dash-kpi { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 16px 18px 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); }
+.dash-kpi-label { font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.dash-kpi-value { font-family: var(--display); font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.dash-kpi-foot { font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+
+/* 关键数字：已付款金额占满一行，字号更大，突出视觉层级 */
+#tab-dash .dash-kpi-lead { grid-column: span 6; gap: 4px; padding: 18px 20px 17px; background: linear-gradient(180deg, var(--brand-light) 0%, var(--surface) 78%); border-color: var(--brand-border); }
+#tab-dash .dash-kpi-lead .dash-kpi-label { font-size: 13px; color: var(--brand); }
+#tab-dash .dash-kpi-lead .dash-kpi-value { font-size: clamp(30px, 3.2vw, 40px); color: var(--brand); letter-spacing: -0.02em; }
+#tab-dash .dash-kpis:not(.dash-kpis-compact) > .dash-kpi:not(.dash-kpi-lead) { grid-column: span 2; }
+
+/* 清仓预测：紧凑四列 */
+#tab-dash .dash-kpis-compact { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+#tab-dash .dash-kpis-compact .dash-kpi { padding: 14px 16px 13px; }
+#tab-dash .dash-kpis-compact .dash-kpi-value { font-size: 22px; }
+
+/* 空状态：没有数据时保持版式，用弱化样式说明“暂无数据”，不伪造 0
+   纯 CSS 钩子：数值容器带 data-empty="true" 时生效；页面本身不写任何监听器，
+   接线由 integration.js 负责（不写该属性时按上面的基础样式显示）。 */
+#tab-dash .dash-kpi[data-empty="true"] { background: var(--sunk); border-color: var(--line); box-shadow: none; }
+#tab-dash .dash-kpi[data-empty="true"] .dash-kpi-value { font-size: 15px; font-weight: 600; color: var(--muted); }
+#tab-dash .dash-kpi-lead[data-empty="true"] { background: var(--sunk); border-color: var(--line-strong); }
+#tab-dash .dash-kpi-lead[data-empty="true"] .dash-kpi-value { font-size: 16px; color: var(--muted); }
+
+/* 低强度指标（转化率等） */
+.dash-rates { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-top: 14px; padding: 11px 16px; border-radius: 12px; background: var(--sunk); border: 1px solid var(--line); }
+.dash-rate { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.dash-rate b { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--ink-secondary); font-variant-numeric: tabular-nums; }
+.dash-rates-note { margin: 0 0 0 auto; font-size: 11.5px; color: var(--muted); }
+
+/* 分享今日成果：次级功能，默认折叠 */
+#tab-dash .dash-share { margin: 22px 0 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); overflow: hidden; }
+#tab-dash .dash-share > summary { display: flex; align-items: center; gap: 9px; padding: 14px 18px; font-size: 14px; font-weight: 700; color: var(--ink); list-style: none; cursor: pointer; }
+#tab-dash .dash-share > summary::-webkit-details-marker { display: none; }
+#tab-dash .dash-share > summary::after { content: "▾"; margin-left: auto; font-size: 11px; color: var(--muted); transition: transform 0.2s ease; }
+#tab-dash .dash-share[open] > summary { background: var(--sunk); border-bottom: 1px solid var(--line); }
+#tab-dash .dash-share[open] > summary::after { transform: rotate(180deg); }
+.dash-share-body { padding: 16px 18px 18px; }
+#tab-dash .dash-share textarea { display: block; width: 100%; min-height: 98px; padding: 12px 14px; border-radius: 11px; border: 1px solid var(--line-strong); background: var(--sunk); color: var(--ink); font-size: 13px; line-height: 1.6; resize: vertical; overflow-wrap: anywhere; }
+#tab-dash .dash-share textarea:focus { border-color: var(--brand); background: var(--surface); outline: none; }
+.dash-share-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 11px; }
+.dash-share-note { font-size: 11.5px; color: var(--muted); }
+
+/* 待审批草稿区的空状态 */
+#tab-dash #draftBox .card.empty { padding: 30px 20px; border: 1px dashed var(--line-strong); box-shadow: none; background: var(--surface); }
+#tab-dash #draftBox .card.empty h3 { font-size: 16px; }
+#tab-dash #draftBox .card.empty p { font-size: 13px; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* 窄屏：1366 / 1440 保持一行主数字 + 三列，再窄时逐级回落 */
+@media (max-width: 1180px) {
+  #tab-dash .dash-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #tab-dash .dash-kpi-lead { grid-column: span 2; }
+  #tab-dash .dash-kpis:not(.dash-kpis-compact) > .dash-kpi:not(.dash-kpi-lead) { grid-column: span 1; }
+  #tab-dash .dash-kpis-compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dash-rates-note { margin-left: 0; }
+}
+@media (max-width: 620px) {
+  #tab-dash .dash-kpis,
+  #tab-dash .dash-kpis-compact { grid-template-columns: minmax(0, 1fr); }
+  #tab-dash .dash-kpi-lead { grid-column: span 1; }
+  .dash-tools { width: 100%; }
+  .dash-notice { align-items: flex-start; }
+  .dash-rates { gap: 10px; }
+}
+
+/* ============ 3. 仍在使用的旧接入样式 ============ */
+.integration-card { margin-bottom: 18px; }
+.integration-heading { margin: 24px 0 12px; }
+.integration-card textarea, .integration-card input, #approvedPromoCopy { display: block; width: 100%; padding: 12px; margin: 8px 0 12px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 10px; font: inherit; }
+.integration-card textarea { resize: vertical; line-height: 1.6; }
+#dashboardHint, #balanceHint, #customerHint { overflow-wrap: anywhere; }
+[data-error="true"] { color: var(--danger, #b42318); }
+.integration-card .kpi-box .v { font-size: clamp(18px, 2vw, 26px); overflow-wrap: anywhere; }
+@media (min-width: 1200px) { .content-grid { grid-template-columns: minmax(0, 1fr) 310px; } }
+body.rescue-open .content-grid { grid-template-columns: minmax(0, 1fr); }
+#phoneWrap[hidden] { display: none; }
+.demo-initial-points-note { font-size: 11px; color: var(--muted); }

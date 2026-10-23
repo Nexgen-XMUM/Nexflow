@@ -50,7 +50,11 @@ def test_frontend_entry_does_not_expose_repository():
         assert 'id="themeToggleBtn"' in page.text
         assert 'id="tab-blind"' in page.text
         assert 'id="quote-form"' in page.text
-        assert 'id="redeem-form"' in page.text
+        # 积分兑换已并入模拟付款弹窗：不再有独立兑换表单，但抵扣开关和金额必须仍在页面上。
+        assert 'id="pay-dialog"' in page.text
+        assert 'id="pay-use-points"' in page.text
+        assert 'id="pay-submit"' in page.text
+        assert 'id="redeem-form"' not in page.text
         for asset in ('customer.js', 'customer.css'):
             response = client.get('/app/assets/' + asset)
             assert response.status_code == 200
