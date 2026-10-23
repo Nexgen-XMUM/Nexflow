@@ -333,6 +333,7 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
 </style>
 <link rel="stylesheet" href="/app/assets/integration.css">
 <link rel="stylesheet" href="/app/assets/rescue-module.css">
+<link rel="stylesheet" href="/app/assets/customer.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-back" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></symbol><symbol id="i-vid" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z"/></symbol><symbol id="i-call" viewBox="0 0 24 24"><path d="M6.62 10.79a15 15 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02z"/></symbol><symbol id="i-more" viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></symbol><symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></symbol><symbol id="i-emo" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-3.5-9a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5zm7 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5zM12 17.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></symbol><symbol id="i-clip" viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6z"/></symbol><symbol id="i-cam" viewBox="0 0 24 24"><path d="M9 3 7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></symbol></svg>
@@ -493,13 +494,56 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
         <section class="panel" id="tab-customer" hidden>
           <div class="panel-head"><div><h2>🛍️ 顾客购买</h2><p>演示账户用于关联购买与积分，不构成身份认证。</p></div></div>
           <div class="card integration-card">
-            <label for="demoCustomer">演示顾客 ID</label><input id="demoCustomer" value="demo_mei" maxlength="80" autocomplete="off">
-            <button type="button" class="btn btn-main" id="selectCustomer">使用此账户</button>
-            <p id="customerHint" role="status">当前账户：demo_mei</p>
+            <label for="demoCustomer">演示顾客 ID</label><input id="demoCustomer" value="demo_mei_ling" disabled maxlength="80" autocomplete="off">
+            <button type="button" class="btn btn-main" id="selectCustomer" disabled>使用此账户</button>
+            <p id="customerHint" role="status">当前账户：demo_mei_ling（固定演示账户）</p>
             <p>积分余额：<strong id="accountBalance">暂无数据</strong></p>
-            <p id="balanceHint" class="muted">等待购买负责人提供账户接口；不维护页面虚拟余额。</p>
+            <p id="balanceHint" class="muted">账户余额从后端读取，不维护页面虚拟余额。</p>
           </div>
-          <div class="card integration-card" id="pickupModule"><h3>取餐信息待接入</h3><p>等待购买负责人交付模块；此处不生成示例订单或虚拟积分。</p></div><div class="card" id="purchaseModule"><h3>购买模块待接入</h3><p>已预留统一入口。模块交付后在这里选择、模拟付款并查看取餐信息。</p></div>
+          <div id="pickupModule" hidden></div><div id="purchaseModule">
+    <div class="page-kicker"><span>顾客体验</span><b>/</b><span>Smart Rescue Box</span></div>
+    <section class="hero">
+      <div class="hero-copy"><span class="hero-tag"><span>✦</span> GOOD FOOD, SECOND CHANCE</span>
+        <h1>今晚的好味道，<br><em>刚好遇见你。</em></h1>
+        <p>发现附近面包店的惊喜盲盒。拯救新鲜好食物，也让今晚多一点小惊喜。</p>
+        <div class="hero-meta"><span><b>01</b> 选取餐时段</span><span class="meta-line"></span><span><b>02</b> 确认惊喜报价</span><span class="meta-line"></span><span><b>03</b> 到店取餐</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true"><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-spark spark-a">✳</div><div class="art-spark spark-b">✦</div><div class="art-box"><span class="box-ribbon"></span><span class="box-bow">✦</span><span class="box-croissant">🥐</span><span class="box-label">BAKERY<br>SURPRISE</span></div><div class="art-sticker">SAVE<br><b>GOOD</b><br>FOOD</div></div>
+      <div class="hero-footnote"><span>↗</span> 每一个盲盒，都是减少浪费的小小行动</div>
+    </section>
+    <nav class="steps" aria-label="购买步骤"><div class="step active"><span class="step-no">1</span><span><b>获取报价</b><small>挑选取餐时段</small></span></div><span class="step-connector"></span><div class="step"><span class="step-no">2</span><span><b>确认订单</b><small>安心模拟付款</small></span></div><span class="step-connector"></span><div class="step"><span class="step-no">3</span><span><b>到店取餐</b><small>核销并获得积分</small></span></div><span class="step-note"><i></i> 轻松三步，减少食物浪费</span></nav>
+    <div id="notice" class="notice" role="status" aria-live="polite"></div>
+    <section class="content-grid">
+      <article class="card quote-card">
+        <div class="card-heading"><div><span class="section-label">TONIGHT'S PICK</span><h2>找到你的惊喜盲盒</h2><p>先选时间和口味偏好，我们会为你锁定一份报价。</p></div><span class="heading-icon">✧</span></div>
+        <form id="quote-form" class="quote-form">
+          <label class="field"><span class="field-label">取餐日期</span><span class="input-wrap"><span class="field-icon">▦</span><input id="pickup-date" type="date" required></span></label>
+          <label class="field"><span class="field-label">取餐时段</span><span class="input-wrap"><span class="field-icon">◷</span><select id="pickup-slot"><option value="21:30">21:30 – 22:00</option><option value="22:00">22:00 – 22:30</option></select><span class="select-caret">⌄</span></span></label>
+          <label class="field"><span class="field-label">喜欢的口味 <small>选填</small></span><span class="input-wrap"><span class="field-icon">♡</span><input id="likes" placeholder="例如 bread, dessert"></span></label>
+          <label class="field"><span class="field-label">需要避开的过敏原 <small>选填</small></span><span class="input-wrap"><span class="field-icon">◇</span><input id="allergens" placeholder="例如 peanut, milk"></span></label>
+          <div class="privacy-note"><span>♧</span><span><b>惊喜内容暂时保密</b><small>确认报价前不会揭晓盲盒内容，也不会预留库存。</small></span></div>
+          <button id="quote-button" type="submit" class="primary-button">为我寻找盲盒 <span>→</span></button>
+        </form>
+        <div id="offer" class="offer empty"><span class="offer-empty-icon">✧</span><b>你的惊喜报价会出现在这里</b><span>选好时段，开启今晚的小小惊喜。</span></div>
+      </article>
+      <aside class="card account-card">
+        <div class="account-head"><div><span class="section-label">YOUR IMPACT</span><h2>我的环保账户</h2></div><span class="leaf-mark">♧</span></div>
+        <p class="account-user"><span class="user-dot">M</span><span>演示顾客账户<small id="customer-id"></small></span><span class="demo-label">演示</span></p>
+        <div class="points-panel"><div class="points-caption"><span>可用积分</span><span class="points-stars">✦ ✦ ✦</span></div><div class="points-value"><strong id="balance">—</strong><span>PTS</span></div><div class="points-divider"></div><div class="pending-line"><span><i></i> 待到账积分</span><b id="pending-points">—</b></div></div>
+        <div class="reward-title"><span>用积分，为下一份好味道加分</span><span>↘</span></div>
+        <form id="redeem-form" class="redeem-form">
+          <label class="field"><span class="field-label">正价金额 <small>RM</small></span><span class="input-wrap"><span class="field-icon">ＲＭ</span><input id="regular-price" inputmode="decimal" placeholder="10.00" required></span></label>
+          <label class="field"><span class="field-label">兑换积分</span><span class="input-wrap"><span class="field-icon">✦</span><input id="redeem-points" inputmode="numeric" type="number" min="1" step="1" placeholder="10" required></span></label>
+          <button id="redeem-button" type="submit" class="redeem-button">模拟兑换 <span>→</span></button>
+        </form>
+        <p id="receipt" class="receipt"></p>
+        <p class="points-footnote">100 积分 = RM1 · 每笔最多抵扣 30%<br>余额与取餐奖励从后端账本读取。</p>
+        <div class="impact-note"><span>✳</span><p><b>好食物不该被浪费</b><small>CO₂e 仅作估算，不是经认证减排或碳积分。</small></p></div>
+      </aside>
+    </section>
+    <section class="card orders-card"><div class="orders-head"><div><span class="section-label">ORDER HISTORY</span><h2>我的订单</h2></div><button id="refresh" class="refresh-button" type="button"><span>↻</span> 刷新订单</button></div><div id="orders" class="orders muted">载入中…</div></section>
+    <footer><span class="footer-mark">O</span><span>Orbyte Smart Yield</span><span class="footer-separator">·</span><span>Hackathon Demo</span><span class="footer-spacer"></span><span>报价、付款与积分均为本地模拟</span></footer>
+  </div>
         </section>
         <section class="panel" id="tab-rescue" hidden>
           <div class="panel-head"><div><h2>🌿 打烊去向</h2><p>只有后端确认完成，经营看板才更新已完成数量。</p></div></div>
@@ -1167,6 +1211,7 @@ loadProducts(); // 再从后端取商品列表
 </script> <!-- JavaScript 结束 -->
 <script src="/app/assets/integration.js"></script>
 <script src="/app/assets/rescue-module.js"></script>
+<script src="/app/assets/customer.js"></script>
 
 <!-- 业务脚本结束 -->
 

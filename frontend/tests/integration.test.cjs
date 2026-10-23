@@ -73,14 +73,14 @@ test('account balance is only supplied by the purchase adapter and checked again
   const p=page();await p.api.refreshBalance();
   assert.equal(p.node('accountBalance').textContent,'暂无数据');
   assert.equal(p.calls.length,0);
-  let balance={user_id:'demo_mei',points:0}, mounted;
+  let balance={user_id:'demo_mei_ling',points:0}, mounted;
   await p.api.registerPurchase({mount:async context=>{mounted=context;},getBalance:async()=>balance});
   assert.equal(p.node('accountBalance').textContent,'0 分');
-  assert.equal(mounted.getContext().userId,'demo_mei');
+  assert.equal(mounted.getContext().userId,'demo_mei_ling');
   balance={user_id:'another',points:100};await p.api.refreshBalance();
   assert.equal(p.node('accountBalance').textContent,'暂无数据');
   assert.match(p.node('balanceHint').textContent,/不匹配/);
-  balance={user_id:'demo_mei',points:10};await p.api.refreshBalance();
+  balance={user_id:'demo_mei_ling',points:10};await p.api.refreshBalance();
   assert.equal(p.node('accountBalance').textContent,'10 分');
   assert.equal('consumer' in p.state,false);
 });
@@ -91,7 +91,7 @@ test('changing an account while its balance is pending cannot show the old balan
   slow=true;const pending=p.api.refreshBalance();
   slow=false;p.node('demoCustomer').value='demo_new';p.node('selectCustomer').onclick();
   await new Promise(setImmediate);
-  finish({user_id:'demo_mei',points:100});await pending;
+  finish({user_id:'demo_mei_ling',points:100});await pending;
   assert.equal(p.api.getContext().userId,'demo_new');
   assert.equal(p.node('accountBalance').textContent,'0 分');
 });
