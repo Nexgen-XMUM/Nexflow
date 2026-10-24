@@ -3,3 +3,9 @@ run = "python replit_run.py"
 
 [deployment]
 deploymentTarget = "autoscale"
+build = ["python", "-m", "pip", "install", "-r", "requirements.txt"]
+run = ["python", "replit_run.py"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80

@@ -9,5 +9,6 @@ the launchers or the test suites imports or serves them. The live versions are:
 | customer.js, customer.html, customers.css, intergration.css | frontend/ (customer.js, customer.css, integration.css, index.html#customer) |
 | test_fronted.py.old | backend/tests/test_frontend.py |
 | loyalty_account.jason | — (misspelled extension, unused) |
+| yarn.lock | — (no package.json; made Replit treat the repo as a Node app) |
 
 Kept rather than deleted so nothing is lost; safe to remove after the hackathon.
