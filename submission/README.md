@@ -77,9 +77,11 @@ NexFlow connects stock entry, calculated clearance offers, owner-reviewed promot
 ├── docs/                    # Screenshots, handover and submission evidence
 ├── submission/              # Prepared submission documents
 │   ├── SDC2026_Nexgen_Preliminary.pdf
-│   ├── SDC2026_Nexgen_TechDeclaration.pdf
-│   └── SDC2026_Nexgen_Replit_POU.pdf
+│   └── SDC2026_Nexgen_TechDeclaration.pdf
+├── replit_run.py            # Replit entry point (binds 0.0.0.0:$PORT)
+├── demo.py                  # Promo-only local demo with auto browser open
 ├── requirements.txt
+├── .replit                  # Replit run configuration
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -102,7 +104,9 @@ The local vision confirmation does not automatically update the main inventory. 
 
 ### Option 1 — Open the Replit Demo
 
-Open https://orbyte-smart-yield-nexgen.replit.app/ . No local installation is needed to view the public deployment. Some deployed files differ from the checked-out GitHub baseline; complete parity has not been verified.
+Open https://orbyte-smart-yield-nexgen.replit.app/ . No local installation is needed to view the public deployment. The code in `main` is the same build that is deployed: Replit reads `.replit` and runs `python replit_run.py`, which starts the competition runner on Replit's public port with a temporary database.
+
+To run it in your own Repl: **Create Repl → Import from GitHub**, paste `https://github.com/Nexgen-XMUM/Nexflow`, then click **Run**. No secrets are required.
 
 ### Option 2 — Run Locally
 
@@ -118,12 +122,12 @@ python -m backend.desktop_demo
 On Windows PowerShell:
 
 ```powershell
-python -m venv .venv
+py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m backend.desktop_demo
 ```
 
-Use Python 3.10 or newer. Open http://127.0.0.1:8000/app . The competition runner uses a temporary database and local promotional text; no API key is required. See the existing detailed documentation below for the welcome page, role windows, independent YOLO startup and demonstration order.
+Use Python 3.10–3.13 (verified on 3.13). Python 3.14 cannot install the pinned `pydantic-core`; on Windows, MSYS2 / Git Bash `python` is often 3.14, so use `py -3.13`. Open http://127.0.0.1:8000/app . The competition runner uses a temporary database and local promotional text; no API key is required. See the existing detailed documentation below for the welcome page, role windows, independent YOLO startup and demonstration order.
 
 ### Run Tests
 
@@ -133,13 +137,15 @@ Use Python 3.10 or newer. Open http://127.0.0.1:8000/app . The competition runne
 node --test frontend/tests/*.test.cjs
 ```
 
-On Windows, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`.
+On Windows, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`. The frontend suite starts the project's `.venv` Python for one integration test, so create `.venv` first. Current suite: 287 backend tests and 67 frontend tests, all passing on Windows 11 / Python 3.13 / Node 24.
 
 ## How We Use Replit
 
-The public deployment is available at https://orbyte-smart-yield-nexgen.replit.app/ . Its homepage rendered and sampled pages, scripts and read-only APIs returned HTTP 200 during the 2026-10-24 verification. This provides evidence of public hosting; account ownership, deployment-source commit and sponsor-credit use still need owner confirmation.
+- **Hosting:** The public deployment is available at https://orbyte-smart-yield-nexgen.replit.app/ . Its homepage rendered and sampled pages, scripts and read-only APIs returned HTTP 200 during the 2026-10-24 verification.
+- **Run configuration:** `.replit` runs `python replit_run.py`, which binds the competition runner to `0.0.0.0:$PORT` with a temporary SQLite database, so every restart is a clean demo.
+- **Secrets:** None are needed; the runner forces the local promotional template, so no API key is stored in the Repl or the repository.
 
-Proof: [Replit public-access evidence](submission/SDC2026_Nexgen_Replit_POU.pdf).
+Account ownership, deployment-source commit and sponsor-credit use still need owner confirmation. Replit proof-of-use PDF: **pending** — to be added as `submission/SDC2026_Nexgen_Replit_POU.pdf`.
 
 ## How We Use RunPod
 
@@ -152,6 +158,20 @@ The workflow distinguishes price forecasts from simulated receipts, generated co
 ## Future Improvements
 
 Pilot with bakery staff to measure closing time and count corrections; connect reviewed image counts to stock; add production authentication and reviewed messaging/payment integrations.
+
+## Submission Checklist
+
+- [x] Team name, domain (Domain 2) and SDG track filled in
+- [x] Slide deck link added
+- [x] Demo video link added
+- [x] Replit used (public deployment, `.replit` + `replit_run.py`)
+- [ ] Replit proof of use in `submission/` — `SDC2026_Nexgen_Replit_POU.pdf` still to be added
+- [ ] RunPod — not used; team accepts the template-compliance risk
+- [x] Preliminary submission (`SDC2026_Nexgen_Preliminary.pdf`) — unsigned fields need human confirmation
+- [x] Technology declaration (`SDC2026_Nexgen_TechDeclaration.pdf`) — unsigned fields need human confirmation
+- [x] Submission files renamed with the team name
+- [x] "How to Run" steps verified on Windows 11 (Python 3.13) — 287 backend + 67 frontend tests pass
+- [x] No API keys or secrets committed to the repository
 
 ## Team
 
@@ -177,7 +197,7 @@ Project code retains the [Apache License 2.0](LICENSE). Third-party libraries, m
 
 **Closing-time automation for small bakeries — one workspace for surplus stocktaking, clearance decisions, customer pickup and food-rescue records.**
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](#requirements)
+[![Python](https://img.shields.io/badge/Python-3.10–3.13-3776AB?logo=python&logoColor=white)](#requirements)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.156-009688?logo=fastapi&logoColor=white)](#technology-stack)
 [![Frontend](https://img.shields.io/badge/Frontend-vanilla%20JS%20%C2%B7%20no%20build-F7DF1E?logo=javascript&logoColor=black)](#technology-stack)
 [![Storage](https://img.shields.io/badge/Storage-SQLite-003B57?logo=sqlite&logoColor=white)](#technology-stack)
@@ -206,7 +226,7 @@ Project code retains the [Apache License 2.0](LICENSE). Third-party libraries, m
 | Live Demo | [Public Replit deployment](https://orbyte-smart-yield-nexgen.replit.app/) · [Local workspace](#4-open-the-app) · [Standalone local YOLO](#local-yolo-image-demo) |
 | Demo video | [Watch the NexFlow project video on YouTube](https://youtu.be/RVNASReQL-Y) |
 | Slide deck / PRD | TODO — HUMAN VERIFICATION: add final share links |
-| Replit proof | [Public-access evidence PDF](submission/SDC2026_Nexgen_Replit_POU.pdf); owner deployment screenshot still needed |
+| Replit proof | Proof-of-use PDF pending (`submission/SDC2026_Nexgen_Replit_POU.pdf`); public deployment is live |
 | Technical declaration | [Official form filled as unsigned draft](submission/SDC2026_Nexgen_TechDeclaration.pdf) |
 | RunPod | Not used. No endpoint or proof-of-use PDF; team accepts the template-compliance risk. |
 
@@ -321,7 +341,7 @@ Captured during a local simulated demo session: count → leftover registration 
 
 | Requirement | Details |
 |---|---|
-| **Python 3.10+** | `requirements.txt` pins FastAPI 0.156.4 and Pydantic 2.14.1, which require Python ≥ 3.10. This repo is verified on **Python 3.13**. |
+| **Python 3.10–3.13** | `requirements.txt` pins FastAPI 0.156.4 and Pydantic 2.14.1, which require Python 3.10–3.13. This repo is verified on **Python 3.13**. Python 3.14 cannot build the pinned `pydantic-core`. |
 | **Git** | To clone the repository. |
 | **Node.js (tests only)** | The web app needs no Node.js and no build step. `node --test` is only used for frontend tests (verified on Node 24). |
 | **DeepSeek API key** | **Not needed.** The demo launcher forces the local copy template. |
@@ -330,7 +350,7 @@ Captured during a local simulated demo session: count → leftover registration 
 ### 1. Clone the repository
 
 ```bash
-git clone --branch submission https://github.com/Nexgen-XMUM/Nexflow.git
+git clone https://github.com/Nexgen-XMUM/Nexflow.git
 cd Nexflow
 ```
 
@@ -345,13 +365,13 @@ py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m backend.desktop_demo
 ```
 
-- If `py` is unavailable, use `python`; confirm with `python --version` that it is 3.10 or newer.
+- If `py` is unavailable, use `python`; confirm with `python --version` that it is 3.10–3.13 (not 3.14).
 - If `.\.venv\Scripts\python.exe` is not found, the virtual environment was not created — re-run the first line.
 
 ### 3. macOS / Linux
 
 ```bash
-python3.13 -m venv .venv      # or: python3 -m venv .venv   (must be 3.10+)
+python3.13 -m venv .venv      # or: python3 -m venv .venv   (must be 3.10–3.13)
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 python -m backend.desktop_demo
@@ -414,6 +434,7 @@ These details matter more than they look:
 | `.venv\Scripts\python.exe` or `.venv/bin/python` missing | The virtual environment was never created. Re-run the `venv` step from the repository root, then install requirements again. |
 | `ModuleNotFoundError: No module named 'fastapi'` | Requirements went into a different interpreter. Install with the environment's own Python: `.venv/bin/python -m pip install -r requirements.txt` (macOS/Linux) or `.\.venv\Scripts\python.exe -m pip install -r requirements.txt` (Windows). |
 | `No matching distribution found for fastapi==0.156.4` | The virtual environment was created with Python older than 3.10. Delete `.venv`, recreate it with 3.10+ (3.13 recommended), reinstall. |
+| `Failed to build 'pydantic-core'` | The virtual environment was created with Python 3.14 (often MSYS2 / Git Bash `python` on Windows). Delete `.venv` and recreate it with `py -3.13 -m venv .venv`. |
 | `ModuleNotFoundError: No module named 'backend'` | You are not in the repository root. `cd Nexflow` first — the launcher runs as a module. |
 | `[Errno 48] Address already in use` / `only one usage of each socket address` | Port 8000 is taken. Run `python -m backend.desktop_demo --port 8080` and open that port. |
 | Browser cannot connect | Check that the terminal still shows the uvicorn banner, use `127.0.0.1`, and make sure the port matches the flag you passed. |
@@ -629,7 +650,7 @@ Additional contributors appear in the commit history under the handles `panpan54
 
 The team supplied https://orbyte-smart-yield-nexgen.replit.app/ as its public deployment. On 2026-10-24 the homepage rendered in a browser; `/login`, `/app`, two sampled scripts and read-only demo/inventory APIs returned HTTP 200. `integration.js` matches the checked-out main baseline byte-for-byte, while sampled HTML and `i18n.js` differ. Full feature/source parity is not asserted. No public checkout or paid API call was performed.
 
-[Replit proof PDF](submission/SDC2026_Nexgen_Replit_POU.pdf) includes a real screenshot and public checks. TODO — HUMAN VERIFICATION: owner project/deployment dashboard, source commit, plan/region and sponsor-voucher redemption. No unverified `.replit` configuration was added.
+Replit proof PDF (`submission/SDC2026_Nexgen_Replit_POU.pdf`) is still to be added. TODO — HUMAN VERIFICATION: owner project/deployment dashboard, source commit, plan/region and sponsor-voucher redemption. `.replit` runs `python replit_run.py`, the same entry point as the public deployment.
 
 ## How We Use RunPod
 
@@ -649,7 +670,7 @@ The team supplied https://orbyte-smart-yield-nexgen.replit.app/ as its public de
 |---|---|
 | [Preliminary](submission/SDC2026_Nexgen_Preliminary.pdf) | Official form populated; unsigned draft; identity, KPI target, workshops and IP questions need human confirmation |
 | [Technical declaration](submission/SDC2026_Nexgen_TechDeclaration.pdf) | Official form populated plus appendix; unsigned draft; license/tool completeness needs team review |
-| [Replit proof](submission/SDC2026_Nexgen_Replit_POU.pdf) | Actual public-access evidence; owner dashboard evidence pending |
+| Replit proof (`SDC2026_Nexgen_Replit_POU.pdf`) | **Pending** — not yet in `submission/`; public deployment is live |
 | RunPod proof | Intentionally absent: not used, team accepts risk |
 | [Submission status](docs/submission-status.md) | Remaining actions, checks and final upload steps |
 | [Compliance audit](docs/submission-compliance-audit.md) | Required vs example vs organizer confirmation |
@@ -678,7 +699,7 @@ Released under the [Apache License 2.0](LICENSE).
 
 | 项目 | 要求 |
 |---|---|
-| Python | **3.10 以上**（本仓库用 3.13 验证）。低于 3.10 装不上 `requirements.txt` 里的固定版本 |
+| Python | **3.10–3.13**（本仓库用 3.13 验证）。低于 3.10 或使用 3.14 都装不上 `requirements.txt` 里的固定版本 |
 | Git | 用于克隆仓库 |
 | Node.js | **只有跑前端测试才需要**；网页本身不需要 Node.js，也不需要构建 |
 | DeepSeek Key | **不需要**。演示启动器强制使用本地文案模板 |
@@ -687,7 +708,7 @@ Released under the [Apache License 2.0](LICENSE).
 ### 2. 克隆仓库
 
 ```bash
-git clone --branch submission https://github.com/Nexgen-XMUM/Nexflow.git
+git clone https://github.com/Nexgen-XMUM/Nexflow.git
 cd Nexflow
 ```
 
@@ -701,12 +722,12 @@ py -3.13 -m venv .venv
 .\.venv\Scripts\python.exe -m backend.desktop_demo
 ```
 
-没有 `py` 就用 `python`，先确认 `python --version` 是 3.10 以上。
+没有 `py` 就用 `python`，先确认 `python --version` 是 3.10–3.13（不能是 3.14）。
 
 ### 4. Mac / Linux 启动
 
 ```bash
-python3.13 -m venv .venv      # 或 python3 -m venv .venv（需 3.10+）
+python3.13 -m venv .venv      # 或 python3 -m venv .venv（需 3.10–3.13）
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 python -m backend.desktop_demo
