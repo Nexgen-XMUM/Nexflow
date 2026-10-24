@@ -20,7 +20,7 @@ const kg = (n) => `${Number(n || 0).toFixed(2)} kg`;
 const rm = (sen) => `RM${(sen / 100).toFixed(2)}`;
 
 const state = { names: {}, result: null, recipients: [], donations: [], donationsError:false, busy: false, inflight: new Set(), handoffId: null,
-  batches: null, recorded: false, stats: null, status: null };
+  batches: null, recorded: false, stats: null, status: null, receipt: null };
 
 async function api(path, body) {
   let res;
@@ -60,7 +60,7 @@ function storeNow() {
   return { date: d.toISOString().slice(0, 10), time: d.toISOString().slice(11, 16) };
 }
 const nameOf = (batchId) => state.names[batchId] || batchId;
-const linesText = (lines) => lines.map((l) => `${esc(nameOf(l.batch_id))} × ${l.qty}`).join('，');
+const linesText = (lines) => lines.map((l) => `${esc(nameOf(l.batch_id))} × ${esc(l.qty)}`).join('，');
 
 function renderInventory() {
   const batches = state.batches || [];
@@ -229,11 +229,15 @@ function donationRow(d) {
   const busy = state.inflight.has(d.id);
   const status = d.status === 'DONATED' ? `<span class="tag ok">${esc(t('rescue.statusDonated', { recipient: d.recipient }))}</span>`
     : d.status === 'PENDING' ? `<span class="tag pending">${esc(t('rescue.statusPending'))}</span>` : `<span class="tag bad">${esc(t('rescue.statusDiscarded'))}</span>`;
+  const action = d.status === 'PENDING'
+    ? `<button type="button" class="btn small give" data-handoff="${esc(d.id)}" ${busy || !canWrite() ? 'disabled' : ''}>${esc(busy ? t('rescue.handoffBusy') : t('rescue.handoffBtn'))}</button>`
+    : d.status === 'DONATED'
+      ? `<button type="button" class="btn small" data-receipt="${esc(d.id)}">${esc(t('rescue.receiptView'))}</button>` : '';
   return `<tr>
     <td>${linesText(p.lines)}<br><span class="muted" style="font-size:12px">${esc(source)} · ${esc(t('rescue.createdAt', { time: String(d.created).slice(11, 16) }))}</span></td>
     <td class="r num">${p.qty}</td><td class="r num">${kg(p.weight_g / 1000)}</td><td class="r num">${kg(p.estimated_co2e_kg)}</td>
     <td>${status}</td>
-    <td>${d.status === 'PENDING' ? `<button type="button" class="btn small give" data-handoff="${esc(d.id)}" ${busy || !canWrite() ? 'disabled' : ''}>${esc(busy ? t('rescue.handoffBusy') : t('rescue.handoffBtn'))}</button>` : ''}</td>
+    <td>${action}</td>
   </tr>`;
 }
 const donationTable = (rows) => `<div class="tablewrap"><table>
@@ -271,6 +275,73 @@ function renderStats() {
   $('statNote').textContent = t('rescue.statNote', { co2: kg(s.estimated_co2e_kg) });
 }
 
+function normalizeReceipt(row) {
+  if (!row || row.status !== 'DONATED' || !row.id || typeof row.recipient !== 'string') return null;
+  let payload = row.payload;
+  if (typeof payload === 'string') {
+    try { payload = JSON.parse(payload); } catch { return null; }
+  }
+  if (!payload || !Array.isArray(payload.lines) || !payload.lines.length) return null;
+  return { ...row, payload };
+}
+
+function renderReceipt() {
+  const d = state.receipt;
+  if (!d) return false;
+  const p = d.payload;
+  const numeric = (value) => value === null || value === undefined || value === '' ? null
+    : Number.isFinite(Number(value)) ? Number(value) : null;
+  const qty = numeric(p.qty);
+  const weight = numeric(p.weight_g);
+  const impact = numeric(p.estimated_co2e_kg);
+  const created = Date.parse(d.created || '');
+  const createdText = Number.isFinite(created)
+    ? new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kuala_Lumpur', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(created)) : '—';
+  const lines = p.lines.map((line) =>
+    `<li><span>${esc(nameOf(line.batch_id))}</span><b>${esc(line.qty)}</b></li>`).join('');
+  $('receiptContent').innerHTML = `
+    <header class="receipt-header">
+      <p class="receipt-brand">Orbyte Smart Yield <span>· Nexgen</span></p>
+      <span class="receipt-stamp">${esc(t('rescue.receiptConfirmed'))}</span>
+      <h2 id="rescue-receiptTitle">${esc(t('rescue.receiptTitle'))}</h2>
+      <p>${esc(t('rescue.receiptSubtitle'))}</p>
+    </header>
+    <dl class="receipt-meta">
+      <div><dt>${esc(t('rescue.receiptReference'))}</dt><dd class="receipt-ref">${esc(d.id)}</dd></div>
+      <div><dt>${esc(t('rescue.receiptRecipient'))}</dt><dd>${esc(d.recipient)}</dd></div>
+      <div><dt>${esc(t('rescue.receiptCreated'))}</dt><dd>${esc(createdText)}</dd></div>
+    </dl>
+    <section class="receipt-items">
+      <h3>${esc(t('rescue.receiptItems'))}</h3>
+      <ul>${lines}</ul>
+    </section>
+    <dl class="receipt-totals">
+      <div><dt>${esc(t('rescue.receiptQuantity'))}</dt><dd>${qty === null ? '—' : esc(qty)}</dd></div>
+      <div><dt>${esc(t('rescue.receiptWeight'))}</dt><dd>${weight === null ? '—' : esc(kg(weight / 1000))}</dd></div>
+      <div><dt>${esc(t('rescue.receiptImpact'))}</dt><dd>${impact === null ? '—' : esc(kg(impact))}</dd></div>
+    </dl>
+    <p class="receipt-estimate">${esc(t('rescue.receiptEstimateNote'))}</p>
+    <p class="receipt-disclaimer">${esc(t('rescue.receiptNotice'))}</p>`;
+  return true;
+}
+
+function openReceipt(idOrRow) {
+  const row = typeof idOrRow === 'string' ? state.donations.find((d) => d.id === idOrRow) : idOrRow;
+  const receipt = normalizeReceipt(row);
+  if (!receipt) return say('rescue.receiptUnavailable', null, true);
+  state.receipt = receipt;
+  renderReceipt();
+  $('receiptDialog').showModal();
+}
+
+$('receiptPrint').onclick = () => {
+  const body = document.body;
+  body?.classList?.add('receipt-printing');
+  try { window.print?.(); } finally {
+    setTimeout(() => body?.classList?.remove('receipt-printing'), 0);
+  }
+};
+
 async function loadStats() {
   try {
     state.stats = await api('/dashboard');
@@ -307,6 +378,14 @@ async function handoff(id, recipient) {
     const row = await api('/donations/handoff', { donation_id: id, recipient });
     window.Nexflow.changed('donation');
     say('rescue.handoffDone', { recipient: row.recipient });
+    const receipt = normalizeReceipt(row);
+    if (receipt) {
+      state.receipt = receipt;
+      renderReceipt();
+      $('receiptDialog').showModal();
+    } else {
+      say('rescue.receiptUnavailable', null, true);
+    }
   } catch (e) {
     sayRaw(t('rescue.handoffFail', { err: e.message }), true);
   } finally {
@@ -318,8 +397,9 @@ async function handoff(id, recipient) {
 
 document.addEventListener('click', (event) => {
   if (!root.contains(event.target)) return;
-  const el = event.target.closest?.('[data-handoff],[data-retry]');
+  const el = event.target.closest?.('[data-handoff],[data-retry],[data-receipt]');
   if (!el) return;
+  if (el.dataset.receipt) return openReceipt(el.dataset.receipt);
   if (el.dataset.handoff) return openHandoff(el.dataset.handoff);
   ({ inventory: loadInventory, donations: () => loadDonations().then(loadStats), stats: loadStats })[el.dataset.retry]?.();
 });
@@ -341,6 +421,7 @@ function relabel() {
   if (!state.donationsError) renderDonations();
   if (state.stats) renderStats();
   if (state.result) render(state.result);
+  if (state.receipt) renderReceipt();
   if ($('handoffDialog')?.open && state.handoffId) {
     const d = state.donations.find((x) => x.id === state.handoffId);
     if (d) $('hoBody').innerHTML = esc(t('rescue.handoffBody', { items: linesText(d.payload.lines), qty: d.payload.qty, weight: kg(d.payload.weight_g / 1000) }));
@@ -348,6 +429,6 @@ function relabel() {
 }
 if (window.NexFlowI18N) window.NexFlowI18N.onChange(relabel);
 
-return {refresh, roleChanged, calculate, openHandoff, handoff, loadDonations, relabel, invalidate:clearResult };
+return {refresh, roleChanged, calculate, openHandoff, handoff, loadDonations, openReceipt, relabel, invalidate:clearResult };
 
 })();

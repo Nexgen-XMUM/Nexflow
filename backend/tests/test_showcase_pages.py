@@ -16,20 +16,75 @@ def demo_client(tmp_path):
     return TestClient(create_demo_app(tmp_path / "demo.sqlite3", DAY))
 
 
-def test_welcome_page_is_served_at_root_as_the_bread_count_demo(tmp_path):
+def test_welcome_page_has_brand_story_features_scanner_and_mascot_login(tmp_path):
     with demo_client(tmp_path) as client:
         response = client.get("/")
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
         page = response.text
-    # Bread Count 欢迎页：样图托盘、识别预览、计数表、确认按钮、小怪兽
-    for element in ('id="tray"', 'id="frame"', 'id="rows"', 'id="confirmBtn"', 'id="log"', 'id="monster"'):
+    # The welcome page keeps its scanner, but introduces the brand and features first.
+    for element in (
+        'id="tray"', 'id="frame"', 'id="rows"', 'id="confirmBtn"', 'id="log"', 'id="monster"',
+        'id="guideToggle"', 'id="guidePanel"', 'id="crumbForm"', 'id="crumbInput"',
+    ):
         assert element in page
-    assert "YOLOv8 Detection Preview · Simulated Results" in page
-    assert 'href="/app#boss"' in page  # Enter NexFlow
-    assert page.count('href="/login"') == 1  # 页脚保留登录页入口
+    assert "Orbyte Smart Yield" in page
+    assert "WHY ORBYTE BUILT NEXGEN" in page
+    assert "good bread goes unsold" in page
+    assert page.count('class="feat-card"') == 6
+    assert page.index('class="origin-section story"') < page.index('id="yolo-preview"') < page.index('id="tray"')
+    for feature in (
+        "End-of-day stocktake",
+        "Clearance pricing &amp; margin guard",
+        "Owner-reviewed customer offers",
+        "Surprise box to pickup",
+        "Food rescue &amp; handover",
+        "Dashboard &amp; impact visibility",
+    ):
+        assert feature in page
+    assert "YOLO bakery scan" in page
+    assert "Experimental · simulated interface" not in page
+    assert "DESKTOP DEMO" not in page
+    assert 'href="/login" data-testid="link-sign-in"' in page
+    assert 'id="enterBtn"' not in page
+    assert "Enter Nexgen" not in page
+    assert "function isHeadPoint" in page
+    assert "window.location.assign('/login')" in page
+    assert "keydown" in page
+    assert 'aria-expanded="false"' in page
+    assert 'href="#feature-stocktake"' in page
+    assert page.count('href="/?view=yolo"') >= 3
+    assert 'id="yolo-workspace"' in page
+    assert "document.documentElement.dataset.view = 'yolo'" in page
+    assert 'data-testid="link-back-welcome"' in page
+    assert 'id="guidePanel" aria-label="Nexgen guide and Crumb chat" hidden' in page
+    assert page.count('class="guide-feature"') == 6
+    assert "Prepare AI-assisted or template promo copy for review." in page
+    assert "These are fictional examples, not real customer testimonials." in page
+    assert "RM 180.00" in page and "not live data" in page
+    assert "function crumbReply" in page
+    assert "data-crumb-prompt" in page
+    assert "Crumb answers with a small set of prepared replies." in page
+    assert "Demo stories" not in page
+    assert "textContent = text" in page
     assert 'src="/showcase/images/' in page  # 样图走白名单静态路由
     assert "orbyte_smart_yield_with_onboarding.html" not in page
+
+
+def test_source_zip_download_is_a_read_only_attachment(tmp_path, monkeypatch):
+    import backend.desktop_demo as desktop_demo
+
+    archive = tmp_path / "source.zip"
+    archive.write_bytes(b"PK\x03\x04demo")
+    monkeypatch.setattr(desktop_demo, "SOURCE_ZIP_DOWNLOAD", archive)
+
+    with demo_client(tmp_path) as client:
+        response = client.get("/download/source.zip")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/zip"
+    assert "attachment; filename=\"Orbyte-Smart-Yield-Nexgen-source.zip\"" in response.headers["content-disposition"]
+    assert response.content == b"PK\x03\x04demo"
 
 
 def test_welcome_preview_never_calls_an_inference_backend(tmp_path):
@@ -39,7 +94,19 @@ def test_welcome_preview_never_calls_an_inference_backend(tmp_path):
     for forbidden in ("/api/detect", "/api/confirm", "/api/images", "/api/meta", "onxxruntime", "8100", "127.0.0.1"):
         assert forbidden not in page, f"欢迎页不应引用 {forbidden}"
     assert "live detection is not enabled" in page  # 上传照片只做预览
-    assert "Simulated" in page and "never written to NexFlow stock" in page
+    assert "fixed detection boxes and count" in page and "or saved to stock" in page
+    assert "This count stays on this page; it is not saved to Nexgen stock." in page
+
+
+def test_yolo_fullscreen_query_uses_existing_welcome_page_and_keeps_login_route(tmp_path):
+    with demo_client(tmp_path) as client:
+        yolo = client.get("/?view=yolo")
+        login = client.get("/login")
+    assert yolo.status_code == 200
+    assert 'id="yolo-workspace"' in yolo.text
+    assert "new URLSearchParams(window.location.search)" in yolo.text
+    assert login.status_code == 200
+    assert 'id="loginForm"' in login.text and 'id="signupForm"' in login.text
 
 
 def test_showcase_images_route_serves_only_the_five_samples(tmp_path):
@@ -81,7 +148,10 @@ def test_login_page_points_at_the_workspace(tmp_path):
     assert 'href="/app#boss"' in page  # 成功弹窗的主按钮
     assert 'href="welcome_page.html"' not in page  # 相对旧链接
     assert 'href="index.html"' not in page
-    assert "DEMO_DESTINATION = '/app#boss'" in page  # 自动跳转目标
+    assert "function destinationForRole(role)" in page
+    assert "{owner:'boss', staff:'staff', user:'customer'}" in page
+    assert "const destination = destinationForRole(userData.role)" in page
+    assert "$('#enterAppBtn').href = destination" in page
 
 
 def test_login_and_signup_never_block_the_demo_flow(tmp_path):
@@ -93,7 +163,7 @@ def test_login_and_signup_never_block_the_demo_flow(tmp_path):
         handler = page[start:page.index("});", page.index("demoEnter(", start)) + 3]
         assert "return;" not in handler, f"{form} 提交被验证拦截，会卡死演示流程"
         assert "demoEnter(" in handler, f"{form} 提交没有走演示进入流程"
-    assert "location.assign(DEMO_DESTINATION)" in page  # 过渡后自动进入老板界面
+    assert "location.assign(destination)" in page  # 过渡后进入所选角色界面
 
 
 def test_workspace_and_demo_api_are_still_served(tmp_path):

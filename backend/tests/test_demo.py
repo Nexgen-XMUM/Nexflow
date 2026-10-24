@@ -1,3 +1,4 @@
+import os
 import subprocess
 from unittest.mock import MagicMock
 
@@ -42,7 +43,7 @@ def test_demo_routes_do_not_change_normal_app():
 
 @pytest.fixture
 def launcher(monkeypatch, tmp_path):
-    python = tmp_path / ".venv" / "bin" / "python"
+    python = tmp_path / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
     python.parent.mkdir(parents=True)
     python.touch()
     monkeypatch.setattr(demo, "ROOT", tmp_path)

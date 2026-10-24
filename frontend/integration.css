@@ -95,6 +95,9 @@ html[data-theme="dark"] .dash-notice { border-color: rgba(245, 158, 11, 0.3); }
 .dash-group-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .dash-group-head h3 { font-size: 16.5px; letter-spacing: -0.01em; }
 .dash-group-head span { font-size: 12.5px; color: var(--muted); }
+.dash-review-group { margin-top: 12px; }
+.dash-review-group .dash-group-head { margin-bottom: 9px; }
+.dash-review-group #draftBox { scroll-margin-top: 18px; }
 
 /* KPI 卡片 */
 #tab-dash .dash-kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
@@ -177,3 +180,54 @@ html[data-theme="dark"] .dash-notice { border-color: rgba(245, 158, 11, 0.3); }
 body.rescue-open .content-grid { grid-template-columns: minmax(0, 1fr); }
 #phoneWrap[hidden] { display: none; }
 .demo-initial-points-note { font-size: 11px; color: var(--muted); }
+
+/* Catalogue states come from the existing API request; no client-side inventory fallback. */
+.catalog-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 4px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--sunk);
+  color: var(--ink-secondary);
+}
+.catalog-state[hidden] { display: none !important; }
+.catalog-state-message { flex: 1; min-width: 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.catalog-state .btn { flex: none; padding: 7px 12px; font-size: 12px; }
+.catalog-state .btn[hidden] { display: none !important; }
+.catalog-state[data-state="loading"] { background: var(--brand-light); border-color: var(--brand-border); }
+.catalog-state[data-state="error"] { background: var(--chili-bg); color: var(--chili); border-color: rgba(220, 38, 38, .28); }
+.catalog-state-dot { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--brand); }
+.catalog-state[data-state="loading"] .catalog-state-dot { animation: catalogue-pulse 1.2s ease-in-out infinite; }
+@keyframes catalogue-pulse { 50% { opacity: .35; transform: scale(.78); } }
+@media (prefers-reduced-motion: reduce) { .catalog-state[data-state="loading"] .catalog-state-dot { animation: none; } }
+
+/* At common laptop widths, let the work area use the full row and move the phone preview below it. */
+@media (min-width: 961px) and (max-width: 1319px) {
+  .content-grid { grid-template-columns: minmax(0, 1fr); }
+  .side {
+    position: static;
+    display: grid;
+    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+    max-width: 760px;
+    margin: 18px auto 0;
+  }
+  .phone { width: 260px; height: 520px; border-radius: 38px; }
+  .phone::before { top: 15px; width: 72px; height: 19px; margin-left: -36px; }
+  .screen { border-radius: 30px; }
+  .phone-cap { text-align: left; }
+  body.rescue-open .content-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (min-width: 1320px) {
+  .content-grid { grid-template-columns: minmax(0, 1fr) minmax(300px, 320px); }
+  .phone { width: 320px; height: min(650px, calc(100svh - 160px)); min-height: 500px; }
+}
+@media (max-width: 620px) {
+  .catalog-state { align-items: flex-start; flex-wrap: wrap; }
+  .catalog-state-message { flex-basis: calc(100% - 20px); }
+  .catalog-state .btn { margin-left: 19px; }
+}

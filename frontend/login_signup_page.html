@@ -1,90 +1,91 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n="auth.pageTitle">登录与注册 · Orbyte Smart Yield</title>
+<title data-i18n="auth.pageTitle">Orbyte Smart Yield · Nexgen · Sign in</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
 <!-- 三语言字典：与欢迎页、工作台共用 frontend/i18n.js 和 nexflow_lang 偏好 -->
 <script src="/app/assets/i18n.js"></script>
 <style>
 /* ==========================================================================
-   1. Orbyte 统一设计令牌 (与 welcome_page.html 和 index.html 完全同步)
+   1. Orbyte Smart Yield design tokens
    ========================================================================== */
 :root, html[data-theme="light"] {
-  --bg: #f4f7fb;
-  --surface: #ffffff;
-  --surface-alt: #f8fafc;
-  --sunk: #eef2f8;
-  --sunk-hover: #e2e8f0;
-  --ink: #0f172a;
-  --ink-secondary: #334155;
-  --muted: #64748b;
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
+  --bg: #f6f1e7;
+  --surface: #fffdf8;
+  --surface-alt: #faf6ed;
+  --sunk: #eee7d9;
+  --sunk-hover: #e4d9c8;
+  --ink: #3c332d;
+  --ink-secondary: #5e5146;
+  --muted: #857565;
+  --line: #e6dac9;
+  --line-strong: #d4c2ad;
 
-  --brand: #1e40af;
-  --brand-hover: #1e3a8a;
-  --brand-light: #eff6ff;
-  --brand-border: #bfdbfe;
-  --brand-ink: #ffffff;
-  --accent: #2563eb;
+  --brand: #a9573b;
+  --brand-hover: #8f452e;
+  --brand-light: #f8e9df;
+  --brand-border: #e8c7b5;
+  --brand-ink: #fffaf2;
+  --accent: #71836b;
 
-  --amber: #f59e0b;
-  --amber-bg: #fef3c7;
-  --amber-ink: #92400e;
-  --chili: #dc2626;
-  --chili-bg: #fef2f2;
-  --ok: #059669;
-  --ok-bg: #ecfdf5;
+  --amber: #c18a32;
+  --amber-bg: #fff2cf;
+  --amber-ink: #845916;
+  --chili: #b64d42;
+  --chili-bg: #fae9e4;
+  --ok: #637e61;
+  --ok-bg: #eaf1e5;
 
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.14);
-  --display: "Bricolage Grotesque", "Figtree", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --shadow-sm: 0 2px 8px rgba(73, 52, 42, 0.06), 0 1px 2px rgba(73, 52, 42, 0.04);
+  --shadow-lg: 0 24px 48px -12px rgba(73, 52, 42, 0.18);
+  --display: Georgia, "Times New Roman", serif;
   --body: "Figtree", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
   color-scheme: light;
 }
 
 html[data-theme="dark"] {
-  --bg: #070d19;
-  --surface: #0f172a;
-  --surface-alt: #162033;
-  --sunk: #1e293b;
-  --sunk-hover: #334155;
-  --ink: #f8fafc;
-  --ink-secondary: #cbd5e1;
-  --muted: #94a3b8;
-  --line: #1e293b;
-  --line-strong: #334155;
+  --bg: #211b17;
+  --surface: #2b241f;
+  --surface-alt: #342b25;
+  --sunk: #382f28;
+  --sunk-hover: #463a31;
+  --ink: #f7eee3;
+  --ink-secondary: #dfcdb8;
+  --muted: #b5a18c;
+  --line: #4a3d32;
+  --line-strong: #5c4b3c;
 
-  --brand: #3b82f6;
-  --brand-hover: #60a5fa;
-  --brand-light: rgba(59, 130, 246, 0.15);
-  --brand-border: rgba(59, 130, 246, 0.35);
-  --brand-ink: #ffffff;
-  --accent: #60a5fa;
+  --brand: #d48664;
+  --brand-hover: #e09b79;
+  --brand-light: rgba(212, 134, 100, 0.15);
+  --brand-border: rgba(212, 134, 100, 0.36);
+  --brand-ink: #241b16;
+  --accent: #a6b38f;
 
-  --amber: #fbbf24;
-  --amber-bg: rgba(245, 158, 11, 0.16);
-  --amber-ink: #fde68a;
-  --chili: #f87171;
-  --chili-bg: rgba(239, 68, 68, 0.15);
-  --ok: #34d399;
-  --ok-bg: rgba(16, 185, 129, 0.15);
+  --amber: #e4b356;
+  --amber-bg: rgba(228, 179, 86, 0.16);
+  --amber-ink: #f3d89a;
+  --chili: #ef9384;
+  --chili-bg: rgba(239, 147, 132, 0.14);
+  --ok: #a9c18f;
+  --ok-bg: rgba(169, 193, 143, 0.15);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 28px 56px rgba(0, 0, 0, 0.65);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.22);
+  --shadow-lg: 0 28px 56px rgba(0, 0, 0, 0.48);
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100svh;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--body);
@@ -296,7 +297,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
   margin-left: 6px;
 }
 
-/* 顶部模式切换器 (🔐 账号登录 vs ✨ 注册新账号) */
+/* Top-level sign-in and account-creation mode switcher */
 .mode-switcher {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -339,7 +340,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
   font-size: 13.5px;
 }
 
-/* 快速演示填入芯片 (3 等分：👑 老板 / 🧑‍🍳 店员 / 👤 普通用户) */
+/* Quick demo account chips */
 .demo-quick-box {
   background: var(--brand-light);
   border: 1px solid var(--brand-border);
@@ -498,7 +499,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
 .field-msg.error { color: var(--chili); }
 .field-msg.ok { color: var(--ok); }
 
-/* 角色选择卡片 (注册页：3 等分 👑 老板 / 🧑‍🍳 店员 / 👤 普通用户，无副标题描述) */
+/* Signup role selector */
 .role-selector {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -625,6 +626,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
   inset: 0;
   background: rgba(7, 13, 25, 0.62);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 9000;
   display: none;
   align-items: center;
@@ -674,12 +676,172 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
 
 /* 响应式适配 */
 @media (max-width: 520px) {
-  .app-header { padding: 0 16px; }
-  .brand-text small { display: none; }
+  .app-header { padding: 0 8px; }
+  .brand { gap: 7px; }
+  .brand-text b { font-size: 14px; letter-spacing: -.025em; }
+  .brand-text small { display: block; font-size: 9px; line-height: 1.2; }
   .auth-card { padding: 26px 20px; }
   .field-row, .demo-chips, .role-selector {
     grid-template-columns: 1fr;
   }
+}
+.auth-wrapper::before { background: radial-gradient(circle, rgba(169, 87, 59, .12) 0%, transparent 70%); }
+.auth-card { border-radius: 24px; box-shadow: 0 24px 52px rgba(73, 52, 42, .13); }
+.mode-switcher { border-radius: 14px; }
+.mode-btn, .btn-submit, .icon-btn { border-radius: 11px; }
+:root, html[data-theme="light"] {
+  --bg: #f2f3eb; --surface: #fbfcf6; --surface-alt: #f7f8f0;
+  --sunk: #e7ece2; --sunk-hover: #dce5d9;
+  --ink: #263b35; --ink-secondary: #52665e; --muted: #78877e;
+  --line: #dce4da; --line-strong: #c7d4c8;
+  --brand: #246a5b; --brand-hover: #195448; --brand-light: #e2eee7; --brand-border: #bfd7ca; --brand-ink: #fbfcf6;
+  --accent: #bd8b45; --amber: #bd8b45; --amber-bg: #f7edcf; --amber-ink: #795c25;
+  --chili: #a44d42; --chili-bg: #f5e7e1; --ok: #47745c; --ok-bg: #e4efe5;
+  --shadow-sm: 0 3px 10px rgba(38,59,53,.055), 0 1px 2px rgba(38,59,53,.04);
+  --shadow-lg: 0 24px 52px rgba(29,58,48,.16);
+}
+html[data-theme="dark"] {
+  --bg: #17231f; --surface: #22312b; --surface-alt: #293a32;
+  --sunk: #2b3b33; --sunk-hover: #35483e;
+  --ink: #edf1e8; --ink-secondary: #d0ddcf; --muted: #a5b4a8;
+  --line: #3b4e43; --line-strong: #506658;
+  --brand: #82b8a6; --brand-hover: #a0cbb9; --brand-light: rgba(130,184,166,.15); --brand-border: rgba(130,184,166,.34); --brand-ink: #17231f;
+  --accent: #ddb36f; --amber: #ddb36f; --amber-bg: rgba(221,179,111,.16); --amber-ink: #ecd09c;
+  --chili: #ef9384; --chili-bg: rgba(239,147,132,.14); --ok: #a4c8a8; --ok-bg: rgba(164,200,168,.15);
+  --shadow-sm: 0 3px 12px rgba(0,0,0,.2); --shadow-lg: 0 28px 56px rgba(0,0,0,.4);
+}
+.logo { background: linear-gradient(145deg, #174f45, #31806b); box-shadow: 0 4px 12px rgba(36,106,91,.2); }
+.logo::after { background: #e0bd73; }
+.auth-wrapper::before { background: radial-gradient(ellipse, rgba(36,106,91,.13), transparent 70%); }
+.auth-card { border-radius: 20px; box-shadow: 0 24px 52px rgba(29,58,48,.13); }
+.mode-btn[aria-selected="true"] { color: var(--brand); }
+.demo-quick-box { background: var(--brand-light); border-color: var(--brand-border); }
+.chip-btn:hover, .chip-btn.active-chip { border-color: var(--brand); color: var(--brand); }
+.btn-submit { box-shadow: 0 4px 16px rgba(36,106,91,.22); }
+.btn-submit:hover:not(:disabled) { box-shadow: 0 6px 16px rgba(36,106,91,.25); }
+.auth-mark, .quick-mark { color: var(--brand); font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+.quick-mark { padding: 3px 5px; border: 1px solid var(--brand-border); border-radius: 5px; }
+.role-mark, .r-emo { color: var(--brand); font-family: var(--body); font-size: 12px; font-weight: 800; }
+.toggle-pwd { width: auto; padding: 0 8px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+::selection { background: #c4ddd1; color: #263b35; }
+/* Spacious bakery-editorial sign-in, paired with the welcome page’s handmade palette. */
+:root, html[data-theme="light"] {
+  --bg: #f7f0e4; --surface: #fffaf0; --surface-alt: #f9f2e7;
+  --sunk: #eee4d5; --sunk-hover: #e6d7c3;
+  --ink: #49342a; --ink-secondary: #665548; --muted: #927e6c;
+  --line: #e4d7c5; --line-strong: #d4c1a9;
+  --brand: #b95b3f; --brand-hover: #a64b33; --brand-light: #f5e4d9; --brand-border: #e4c4b3; --brand-ink: #fff8ec;
+  --accent: #71866d; --amber: #c99752; --amber-bg: #f4e7c9; --amber-ink: #805a24;
+  --chili: #b64d42; --chili-bg: #fae9e4; --ok: #637e61; --ok-bg: #eaf1e5;
+  --shadow-sm: 0 3px 10px rgba(73,52,42,.055), 0 1px 2px rgba(73,52,42,.04);
+  --shadow-lg: 0 28px 70px -25px rgba(73,52,42,.24);
+  --display: "Fraunces", Georgia, serif;
+  --body: "DM Sans", sans-serif;
+}
+html[data-theme="dark"] {
+  --bg: #241c18; --surface: #30251f; --surface-alt: #382b24;
+  --sunk: #3c2f27; --sunk-hover: #4a382e;
+  --ink: #f7eee3; --ink-secondary: #dfcdb8; --muted: #b5a18c;
+  --line: #4d3d32; --line-strong: #624b3b;
+  --brand: #d48664; --brand-hover: #e09b79; --brand-light: rgba(212,134,100,.15); --brand-border: rgba(212,134,100,.36); --brand-ink: #241b16;
+  --accent: #a6b38f; --amber: #e4b356; --amber-bg: rgba(228,179,86,.16); --amber-ink: #f3d89a;
+  --chili: #ef9384; --chili-bg: rgba(239,147,132,.14); --ok: #a9c18f; --ok-bg: rgba(169,193,143,.15);
+}
+body { background: var(--bg); }
+.app-header { height: 76px; padding-inline: max(34px, calc((100vw - 1240px)/2)); background: rgba(255,250,240,.9); box-shadow: none; }
+html[data-theme="dark"] .app-header { background: rgba(48,37,31,.92); }
+.logo { border-radius: 10px; background: #b95b3f; box-shadow: 0 5px 14px rgba(185,91,63,.2); }
+.logo::after { background: #e0bd73; }
+.brand-text b { font-size: 19px; letter-spacing: -.035em; }
+.brand-text small { font-size: 11px; letter-spacing: .025em; }
+.auth-wrapper {
+  width: min(1180px, calc(100% - 72px));
+  min-height: calc(100vh - 142px);
+  margin: 0 auto;
+  padding: 45px 0 70px;
+  justify-content: flex-end;
+}
+.auth-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 4%;
+  width: 390px;
+  height: 385px;
+  transform: translateY(-48%);
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 51% 48%, #141414 0 2.7%, transparent 3.2%),
+    radial-gradient(ellipse at 69% 47%, #141414 0 2.7%, transparent 3.2%),
+    radial-gradient(ellipse at 42% 45%, #fff 0 6%, transparent 6.4%),
+    radial-gradient(ellipse at 70% 43%, #fff 0 6.3%, transparent 6.7%),
+    radial-gradient(ellipse at 45% 58%, #f59ab3 0 4%, transparent 4.5%),
+    radial-gradient(ellipse at 75% 56%, #f59ab3 0 4%, transparent 4.5%),
+    radial-gradient(ellipse at 60% 66%, #f6a2ba 0 12%, transparent 12.5%),
+    radial-gradient(ellipse at 48% 34%, #e7dcfd 0, #c5b0f3 48%, #9478dd 78%, transparent 79%);
+  filter: drop-shadow(0 22px 28px rgba(73,52,42,.12));
+  pointer-events: none;
+}
+.auth-wrapper::after {
+  content: "THE EARLY SHIFT\A\A A little more room\A for the good work.";
+  white-space: pre;
+  position: absolute;
+  top: 11%;
+  left: 5%;
+  z-index: 1;
+  color: #927762;
+  font: 500 11px/1.8 "DM Mono", monospace;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.auth-card {
+  width: min(500px, 48%);
+  max-width: 500px;
+  padding: 34px 38px;
+  border: 1px solid #e4d7c5;
+  border-radius: 12px;
+  background: rgba(255,250,240,.94);
+  box-shadow: 0 24px 64px -32px rgba(73,52,42,.32);
+}
+html[data-theme="dark"] .auth-card { background: rgba(48,37,31,.96); border-color: var(--line); }
+.mode-switcher { background: #efe5d6; border-color: #e4d7c5; border-radius: 10px; }
+.mode-btn[aria-selected="true"] { color: #a64b33; }
+.demo-quick-box { border-radius: 10px; }
+.chip-btn, .role-card, .form-input { border-radius: 8px; }
+.btn-submit { box-shadow: 0 5px 14px rgba(185,91,63,.18); border-radius: 8px; }
+.form-header h1 { font: 600 34px/1.04 var(--display); letter-spacing: -.045em; }
+.field-label { color: #806f60; font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .08em; }
+.form-input { background: #fbf6ed; border-color: #d8c8b4; }
+.auth-mark, .quick-mark, .role-mark, .r-emo { color: #a9573b; }
+@media (max-width: 820px) {
+  .auth-wrapper { width: min(540px, calc(100% - 32px)); min-height: auto; padding: 40px 0 64px; }
+  .auth-wrapper::before, .auth-wrapper::after { display: none; }
+  .auth-card { width: 100%; }
+  .app-header { padding-inline: 18px; }
+}
+.auth-wrapper {
+  width: min(560px, calc(100% - 40px));
+  min-height: calc(100vh - 76px);
+  min-height: calc(100svh - 76px);
+  margin: 0 auto;
+  padding: 42px 0 56px;
+  justify-content: center;
+}
+.auth-wrapper::before {
+  content: "";
+  top: 8%;
+  left: 50%;
+  right: auto;
+  width: min(680px, 92vw);
+  height: 380px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(185, 91, 63, .1) 0%, transparent 70%);
+  filter: none;
+}
+.auth-wrapper::after { content: none; display: none; }
+.auth-card { width: 100%; max-width: 500px; }
+@media (max-width: 820px) {
+  .auth-wrapper { width: min(540px, calc(100% - 32px)); min-height: auto; padding: 40px 0 64px; }
+  .auth-wrapper::before { display: none; }
 }
 </style>
 </head>
@@ -687,17 +849,17 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
 
 <!-- ==================== 顶部栏 ==================== -->
 <header class="app-header">
-  <a href="/" class="brand" data-i18n-title="auth.backTitle" title="返回 NexFlow 欢迎页">
-    <div class="logo" aria-hidden="true">O</div>
+  <a href="/" class="brand" data-i18n-title="auth.backTitle" title="Back to the Orbyte welcome page">
+      <div class="logo" aria-hidden="true">O</div>
     <div class="brand-text">
       <b>Orbyte Smart Yield</b>
-      <small data-i18n="auth.brand.sub">智能烘焙打烊清仓与 AI 自动化系统</small>
+      <small data-i18n="auth.brand.sub">Bakery closing operations</small>
     </div>
   </a>
 
   <div class="header-actions">
     <label class="lang-switch" for="langSelect">
-      <span class="lang-icon" aria-hidden="true">🌐</span>
+      <span class="lang-icon" aria-hidden="true">EN</span>
       <span class="sr-only" data-i18n="app.langLabel">界面语言</span>
       <select id="langSelect" data-i18n-aria="app.langLabel" aria-label="界面语言">
         <option value="en" lang="en">English</option>
@@ -709,9 +871,9 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
       <span aria-hidden="true">←</span>
       <span class="btn-label" data-i18n="auth.back">返回欢迎页</span>
     </a>
-    <button type="button" class="icon-btn" id="themeToggleBtn" data-i18n-aria="auth.themeToggleAria" aria-label="切换深色或浅色模式">
-      <span id="themeIcon" aria-hidden="true">🌙</span>
-      <span class="btn-label" id="themeText">深色模式</span>
+      <button type="button" class="icon-btn" id="themeToggleBtn" data-i18n-aria="auth.themeToggleAria" aria-label="Switch between dark and light mode">
+      <span id="themeIcon" aria-hidden="true">◐</span>
+      <span class="btn-label" id="themeText">Dark mode</span>
     </button>
   </div>
 </header>
@@ -730,10 +892,10 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
     <!-- 双栏模式切换器 -->
     <div class="mode-switcher" role="tablist" data-i18n-aria="auth.tablistAria" aria-label="选择账号登录或注册新账号">
       <button type="button" class="mode-btn" id="tabLoginBtn" role="tab" aria-selected="true" data-mode="login">
-        🔐 <span data-i18n="auth.tab.login">账号登录</span>
+        <span class="auth-mark" aria-hidden="true">01</span><span data-i18n="auth.tab.login">Sign in</span>
       </button>
       <button type="button" class="mode-btn" id="tabSignupBtn" role="tab" aria-selected="false" data-mode="signup">
-        ✨ <span data-i18n="auth.tab.signup">注册新账号</span>
+        <span class="auth-mark" aria-hidden="true">02</span><span data-i18n="auth.tab.signup">Create account</span>
       </button>
     </div>
 
@@ -747,21 +909,21 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
       <!-- 快速体验：一键填入演示账号 (3 等分：老板 / 店员 / 普通用户) -->
       <div class="demo-quick-box">
         <div class="demo-quick-label">
-          <span>⚡ <span data-i18n="auth.quick.label">快速体验：一键填入演示账号</span></span>
+          <span><span class="quick-mark" aria-hidden="true">DEMO</span> <span data-i18n="auth.quick.label">Quick demo: fill a sample account</span></span>
           <span style="font-weight:500;opacity:0.85" data-i18n="auth.quick.hint">免手动输入</span>
         </div>
         <div class="demo-chips">
           <button type="button" class="chip-btn active-chip" data-fill="owner">
-            <span aria-hidden="true">👑</span>
-            <span data-i18n="auth.role.owner">老板</span>
+            <span class="role-mark" aria-hidden="true">O</span>
+            <span data-i18n="auth.role.owner">Owner</span>
           </button>
           <button type="button" class="chip-btn" data-fill="staff">
-            <span aria-hidden="true">🧑‍🍳</span>
-            <span data-i18n="auth.role.staff">店员</span>
+            <span class="role-mark" aria-hidden="true">S</span>
+            <span data-i18n="auth.role.staff">Staff</span>
           </button>
           <button type="button" class="chip-btn" data-fill="user">
-            <span aria-hidden="true">👤</span>
-            <span data-i18n="auth.role.user">普通用户</span>
+            <span class="role-mark" aria-hidden="true">C</span>
+            <span data-i18n="auth.role.user">Customer</span>
           </button>
         </div>
       </div>
@@ -771,7 +933,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
       <div class="field-group">
         <label class="field-label" for="loginEmail">
           <span data-i18n="auth.emailLabel">EMAIL ADDRESS · 邮箱地址</span>
-          <span class="role-pill-badge" id="loginRoleBadge">👑 老板</span>
+          <span class="role-pill-badge" id="loginRoleBadge">O Owner</span>
         </label>
         <div class="input-wrap">
           <input
@@ -800,13 +962,13 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
             autocomplete="current-password"
             required
           >
-          <button type="button" class="toggle-pwd" data-target="loginPassword" data-i18n-aria="auth.pwdToggleAria" aria-label="显示或隐藏密码">👁️</button>
+            <button type="button" class="toggle-pwd" data-target="loginPassword" data-i18n-aria="auth.pwdToggleAria" aria-label="Show or hide password">Show</button>
         </div>
         <div class="field-msg" id="loginPasswordMsg" role="status"></div>
       </div>
 
       <button type="submit" class="btn-submit" id="loginSubmitBtn">
-        <span><span id="loginSubmitLabel" data-i18n="auth.login.submit">进入系统</span> ✨</span>
+        <span><span id="loginSubmitLabel" data-i18n="auth.login.submit">Sign in</span></span>
       </button>
 
       <div class="form-footer-switch">
@@ -829,20 +991,20 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
           <label class="role-card selected" data-role-card="owner">
             <input type="radio" name="signupRole" value="owner" checked>
             <span class="radio-dot" aria-hidden="true"></span>
-            <span class="r-emo" aria-hidden="true">👑</span>
-            <span class="r-title" data-i18n="auth.role.owner">老板</span>
+            <span class="r-emo" aria-hidden="true">O</span>
+            <span class="r-title" data-i18n="auth.role.owner">Owner</span>
           </label>
           <label class="role-card" data-role-card="staff">
             <input type="radio" name="signupRole" value="staff">
             <span class="radio-dot" aria-hidden="true"></span>
-            <span class="r-emo" aria-hidden="true">🧑‍🍳</span>
-            <span class="r-title" data-i18n="auth.role.staff">店员</span>
+            <span class="r-emo" aria-hidden="true">S</span>
+            <span class="r-title" data-i18n="auth.role.staff">Staff</span>
           </label>
           <label class="role-card" data-role-card="user">
             <input type="radio" name="signupRole" value="user">
             <span class="radio-dot" aria-hidden="true"></span>
-            <span class="r-emo" aria-hidden="true">👤</span>
-            <span class="r-title" data-i18n="auth.role.user">普通用户</span>
+            <span class="r-emo" aria-hidden="true">C</span>
+            <span class="r-title" data-i18n="auth.role.user">Customer</span>
           </label>
         </div>
       </div>
@@ -894,7 +1056,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
               autocomplete="new-password"
               required
             >
-            <button type="button" class="toggle-pwd" data-target="signupPassword" data-i18n-aria="auth.pwdToggleAria" aria-label="显示或隐藏密码">👁️</button>
+            <button type="button" class="toggle-pwd" data-target="signupPassword" data-i18n-aria="auth.pwdToggleAria" aria-label="Show or hide password">Show</button>
           </div>
         </div>
 
@@ -910,14 +1072,14 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
               autocomplete="new-password"
               required
             >
-            <button type="button" class="toggle-pwd" data-target="signupConfirm" data-i18n-aria="auth.confirmToggleAria" aria-label="显示或隐藏确认密码">👁️</button>
+            <button type="button" class="toggle-pwd" data-target="signupConfirm" data-i18n-aria="auth.confirmToggleAria" aria-label="Show or hide confirmation password">Show</button>
           </div>
         </div>
       </div>
       <div class="field-msg" id="signupPwdMsg" role="status" style="margin-bottom:10px;"></div>
 
       <button type="submit" class="btn-submit" id="signupSubmitBtn">
-        <span><span id="signupSubmitLabel" data-i18n="auth.signup.submit">创建账号并进入系统</span> ✨</span>
+        <span><span id="signupSubmitLabel" data-i18n="auth.signup.submit">Create account</span></span>
       </button>
 
       <div class="form-footer-switch">
@@ -933,7 +1095,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
 <div class="modal-backdrop" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
   <div class="modal-card">
     <div style="width:48px;height:48px;border-radius:14px;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center;font-size:22px;margin-bottom:14px;">
-      ✅
+      ✓
     </div>
     <h3 id="successModalTitle" style="font-size:20px;margin-bottom:6px;" data-i18n="auth.modal.title">演示登录成功，正在进入系统</h3>
     <p style="color:var(--muted);font-size:13.5px;margin:0 0 16px;" data-i18n="auth.modal.body">
@@ -943,17 +1105,17 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
     <div style="background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:20px;font-size:13px;display:flex;flex-direction:column;gap:7px;">
       <div style="display:flex;justify-content:space-between;">
         <span style="color:var(--muted);" data-i18n="auth.modal.emailLabel">登录邮箱：</span>
-        <b id="summaryEmail">owner@orbyte.my</b>
+        <b id="summaryEmail">owner@example.invalid</b>
       </div>
       <div style="display:flex;justify-content:space-between;">
         <span style="color:var(--muted);" data-i18n="auth.modal.roleLabel">当前角色：</span>
-        <b id="summaryRole" style="color:var(--brand);">👑 老板</b>
+        <b id="summaryRole" style="color:var(--brand);">O Owner</b>
       </div>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:10px;">
       <a href="/app#boss" class="btn-submit" id="enterAppBtn" style="text-decoration:none;text-align:center;margin-top:0;">
-        <span>🚀 <span data-i18n="auth.modal.enter">进入老板主界面</span></span>
+        <span><span data-i18n="auth.modal.enter">Enter owner workspace</span></span>
       </a>
       <button type="button" class="icon-btn" id="stayPreviewBtn" style="justify-content:center;width:100%;" data-i18n="auth.modal.stay">
         留在本页继续预览
@@ -990,7 +1152,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
     document.documentElement.setAttribute('data-theme', theme);
     store('orbyte_theme', theme);
     const isDark = theme === 'dark';
-    $('#themeIcon').textContent = isDark ? '🌞' : '🌙';
+    $('#themeIcon').textContent = isDark ? '☼' : '◐';
     $('#themeText').textContent = T(themeTextKey(theme));
   }
 
@@ -1028,8 +1190,8 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
   let selectedSignupRole = 'owner';
   let currentMode = 'login';
 
-  const ROLE_EMOJI = { owner: '👑', staff: '🧑‍🍳', user: '👤' };
-  const roleLabel = key => ROLE_EMOJI[key] + ' ' + T('auth.role.' + key);
+  const ROLE_MARK = { owner: 'O', staff: 'S', user: 'C' };
+  const roleLabel = key => ROLE_MARK[key] + ' ' + T('auth.role.' + key);
 
   function paintStepLabel() {
     $('#stepTagText').textContent = T(currentMode === 'login' ? 'auth.step.login' : 'auth.step.signup');
@@ -1056,10 +1218,10 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
   /* =====================================================
      4. 登录页：一键填入演示账号 (老板 / 店员 / 普通用户)
      ===================================================== */
-  const DEMO_ACCOUNTS = {
-    owner: { email: 'owner@orbyte.my', pass: 'Orbyte2026!' },
-    staff: { email: 'staff@orbyte.my', pass: 'Orbyte2026!' },
-    user: { email: 'user@orbyte.my', pass: 'Orbyte2026!' }
+   const DEMO_ACCOUNTS = {
+    owner: { email: 'owner@example.invalid', pass: '' },
+    staff: { email: 'staff@example.invalid', pass: '' },
+    user: { email: 'user@example.invalid', pass: '' }
   };
 
   function paintLoginBadge() {
@@ -1095,7 +1257,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
   });
 
   /* =====================================================
-     5. 密码明文/密文切换 (👁️)
+     5. Password visibility toggle
      ===================================================== */
   $$('.toggle-pwd').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1103,7 +1265,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
       if (!input) return;
       const isPwd = input.type === 'password';
       input.type = isPwd ? 'text' : 'password';
-      btn.textContent = isPwd ? '🙈' : '👁️';
+      btn.textContent = isPwd ? 'Hide' : 'Show';
     });
   });
 
@@ -1236,10 +1398,13 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
      7. 表单提交与反馈
      ===================================================== */
   /* =====================================================
-     比赛演示入口：不做账号校验，登录与注册最终都进入老板主界面。
-     DEMO_DESTINATION 就是现有 FastAPI 工作台的老板视图。
+     比赛演示入口：不做账号校验，登录与注册进入所选角色的工作台。
+     成功弹窗按钮与自动跳转共用同一个角色目标。
      ===================================================== */
-  const DEMO_DESTINATION = '/app#boss';
+   function destinationForRole(role) {
+     const page = {owner:'boss', staff:'staff', user:'customer'}[role] || 'boss';
+     return '/app#' + page;
+   }
   let enterTimer = null;
   let lastUserData = null;
 
@@ -1259,10 +1424,12 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
     store('orbyte_demo_user', JSON.stringify(userData));
     $('#summaryEmail').textContent = userData.email;
     paintSummaryRole();
+    const destination = destinationForRole(userData.role);
+    $('#enterAppBtn').href = destination;
     $('#successModal').classList.add('active');
     toast('auth.toast.success');
     cancelEnter();
-    enterTimer = setTimeout(() => window.location.assign(DEMO_DESTINATION), 900);
+    enterTimer = setTimeout(() => window.location.assign(destination), 900);
   }
 
   /* 轻量过渡：先显示按钮忙碌态，再弹出成功提示并自动跳转。
@@ -1289,7 +1456,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
     }
 
     demoEnter($('#loginSubmitBtn'), $('#loginSubmitLabel'), 'auth.login.submitting', 'auth.login.submit', {
-      email: emailEl.value.trim() || 'demo@orbyte.my',
+      email: emailEl.value.trim() || 'demo@example.invalid',
       role: selectedLoginRole
     });
   });
@@ -1306,7 +1473,7 @@ h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.015e
 
     demoEnter($('#signupSubmitBtn'), $('#signupSubmitLabel'), 'auth.signup.submitting', 'auth.signup.submit', {
       name: nameEl.value.trim() || 'Demo Owner',
-      email: emailEl.value.trim() || 'demo@orbyte.my',
+      email: emailEl.value.trim() || 'demo@example.invalid',
       role: selectedSignupRole
     });
   });

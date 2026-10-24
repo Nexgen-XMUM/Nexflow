@@ -267,6 +267,7 @@
       demoTime = null; leftoversRegistered = false; registeredQty = null;
     }
     paintSession();
+    purchase?.onContextChanged?.(context()); // 让顾客页按演示时钟同步可选时段
     // “含演示初始积分”只在比赛演示会话出现；普通服务没有初始赠送。
     (document.querySelectorAll?.('[data-demo-initial-points]') || []).forEach(el => { el.hidden = !demoTime; });
   }
@@ -290,6 +291,8 @@
       registeredQty = Number.isSafeInteger(result?.registered_qty) ? result.registered_qty : before;
       setStatus('leftovers', 'store.registered', {n:registeredQty}, false);
       await changed(t('logEntry.kindLeftovers'));
+      navigate('rescue');
+      toast(t('store.registered', {n:registeredQty}));
     } catch (err) {
       setStatus('leftovers', 'store.registerFail', {err:err.message}, true);
     } finally {

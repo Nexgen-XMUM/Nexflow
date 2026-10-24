@@ -140,7 +140,7 @@ def test_invalid_stock_does_not_call_ai(monkeypatch):
 
 def test_dotenv_does_not_override_process_environment(tmp_path, monkeypatch):
     path = tmp_path / ".env"
-    path.write_text("AI_PROVIDER=deepseek\nDEEPSEEK_API_KEY=example\n")
+    path.write_text("AI_PROVIDER=deepseek\nDEEPSEEK_API_KEY=example\n", encoding="utf-8")
     main.load_dotenv(path, override=False)
     assert main.os.environ["AI_PROVIDER"] == "local_demo"
     assert main.os.environ["DEEPSEEK_API_KEY"] == ""

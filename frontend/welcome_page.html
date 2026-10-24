@@ -3,35 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NexFlow · Bread Count — closing-time count demo</title>
+<title>Orbyte Smart Yield · Nexgen Bakery Workflow</title>
+<meta name="description" content="Why Orbyte built Nexgen: a clearer closing routine for independent bakeries, with cost-aware pricing, owner-approved offers, surplus rescue, and visible outcomes.">
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500;62..125,800;62..125,900&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
 <style>
 /* Bread Count entry page: same system as the impeccable prototype —
    Swiss grid, glass cards, one green accent, the lilac monster on the right.
    Everything here is a front-end animation; no inference runs on this page. */
 :root {
-  --paper: #f4f4f0; --ink: #121412; --muted: #6b6e68; --line: rgba(18,20,18,.12);
-  --green: #0d6e49; --green-soft: rgba(13,110,73,.09);
-  --warn: #9a5b00; --warn-soft: rgba(196,124,0,.12);
+  --paper: #f3f2e9; --ink: #263b35; --muted: #718079; --line: rgba(38,59,53,.14);
+  --green: #246a5b; --green-soft: rgba(36,106,91,.10);
+  --warn: #96651e; --warn-soft: rgba(193,138,50,.14);
   --glass: 255,255,255; --sunk: rgba(18,20,18,.04);
-  --font-display: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
   --font-body: "Instrument Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
   --gutter: clamp(16px, 3vw, 48px);
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --paper: #10130f; --ink: #eef0ea; --muted: #9aa096; --line: rgba(255,255,255,.12);
-  --green: #3fc489; --green-soft: rgba(63,196,137,.12);
-  --warn: #f0b04a; --warn-soft: rgba(240,176,74,.14);
-  --glass: 22,26,21; --sunk: rgba(255,255,255,.04);
+  --paper: #17231f; --ink: #edf1e8; --muted: #a8b4aa; --line: rgba(237,241,232,.13);
+  --green: #82b8a6; --green-soft: rgba(130,184,166,.15);
+  --warn: #e4b356; --warn-soft: rgba(228,179,86,.16);
+  --glass: 34,48,42; --sunk: rgba(255,255,255,.045);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; }
-body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; transition: background-color .4s, color .4s; }
+html, body { margin: 0; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { min-height: 100vh; min-height: 100svh; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; transition: background-color .4s, color .4s; }
 button { font: inherit; color: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
@@ -183,28 +185,660 @@ footer.legal a { text-decoration: none; border-bottom: 1px solid currentColor; }
   .monster .breathe, .monster .heart, .monster.rubbing .squash, .monster.cheer .squash, .monster.thinking .squash, .bubble.pop, .scan.on { animation: none; }
   .box { transition: none; }
 }
+.top { padding-block: 20px; }
+.enter { background: var(--green); border-color: var(--green); color: #fffaf2; }
+.enter:hover { background: #195448; border-color: #195448; }
+.card { border-radius: 18px; box-shadow: 0 18px 42px -24px rgba(73,52,42,.24); }
+.thumb { border-radius: 14px; }
+.thumb[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--green); }
+.frame { border-radius: 16px; }
+.sheet input, .sheet select, .sheet button, .icon-btn, label.upload { border-radius: 11px; }
+.badge { background: var(--green-soft); }
+::selection { background: #c4ddd1; color: #263b35; }
+/* Nexgen welcome: desktop landing-page adaptation of the supplied reference layout. */
+:root {
+  --paper: #f7f0e4;
+  --ink: #49342a;
+  --muted: #806f60;
+  --line: rgba(73,52,42,.16);
+  --green: #71866d;
+  --green-soft: rgba(113,134,109,.13);
+  --warn: #96651e;
+  --warn-soft: rgba(193,138,50,.14);
+  --glass: 255,250,240;
+  --sunk: rgba(73,52,42,.045);
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "DM Sans", sans-serif;
+  --font-mono: "DM Mono", monospace;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); }
+.top { max-width: 1340px; padding-block: 21px; border-color: #ded2c1; }
+.brand b { font: 600 25px/1 var(--font-display); letter-spacing: -.055em; }
+.brand i { width: 12px; height: 12px; background: #b95b3f; box-shadow: 0 0 0 5px #b95b3f17; }
+.mono { font-family: var(--font-mono); letter-spacing: .12em; }
+.badge { border-color: #d7e0cf; background: #e6eadf; color: #536b4e; }
+.badge .dot { background: #718c6b; }
+.enter { background: #b95b3f; border-color: #b95b3f; border-radius: 7px; font-family: var(--font-body); font-weight: 700; }
+.enter:hover { background: #a64b33; border-color: #a64b33; }
+.app { max-width: 1340px; grid-template-columns: minmax(0,1fr) 325px; gap: clamp(32px,5vw,78px); padding-block: 42px 74px; }
+.main { gap: 22px; }
+h1 { color: #49342a; font: 600 clamp(48px,5.25vw,74px)/.99 var(--font-display); letter-spacing: -.065em; max-width: 900px; }
+h1 em { color: #b95b3f; font-style: italic; }
+.lede { max-width: 68ch; margin-top: 15px; color: #746457; font-size: 16px; line-height: 1.75; }
+.card { border-color: #e2d5c2; border-radius: 14px; background: rgba(255,250,240,.8); box-shadow: 0 14px 38px -24px rgba(73,52,42,.25); padding: 22px; }
+.head-row { border-color: #e4d9c9; }
+.head-row .mono { color: #927762; }
+.thumb { border-radius: 9px; background: #f0e6d6; }
+.thumb[aria-pressed="true"] { border-color: #b95b3f; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px #b95b3f; }
+label.upload { border-color: #d1bfa9; }
+label.upload:hover { border-color: #b95b3f; color: #b95b3f; }
+.work { gap: 18px; }
+.frame { background: #eee2d0; }
+.btn.primary { background: #b95b3f; color: #fff8ec; font-family: var(--font-display); }
+.btn.primary:hover { background: #a64b33; }
+.btn { border-color: #d7c7b3; background: #f9f2e7; color: #574539; }
+.btn:hover { border-color: #b95b3f; }
+.qty { border-color: #d1bfa9; background: #fffaf0; }
+.qty.changed { border-color: #71866d; }
+.qty button { background: #eee7d9; }
+.buddy { top: 30px; gap: 8px; }
+.bubble { min-height: 58px; border-color: #e5d8c4; border-radius: 15px 15px 15px 4px; background: #fffaf0; box-shadow: 0 10px 28px rgba(73,52,42,.08); color: #705d4c; }
+.monster { max-width: 325px; filter: drop-shadow(0 22px 22px rgba(91,66,113,.13)); }
+.monster-hint { margin: -2px 0 0; color: #927e6c; text-align: center; font-size: 10px; line-height: 1.5; letter-spacing: .04em; }
+footer.legal { max-width: 1340px; border-color: #ded2c1; color: #927e6c; }
+footer.legal a { color: #a85338; }
+::selection { background: #e5cabc; color: #49342a; }
+
+/* Orbyte / Nexgen — an editorial closing-time workbench. */
+:root {
+  --paper: #f5efe3; --ink: #3d3028; --muted: #796a5c; --line: #dfd2bf;
+  --green: #667b61; --green-soft: #e7ebdf; --warn: #a45c40;
+  --warn-soft: #f3e3d9; --glass: 255,250,241; --sunk: rgba(61,48,40,.055);
+  --font-display: "Fraunces", Georgia, serif; --font-body: "DM Sans", sans-serif;
+  --font-mono: "DM Mono", monospace; --gutter: clamp(20px, 5vw, 76px);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --paper: #252820; --ink: #f2eadb; --muted: #b4a895; --line: #48463b;
+  --green: #a6b397; --green-soft: #343d32; --warn: #d38a68;
+  --warn-soft: #49352e; --glass: 48,49,41; --sunk: rgba(255,255,255,.06);
+  color-scheme: dark;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); min-width: 320px; font-size: 15px; }
+body::before { content:""; position:fixed; inset:0; z-index:8; pointer-events:none; opacity:.13; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E"); mix-blend-mode:multiply; }
+.wrap { width:min(1320px, calc(100% - 2 * var(--gutter))); margin-inline:auto; padding-left:0; padding-right:0; }
+.top { max-width:1320px; padding-block:22px; border-color:var(--line); position:relative; z-index:10; }
+.brand { gap:12px; align-items:center; }
+.brand b { font:600 23px/1 var(--font-display); letter-spacing:-.045em; }
+.brand i { width:11px;height:11px;background:#b75d42; box-shadow:0 0 0 5px rgba(183,93,66,.12); }
+.brand .mono { font-size:9px; letter-spacing:.16em; }
+.right { gap:12px; }
+.badge { background:transparent; border-color:var(--line); color:var(--muted); padding:7px 11px; font-size:9px; }
+.badge .dot { background:#b75d42; }
+.icon-btn { border-radius:50%; width:38px; height:38px; padding:0; color:var(--ink); }
+.app { max-width:1320px; grid-template-columns:minmax(0,1fr) 300px; gap:clamp(28px,5vw,74px); padding-block:50px 78px; align-items:start; }
+.main { gap:0; }
+.main > div:first-child { padding:8px 0 47px; position:relative; }
+.main > div:first-child::after { content:"A GOOD ENDING TO THE DAY"; display:none; }
+h1 { max-width:920px; color:var(--ink); font:600 clamp(52px,7.2vw,96px)/.96 var(--font-display); letter-spacing:-.07em; }
+h1 em { color:#b75d42; font-style:italic; }
+.lede { max-width:520px; margin-top:21px; color:var(--muted); font-size:16px; line-height:1.65; }
+.buddy { top:30px; gap:12px; padding-top:28px; }
+.bubble { border-color:var(--line); border-radius:17px 17px 17px 4px; background:rgba(var(--glass),.86); box-shadow:0 12px 36px rgba(61,48,40,.08); font-family:var(--font-display); color:var(--ink); font-size:17px; line-height:1.3; }
+.bubble::after { background:rgba(var(--glass),.86); }
+.monster { max-width:300px; filter:drop-shadow(0 20px 18px rgba(84,61,98,.13)); cursor:grab; }
+.monster:focus-visible { outline:3px solid #b75d42; outline-offset:5px; border-radius:48%; }
+.monster-hint { margin:0; color:var(--muted); text-align:center; font-size:9px; letter-spacing:.1em; }
+.guide-toggle { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:rgba(var(--glass),.7); color:var(--ink); cursor:pointer; text-align:left; }
+.guide-toggle:hover, .guide-toggle[aria-expanded="true"] { border-color:#b75d42; }
+.guide-toggle .mono { color:var(--muted); font-size:9px; }
+.guide-toggle-mark { color:#b75d42; font-size:20px; line-height:1; transition:transform .2s; }
+.guide-toggle[aria-expanded="true"] .guide-toggle-mark { transform:rotate(45deg); }
+.guide-panel { width:100%; max-height:min(72vh,760px); overflow:auto; padding:16px; border:1px solid var(--line); border-radius:14px; background:rgba(var(--glass),.96); box-shadow:0 18px 40px rgba(61,48,40,.12); text-align:left; }
+.guide-panel[hidden] { display:none !important; }
+.guide-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:12px; border-bottom:1px solid var(--line); }
+.guide-head h2 { margin:0; font:600 23px/1.1 var(--font-display); letter-spacing:-.04em; }
+.guide-close { width:32px; height:32px; border:1px solid var(--line); border-radius:50%; background:transparent; color:var(--ink); cursor:pointer; font-size:18px; line-height:1; }
+.guide-caption { margin:12px 0 8px; color:var(--muted); font:9px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; }
+.guide-links { display:grid; gap:5px; }
+.guide-links a, .guide-steps summary { display:flex; justify-content:space-between; gap:12px; padding:9px 10px; border-radius:9px; color:var(--ink); font-size:12px; text-decoration:none; cursor:pointer; }
+.guide-links a:hover, .guide-steps summary:hover { background:var(--sunk); color:#9d4e37; }
+.guide-steps { border-radius:9px; }
+.guide-steps summary { list-style:none; }
+.guide-steps summary::-webkit-details-marker { display:none; }
+.guide-steps summary::after { content:"+"; color:#b75d42; font-size:16px; line-height:1; }
+.guide-steps[open] summary::after { content:"−"; }
+.guide-sub-links { display:grid; gap:2px; padding:0 0 6px 10px; }
+.guide-sub-links a { padding-block:6px; color:var(--muted); font-size:11px; }
+.guide-feature summary { padding:7px 8px; color:var(--muted); font-size:11px; }
+.guide-feature summary::after { content:"+"; color:#b75d42; font-size:14px; }
+.guide-feature[open] summary::after { content:"−"; }
+.guide-detail { margin:0 8px 10px; color:var(--muted); font-size:10px; line-height:1.55; }
+.crumb-chat { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+.crumb-chat-title { margin:0 0 8px; font:600 17px/1.2 var(--font-display); }
+.crumb-chat-note { margin:8px 0 0; color:var(--muted); font-size:10px; line-height:1.45; }
+.crumb-log { display:grid; gap:7px; max-height:145px; overflow:auto; padding:2px 1px 8px; }
+.crumb-message { max-width:92%; margin:0; padding:8px 10px; border:1px solid var(--line); border-radius:10px 10px 10px 3px; background:var(--sunk); color:var(--ink); font-size:11px; line-height:1.45; overflow-wrap:anywhere; }
+.crumb-message.user { justify-self:end; border-radius:10px 10px 3px 10px; background:var(--green-soft); }
+.quick-prompts { display:flex; flex-wrap:wrap; gap:5px; margin:0 0 9px; }
+.quick-prompts button { padding:5px 7px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--muted); cursor:pointer; font-size:9px; }
+.quick-prompts button:hover { border-color:#b75d42; color:#9d4e37; }
+.crumb-form { display:flex; gap:6px; }
+.crumb-form input { flex:1; min-width:0; height:38px; padding:0 10px; border:1px solid var(--line); border-radius:9px; background:transparent; color:var(--ink); font:inherit; font-size:11px; }
+.crumb-form button { padding:0 11px; border:0; border-radius:9px; background:#b75d42; color:#fff8ec; cursor:pointer; font-size:11px; font-weight:700; }
+.crumb-form button:hover { background:#9e4d36; }
+.signin-link { order:-1; display:inline-flex; align-items:center; height:38px; padding:0 16px; border:1px solid var(--line); border-radius:999px; color:var(--ink); font-weight:700; font-size:13px; text-decoration:none; white-space:nowrap; }
+.signin-link:hover { border-color:#b75d42; color:#9d4e37; }
+:root[data-view="yolo"] .signin-link { display:none; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.card { border:1px solid var(--line); border-radius:13px; background:rgba(var(--glass),.76); box-shadow:0 14px 36px -26px rgba(73,52,42,.25); padding:20px; }
+.head-row { border-color:var(--line); }
+.head-row .mono { color:var(--green); }
+.work { gap:14px; }
+.thumb { background:var(--sunk); }
+.thumb img { background:#e9dfce; }
+.thumb[aria-pressed="true"] { border-color:#b75d42; box-shadow:0 0 0 2px var(--paper),0 0 0 4px #b75d42; }
+label.upload { border-color:var(--line); }
+.frame { background:var(--sunk); }
+.btn.primary { background:#b75d42; }
+.btn.primary:hover { background:#9e4d36; }
+.btn, .add select, .qty { border-color:var(--line); background:rgba(var(--glass),.62); color:var(--ink); }
+.qty button { color:var(--ink); background:var(--sunk); }
+.log li { border-color:var(--line); }
+footer.legal { max-width:1320px; border-color:var(--line); color:var(--muted); padding-top:18px; padding-bottom:28px; }
+
+.story { padding:18px 0 84px; border-top:1px solid var(--line); }
+.story-head { display:flex; align-items:baseline; justify-content:space-between; gap:18px; margin-bottom:28px; }
+.story-head h2 { margin:0; color:var(--ink); font:600 clamp(30px,4vw,47px)/1.05 var(--font-display); letter-spacing:-.05em; }
+.story-head .mono { color:var(--muted); font-size:9px; }
+.capabilities { display:grid; grid-template-columns:repeat(6,1fr); border-top:1px solid var(--line); border-left:1px solid var(--line); }
+.capability { min-height:142px; grid-column:span 2; padding:20px 22px 22px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); position:relative; }
+.capability:nth-child(4), .capability:nth-child(5) { grid-column:span 3; min-height:132px; }
+.capability:nth-child(2), .capability:nth-child(4) { background:rgba(230,220,202,.28); }
+.cap-num { color:#b75d42; font:10px var(--font-mono); letter-spacing:.1em; }
+.capability h3 { margin:16px 0 0; max-width:28ch; font:600 22px/1.12 var(--font-display); letter-spacing:-.035em; }
+.capability p { max-width:44ch; margin:0; color:var(--muted); font-size:12px; line-height:1.65; }
+.story-note { margin:16px 0 0; color:var(--muted); font:9px/1.6 var(--font-mono); letter-spacing:.04em; }
+.scanner-intro { display:flex; align-items:end; justify-content:space-between; gap:24px; padding:48px 0 20px; }
+.scanner-intro h2 { margin:8px 0 0; font:600 clamp(32px,4vw,49px)/1 var(--font-display); letter-spacing:-.055em; }
+.scanner-intro p { max-width:360px; margin:0; color:var(--muted); font-size:12px; line-height:1.6; }
+.experimental { color:#9d5940!important; }
+.scanner-tag { display:inline-block; padding:6px 9px; border:1px solid #d9b7a7; border-radius:99px; color:#9d5940; font:9px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; }
+.tray { padding-top:2px; }
+.main > .card.log { margin-top:15px; }
+.meta .sim { color:#a45c40; }
+.note { line-height:1.5; }
+@media (max-width:900px) {
+  .app { grid-template-columns:1fr; gap:0; padding-top:34px; }
+  .buddy { position:relative; top:auto; order:-1; grid-template-columns:130px 1fr; align-items:center; justify-items:stretch; padding:0 0 25px; }
+  .buddy .monster { max-width:130px; order:-1; }
+  .bubble::after { left:-8px; bottom:auto; top:50%; transform:translateY(-50%) rotate(135deg); }
+  .monster-hint { grid-column:1 / -1; }
+  .guide-toggle,.guide-panel { grid-column:1 / -1; }
+  .main > div:first-child { padding-top:0; }
+}
+@media (max-width:620px) {
+  .top { padding-block:15px; align-items:flex-start; }
+  .brand { flex-wrap:wrap; gap:8px; }
+  .brand .mono { width:100%; }
+  .right { gap:7px; }
+  .badge { display:none; }
+  .app { padding-block:26px 50px; }
+  .main > div:first-child { padding-bottom:32px; }
+  h1 { font-size:clamp(47px,13vw,66px); }
+  .lede { font-size:14px; }
+  .capabilities { grid-template-columns:1fr; }
+  .capability,.capability:nth-child(4),.capability:nth-child(5) { grid-column:span 1; min-height:0; padding:19px; }
+  .capability h3 { margin-top:13px; }
+  .story { padding-bottom:54px; }
+  .story-head { align-items:flex-start; flex-direction:column; }
+  .scanner-intro { align-items:flex-start; flex-direction:column; padding-top:32px; }
+  .work { grid-template-columns:1fr; }
+  .buddy { grid-template-columns:100px 1fr; }
+  .buddy .monster { max-width:100px; }
+  .bubble { font-size:15px; min-height:48px; }
+  .log li { grid-template-columns:1fr auto; }
+  .log time { grid-column:1 / -1; }
+  footer.legal { gap:8px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior:auto; }
+  .monster .breathe,.monster .heart,.monster.rubbing .squash,.monster.cheer .squash,.monster.thinking .squash,.bubble.pop,.scan.on { animation:none; }
+}
+
+/* Adapted from the attached NexFlow landing-page layout. */
+:root {
+  --paper:#f8fafc; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+  --green:#1e40af; --green-soft:#eff6ff; --warn:#b45309; --warn-soft:#fef3c7;
+  --glass:255,255,255; --sunk:rgba(15,23,42,.045);
+  --font-display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
+  --font-body:"Figtree",system-ui,sans-serif; --font-mono:"DM Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+:root[data-theme="dark"] {
+  --paper:#070d19; --ink:#f8fafc; --muted:#94a3b8; --line:#1e293b;
+  --green:#60a5fa; --green-soft:rgba(59,130,246,.16); --warn:#fbbf24; --warn-soft:rgba(245,158,11,.16);
+  --glass:15,23,42; --sunk:rgba(255,255,255,.055); color-scheme:dark;
+}
+body { min-width:320px; background:var(--paper); color:var(--ink); font-family:var(--font-body); }
+body::before { display:none; }
+.top {
+  position:sticky; top:0; z-index:100; width:100%; max-width:none; height:72px;
+  margin:0; padding:0 max(var(--gutter),calc((100vw - 1320px)/2));
+  background:rgba(var(--glass),.96); border-color:var(--line);
+  box-shadow:0 1px 3px rgba(15,23,42,.06); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+}
+.brand { align-items:center; gap:12px; }
+.brand i {
+  display:grid; place-items:center; width:40px; height:40px; border-radius:12px;
+  background:linear-gradient(135deg,#1e40af,#2563eb); color:#fff;
+  box-shadow:0 4px 12px rgba(37,99,235,.28); font:800 20px/1 var(--font-display);
+}
+.brand b { font:700 19px/1.1 var(--font-display); letter-spacing:-.03em; }
+.brand .brand-product { color:var(--muted); font:500 9px/1 var(--font-mono); letter-spacing:.16em; }
+.nav-links { display:flex; align-items:center; gap:22px; }
+.nav-links a { color:var(--muted); font-size:13px; font-weight:600; text-decoration:none; }
+.nav-links a:hover { color:var(--green); }
+.right { gap:10px; }
+.icon-btn { border-color:var(--line); background:var(--glass); color:var(--ink); }
+.app { max-width:1320px; grid-template-columns:minmax(0,1fr) 280px; gap:clamp(28px,4vw,58px); padding-block:30px 54px; }
+.main { display:grid; gap:0; min-width:0; }
+.hero { padding:34px 0 22px; text-align:center; }
+.hero-inner { max-width:840px; margin:0 auto; }
+.badge-pill {
+  display:inline-flex; align-items:center; gap:7px; margin:0 0 18px; padding:6px 13px;
+  border:1px solid #bfdbfe; border-radius:999px; background:#eff6ff; color:#1e40af;
+  font-size:11px; font-weight:700; letter-spacing:.02em;
+}
+.hero h1 { max-width:840px; margin:0 auto 18px; color:var(--ink); text-align:center; font:700 clamp(42px,5.2vw,72px)/1.03 var(--font-display); letter-spacing:-.055em; }
+.hero h1 em { color:#2563eb; font-style:normal; }
+.hero-copy { max-width:700px; margin:0 auto; color:var(--muted); font-size:16px; line-height:1.65; }
+.hero-cta { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin:22px 0 0; }
+.hero-cta .btn { padding:11px 18px; border-radius:11px; font-size:13px; }
+.btn { border-color:var(--line); background:rgb(var(--glass)); color:var(--ink); }
+.btn-primary { border-color:#1e40af; background:#1e40af; color:#fff; box-shadow:0 4px 14px rgba(30,64,175,.2); }
+.btn-primary:hover { border-color:#1e3a8a; background:#1e3a8a; }
+.hero-preview {
+  width:100%; margin:26px 0 38px; padding:15px; border:1px solid var(--line);
+  border-radius:18px; background:rgb(var(--glass)); box-shadow:0 18px 40px rgba(15,23,42,.08);
+}
+.preview-bar { display:flex; align-items:center; gap:8px; padding-bottom:12px; margin-bottom:13px; border-bottom:1px solid var(--line); text-align:left; }
+.preview-dots { display:flex; gap:5px; }
+.preview-dots span { width:9px; height:9px; border-radius:50%; background:#cbd5e1; }
+.preview-bar-title { margin-left:4px; color:var(--muted); font-size:11px; font-weight:600; }
+.preview-tag { margin-left:auto; color:#1e40af; font:9px var(--font-mono); letter-spacing:.1em; }
+.preview-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; text-align:left; }
+.p-card { padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:var(--paper); }
+.p-card b { display:block; margin-bottom:4px; color:#1e40af; font:700 22px/1.1 var(--font-display); }
+.p-card span { color:var(--muted); font-size:11px; line-height:1.45; }
+.preview-note { margin:10px 2px 0; color:var(--muted); font-size:10px; text-align:left; }
+.origin-section { padding:28px 0 42px; border-top:1px solid var(--line); scroll-margin-top:88px; }
+.sec-header { max-width:720px; margin:0 auto 24px; text-align:center; }
+.eyebrow { display:block; margin-bottom:9px; color:#1e40af; font:10px var(--font-mono); letter-spacing:.13em; text-transform:uppercase; }
+.sec-header h2 { margin:0 0 10px; color:var(--ink); font:700 clamp(28px,3.2vw,38px)/1.08 var(--font-display); letter-spacing:-.045em; }
+.sec-header p { margin:0; color:var(--muted); font-size:14px; line-height:1.6; }
+.origin-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.origin-card { padding:17px; border:1px solid var(--line); border-radius:14px; background:rgb(var(--glass)); }
+.origin-num { display:block; margin-bottom:12px; color:#2563eb; font:10px var(--font-mono); letter-spacing:.1em; }
+.origin-card h3 { margin:0 0 6px; font:700 16px/1.2 var(--font-display); }
+.origin-card p { margin:0; color:var(--muted); font-size:11px; line-height:1.55; }
+.origin-callout { margin:14px 0 0; padding:12px 16px; border-left:3px solid #2563eb; border-radius:0 10px 10px 0; background:#eff6ff; color:#1e3a8a; font-size:12px; font-weight:600; }
+.features { padding:38px 0; border-top:1px solid var(--line); scroll-margin-top:88px; }
+.features .sec-header { margin-bottom:22px; }
+.feat-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; }
+.feat-card { min-height:190px; padding:19px; border:1px solid var(--line); border-radius:15px; background:rgb(var(--glass)); transition:transform .2s,box-shadow .2s,border-color .2s; }
+.feat-card:hover { transform:translateY(-3px); border-color:#bfdbfe; box-shadow:0 10px 25px rgba(30,64,175,.08); }
+.feat-icon { display:grid; place-items:center; width:38px; height:38px; margin-bottom:14px; border:1px solid #bfdbfe; border-radius:11px; background:#eff6ff; color:#1e40af; font:700 12px var(--font-mono); }
+.feat-card h3 { margin:0 0 7px; font:700 16px/1.2 var(--font-display); letter-spacing:-.02em; }
+.feat-card p { margin:0; color:var(--muted); font-size:11px; line-height:1.55; }
+.demo-disclaimer { margin:12px 0 0; color:var(--muted); font-size:10px; line-height:1.5; text-align:center; }
+.scanner-intro { padding:44px 0 18px; scroll-margin-top:88px; }
+.scanner-intro h2 { font:700 clamp(30px,3.7vw,44px)/1.05 var(--font-display); }
+.scanner-intro p { max-width:440px; color:var(--muted); font-size:12px; }
+.testimonials { padding:38px 0; border-top:1px solid var(--line); scroll-margin-top:88px; }
+.testimonials .sec-header { margin-bottom:20px; }
+.testi-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.testi-card { display:flex; flex-direction:column; justify-content:space-between; min-height:190px; padding:18px; border:1px solid var(--line); border-radius:15px; background:rgb(var(--glass)); box-shadow:0 1px 3px rgba(15,23,42,.04); }
+.testi-card p { margin:0 0 18px; color:var(--ink-secondary,var(--muted)); font-size:12px; font-style:italic; line-height:1.55; }
+.testi-author { display:flex; align-items:center; gap:10px; }
+.testi-avatar { display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:#eff6ff; font-size:17px; }
+.testi-author b { display:block; font-size:11px; }
+.testi-author small { color:var(--muted); font-size:10px; }
+.testi-disclaimer { margin:0 0 18px; color:var(--muted); font-size:10px; text-align:center; }
+.cta-banner { margin:32px 0 0; padding:36px 22px; border-radius:18px; background:linear-gradient(135deg,#1e3a8a,#2563eb); color:#fff; text-align:center; }
+.cta-banner h2 { margin:0 0 8px; font:700 clamp(25px,3vw,34px)/1.1 var(--font-display); }
+.cta-banner p { max-width:570px; margin:0 auto 18px; color:rgba(255,255,255,.88); font-size:13px; line-height:1.55; }
+.cta-banner .btn { border:0; border-radius:11px; background:#fff; color:#1e3a8a; font-size:13px; }
+.cta-banner .btn:hover { background:#eff6ff; }
+.buddy { top:88px; gap:12px; padding-top:8px; }
+.guide-panel { max-height:calc(100vh - 240px); max-height:calc(100svh - 240px); }
+footer.legal { max-width:1320px; padding-top:18px; padding-bottom:28px; border-color:var(--line); color:var(--muted); font-size:10px; }
+#preview,#origin,#features,#yolo-preview,#testimonials { scroll-margin-top:88px; }
+@media (max-width:1050px) { .nav-links { display:none; } }
+@media (max-width:900px) {
+  .app { grid-template-columns:1fr; gap:0; padding-top:22px; }
+  .buddy { position:relative; top:auto; order:-1; grid-template-columns:130px 1fr; align-items:center; justify-items:stretch; padding:0 0 20px; }
+  .buddy .monster { max-width:130px; order:-1; }
+  .monster-hint,.guide-toggle,.guide-panel { grid-column:1 / -1; }
+  .hero { padding-top:18px; }
+  .origin-grid,.feat-grid,.testi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:620px) {
+  .top { height:auto; min-height:64px; padding-block:10px; }
+  .brand { flex-wrap:wrap; gap:8px; }
+  .brand b { font-size:16px; }
+  .brand .brand-product { width:100%; padding-left:48px; }
+  .right { gap:7px; }
+  .app { padding-block:18px 40px; }
+  .hero { padding:12px 0 10px; }
+  .hero h1 { font-size:clamp(38px,10vw,54px); }
+  .hero-copy { font-size:13px; }
+  .hero-cta .btn { flex:1 1 100%; justify-content:center; }
+  .preview-grid,.origin-grid,.feat-grid,.testi-grid { grid-template-columns:1fr; }
+  .preview-tag { display:none; }
+  .sec-header h2 { font-size:28px; }
+  .feat-card { min-height:0; }
+  .scanner-intro { align-items:flex-start; flex-direction:column; }
+  .scanner-intro p { max-width:none; }
+  .cta-banner { padding:28px 18px; }
+}
+.yolo-back {
+  display:none; align-items:center; padding:9px 13px; border:1px solid var(--line);
+  border-radius:10px; background:rgb(var(--glass)); color:var(--ink); font-size:12px;
+  font-weight:600; text-decoration:none;
+}
+:root[data-view="yolo"] .nav-links { display:none !important; }
+:root[data-view="yolo"] .typefield,
+:root[data-view="yolo"] .right::before { display:none !important; }
+:root[data-view="yolo"] .yolo-back { display:inline-flex; }
+:root[data-view="yolo"] .app {
+  max-width:1320px; grid-template-columns:minmax(0,1fr); gap:0;
+  min-height:calc(100vh - 72px); min-height:calc(100svh - 72px); padding-top:22px;
+}
+:root[data-view="yolo"] .main > :not(#yolo-workspace) { display:none !important; }
+:root[data-view="yolo"] .buddy,
+:root[data-view="yolo"] footer.legal { display:none !important; }
+:root[data-view="yolo"] #yolo-workspace {
+  display:block; min-height:calc(100vh - 110px); min-height:calc(100svh - 110px); padding-bottom:36px;
+}
+:root[data-view="yolo"] #yolo-workspace .scanner-intro {
+  align-items:end; padding:8px 0 24px;
+}
+:root[data-view="yolo"] #yolo-workspace .scanner-intro h2 {
+  font-size:clamp(38px,5vw,58px);
+}
+:root[data-view="yolo"] #yolo-workspace > .card { margin-bottom:18px; }
+:root[data-view="yolo"] #yolo-workspace .work {
+  grid-template-columns:minmax(0,1.5fr) minmax(340px,1fr); gap:18px;
+}
+:root[data-view="yolo"] #yolo-workspace .log { margin-top:18px; }
+@media (max-width:900px) {
+  :root[data-view="yolo"] #yolo-workspace .work { grid-template-columns:1fr; }
+}
+/* NexFlow reference direction: typographic editorial grid, warm paper, bakery green. */
+:root {
+  --paper:#f8f7f3; --ink:#171916; --muted:#73766f; --line:#d8d9d3;
+  --green:#176b4b; --green-soft:#e7efe9; --glass:255,255,252;
+  --font-display:"Bricolage Grotesque", "Arial Narrow", sans-serif;
+  --font-body:"Figtree", sans-serif;
+}
+body { overflow-x:hidden; background:#f8f7f3; }
+body::before { opacity:.045; z-index:1; mix-blend-mode:multiply; }
+.top,.app,footer.legal { position:relative; z-index:2; }
+.top { height:76px; max-width:1320px; padding-block:0; border-color:#242622; }
+.brand { gap:8px; }
+.brand b { font:800 22px/1 var(--font-display); letter-spacing:-.055em; }
+.brand i { display:none; }
+.brand-product { color:var(--green); font:10px var(--font-mono); letter-spacing:.12em; }
+.nav-links { display:flex; align-items:center; gap:30px; margin-left:32px; margin-right:auto; }
+.nav-links a { color:var(--ink); font:10px var(--font-mono); text-transform:uppercase; letter-spacing:.09em; text-decoration:none; }
+.nav-links a:hover { color:var(--green); }
+.right::before { content:"RUB THE MONSTER TO LOG IN"; color:var(--muted); font:9px var(--font-mono); letter-spacing:.11em; }
+.icon-btn { border-color:var(--line); font-size:14px; }
+.icon-btn::after { content:none; }
+.app { max-width:1320px; grid-template-columns:minmax(0,1fr) 300px; gap:clamp(30px,5vw,72px); padding-block:28px 58px; }
+.main { display:block; }
+.hero { padding:10px 0 26px; }
+.hero-inner { display:grid; grid-template-columns:minmax(0,1fr) 220px; align-items:end; gap:26px; }
+.badge-pill { grid-column:1/-1; width:max-content; color:var(--muted); font:9px var(--font-mono); letter-spacing:.13em; border:1px solid var(--line); border-radius:0; padding:7px 10px; }
+.hero h1 { grid-column:1; grid-row:2; max-width:900px; margin:0; text-align:left; color:var(--ink); font:800 clamp(48px,5.1vw,74px)/1.08 var(--font-display); letter-spacing:-.04em; overflow-wrap:normal; }
+.hero h1 em { display:block; padding-top:.12em; padding-bottom:.08em; color:var(--green); font-style:normal; letter-spacing:-.035em; }
+.hero-copy { grid-column:2; grid-row:2; align-self:center; max-width:26ch; margin:0; color:var(--muted); font-size:14px; line-height:1.55; }
+.hero-cta { grid-column:1/-1; justify-content:flex-start; margin:4px 0 0; }
+.hero-cta .btn { height:auto; min-height:38px; padding:9px 13px; border-radius:0; font:10px var(--font-mono); letter-spacing:.04em; text-transform:uppercase; }
+.btn-primary { background:var(--green); border-color:var(--green); color:#fff; box-shadow:none; }
+.btn-primary:hover { background:#10583d; border-color:#10583d; }
+.hero-preview { margin:0 0 34px; padding:0; border:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); border-radius:0; background:transparent; box-shadow:none; }
+.preview-bar { padding:13px 0 10px; margin:0; border:0; }
+.preview-dots { display:none; }
+.preview-bar-title { margin:0; font:9px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; }
+.preview-tag { color:var(--green); }
+.preview-grid { gap:22px; }
+.p-card { padding:9px 0 20px; border:0; border-top:1px solid #292b27; border-radius:0; background:transparent; }
+.p-card b { margin-bottom:8px; color:var(--ink); font:800 clamp(27px,3vw,42px)/1 var(--font-display); letter-spacing:-.06em; }
+.p-card span { font-size:12px; }
+.preview-note { padding-bottom:10px; font:9px var(--font-mono); }
+.origin-section { display:grid; grid-template-columns:1fr 1fr; gap:0 30px; padding:25px 0 35px; border-top:1px solid var(--line); }
+.origin-section .sec-header { grid-column:1/-1; max-width:none; margin:0 0 22px; text-align:left; display:grid; grid-template-columns:1fr 1fr; gap:0 28px; }
+.origin-section .eyebrow { grid-column:1/-1; }
+.origin-section .sec-header h2 { max-width:24ch; margin:0; font-size:clamp(30px,3.3vw,45px); }
+.origin-section .sec-header p { align-self:end; max-width:54ch; font-size:13px; }
+.origin-grid { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--line); border-left:1px solid var(--line); gap:0; }
+.origin-card { min-height:155px; padding:16px; border:0; border-right:1px solid var(--line); border-bottom:1px solid var(--line); border-radius:0; background:transparent; }
+.origin-card.reveal-tile { --reveal:0; filter:blur(calc((1 - var(--reveal)) * 5px)); opacity:calc(.55 + var(--reveal) * .45); transform:translate3d(0,calc((1 - var(--reveal)) * 7px),0); transition:transform .36s cubic-bezier(.2,.8,.2,1),filter .36s ease,opacity .36s ease,background-color .3s ease; }
+.origin-card.revealed,.origin-card:focus-visible { --reveal:1; background:rgba(255,255,252,.62); }
+.origin-num { color:var(--green); }
+.origin-card h3 { font-size:18px; }
+.origin-card p { font-size:12px; }
+.origin-callout { grid-column:1/-1; margin-top:12px; border-left-color:var(--green); border-radius:0; background:#eaf0e9; color:#305c45; }
+.features { padding:28px 0 40px; border-top:1px solid var(--line); }
+.features .sec-header { display:grid; grid-template-columns:1fr 1fr; gap:0 28px; max-width:none; margin:0 0 20px; text-align:left; }
+.features .eyebrow { grid-column:1/-1; }
+.features .sec-header h2 { font-size:clamp(30px,3.4vw,46px); }
+.features .sec-header p { align-self:end; max-width:48ch; font-size:12px; }
+.feat-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; border-top:1px solid var(--line); border-left:1px solid var(--line); }
+.feat-card { --reveal:0; min-height:200px; position:relative; overflow:hidden; padding:17px 18px; border:0; border-right:1px solid var(--line); border-bottom:1px solid var(--line); border-radius:0; background:rgba(255,255,252,.44); box-shadow:none; transform:translate3d(0,calc((1 - var(--reveal)) * 9px),0) scale(calc(.985 + var(--reveal) * .015)); filter:blur(calc((1 - var(--reveal)) * 6px)); opacity:calc(.48 + var(--reveal) * .52); transition:transform .36s cubic-bezier(.2,.8,.2,1),filter .36s ease,opacity .36s ease,background-color .3s ease; }
+.feat-card::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(135deg,rgba(255,255,255,calc((1 - var(--reveal)) * .48)),transparent 70%); opacity:1; transition:opacity .35s; }
+.feat-card.revealed,.feat-card:focus-within,.feat-card:focus-visible { --reveal:1; background:#fffefa; }
+.feat-card.revealed::after,.feat-card:focus-within::after,.feat-card:focus-visible::after { opacity:0; }
+.feat-card:hover { border-color:#b9c9bc; box-shadow:none; }
+.feat-icon { width:30px;height:30px;margin-bottom:22px;border:0;border-radius:50%;background:var(--green-soft);color:var(--green);font-size:10px; }
+.feat-card h3 { font-size:18px; }
+.feat-card p { max-width:38ch; font-size:12px; line-height:1.55; }
+.demo-disclaimer { text-align:left; font:9px/1.6 var(--font-mono); }
+.buddy { padding-top:36px; }
+.bubble { border-radius:14px 14px 14px 3px; box-shadow:0 8px 24px rgba(30,36,29,.06); }
+.monster { max-width:285px; filter:drop-shadow(0 18px 18px rgba(79,66,105,.12)); }
+.story-head h2 { font-family:var(--font-display); }
+.scanner-intro { border-top:1px solid var(--line); }
+.scanner-tag { border-radius:0; color:#8a593f; }
+.cta-banner { background:var(--green); border-radius:0; padding:42px 28px; }
+.cta-banner h2 { line-height:1.2; margin:0 auto 16px; }
+.cta-banner p { margin:0 auto 24px; line-height:1.65; }
+.cta-banner .btn { height:auto; min-height:38px; padding:9px 13px; border:1px solid rgba(255,255,255,.72); border-radius:0; background:transparent; color:#fff; font:10px var(--font-mono); letter-spacing:.04em; text-decoration:none; text-transform:uppercase; }
+.cta-banner .btn:hover { background:rgba(255,255,255,.12); border-color:#fff; }
+.typefield { position:fixed; inset:-18vh -8vw; z-index:0; overflow:hidden; pointer-events:none; opacity:.075; color:#74786f; font:800 clamp(100px,16vw,240px)/.86 var(--font-display); letter-spacing:-.09em; user-select:none; }
+.typefield span { position:absolute; white-space:nowrap; animation:driftType 34s ease-in-out infinite alternate; }
+.typefield span:nth-child(1) { top:8%;left:-4%; }
+.typefield span:nth-child(2) { top:48%;right:-8%; animation-duration:42s; animation-direction:alternate-reverse; }
+.typefield span:nth-child(3) { top:84%;left:12%; animation-duration:38s; }
+@keyframes driftType { from { transform:translate3d(-1.4%,0,0) rotate(-2deg); } to { transform:translate3d(1.5%,-1.2%,0) rotate(1deg); } }
+@media (max-width:900px) {
+  .nav-links { display:none; }
+  .hero-inner { grid-template-columns:1fr; }
+  .hero h1,.hero-copy { grid-column:1; grid-row:auto; }
+  .hero h1 { font-size:clamp(52px,10vw,82px); }
+  .hero-copy { max-width:58ch; }
+  .origin-section { display:block; }
+  .origin-section .sec-header,.features .sec-header { display:block; }
+  .feat-card { filter:none; opacity:1; transform:none; }
+}
+@media (max-width:620px) {
+  .right::before { display:none; }
+  .hero h1 { font-size:clamp(44px,12vw,66px); }
+  .preview-grid { grid-template-columns:1fr; gap:0; }
+  .origin-grid,.feat-grid { grid-template-columns:1fr; }
+  .feat-card { min-height:0; }
+  .typefield { opacity:.045; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .typefield span { animation:none; }
+  .feat-card,.origin-card.reveal-tile { filter:none;opacity:1;transform:none;transition:none; }
+}
+.right::before { content:none; }
+.language-picker { display:inline-flex; align-items:center; }
+.language-picker select { max-width:148px; height:36px; padding:0 26px 0 10px; border:1px solid var(--line); border-radius:18px; background:var(--paper); color:var(--ink); font:12px var(--font-body); cursor:pointer; }
+.nav-links { gap:clamp(12px,1.6vw,24px); margin-left:20px; }
+html[lang="zh-CN"] { --font-body:"Figtree","PingFang SC","Microsoft YaHei",sans-serif; --font-display:"Bricolage Grotesque","PingFang SC","Microsoft YaHei",sans-serif; }
+html[lang="zh-CN"] .hero h1 { font-size:clamp(42px,4.4vw,64px); line-height:1.28; letter-spacing:.01em; }
+html[lang="zh-CN"] .hero h1 em { letter-spacing:.01em; }
+html[lang="zh-CN"] .hero-copy { line-height:1.85; }
+html[lang="ms"] .hero h1 { font-size:clamp(44px,4.5vw,65px); line-height:1.14; }
 </style>
 </head>
 <body>
+<div class="typefield" aria-hidden="true"><span>GOOD BREAD</span><span>BETTER CLOSE</span><span>LESS LEFT BEHIND</span></div>
+<script>
+if (new URLSearchParams(window.location.search).get('view') === 'yolo') {
+  document.documentElement.dataset.view = 'yolo';
+  document.title = 'Orbyte Smart Yield · Nexgen YOLO Scan';
+}
+</script>
 
 <header class="top wrap">
-  <div class="brand"><i></i><b>NexFlow</b><span class="mono muted">Bread Count</span></div>
+  <a class="signin-link" href="/login" data-testid="link-sign-in">Sign in</a>
+  <div class="brand"><i aria-hidden="true">O</i><b>Orbyte Smart Yield</b><span class="brand-product">NEXGEN</span></div>
+  <nav class="nav-links" aria-label="Primary navigation">
+    <a href="#origin">Our purpose</a>
+    <a href="#features">Features</a>
+    <a href="#preview">Numbers</a>
+    <a href="#testimonials">Voices</a>
+    <a href="/?view=yolo">YOLO interface</a>
+  </nav>
   <div class="right">
-    <span class="badge mono"><i class="dot"></i>YOLOv8 Detection Preview · Simulated Results</span>
+    <a class="yolo-back" href="/" data-testid="link-back-welcome">← Back to welcome</a>
+    <label class="language-picker">
+      <span class="sr-only">Page language</span>
+      <select id="welcomeLanguage" aria-label="Page language" data-language-options>
+        <option value="en">English</option>
+        <option value="zh-CN">中文</option>
+        <option value="ms">Bahasa Melayu</option>
+      </select>
+    </label>
     <button class="icon-btn" type="button" id="themeBtn" aria-label="Toggle dark mode">◐</button>
-    <a class="enter" href="/app#boss" id="enterBtn">Enter NexFlow <span aria-hidden="true">→</span></a>
   </div>
 </header>
 
 <div class="app wrap">
-  <div class="main">
-    <div>
-      <h1>Count tonight’s bread. <em>Check it, then confirm.</em></h1>
-      <p class="lede">Pick a sample photo to preview how the trained model boxes each loaf. You correct the numbers before confirming — the same flow staff use at closing time.</p>
-    </div>
+  <main class="main">
+    <section class="hero" id="welcome" aria-labelledby="welcomeTitle">
+      <div class="hero-inner">
+        <div class="badge-pill">BAKERY CLOSING WORKFLOW</div>
+        <h1 id="welcomeTitle">Give the day’s last bread <em>a better ending.</em></h1>
+        <p class="hero-copy">Built for independent bakeries that count leftovers by hand, write closing offers in a rush, and need a clear next step for surplus stock. Nexgen connects counts, cost-aware pricing, owner-reviewed offers, rescue and outcome records.</p>
+        <div class="hero-cta">
+          <a href="#features" class="btn btn-primary" data-testid="link-explore-features">Explore the features</a>
+          <a href="/?view=yolo" class="btn" data-testid="link-see-scan">Open YOLO interface</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero-preview" id="preview" aria-label="Closing overview">
+      <div class="preview-bar">
+        <div class="preview-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+        <span class="preview-bar-title">Orbyte Smart Yield · Closing overview</span>
+      </div>
+      <div class="preview-grid">
+        <div class="p-card">
+          <b>RM 180.00</b>
+          <span>Example recovered sales · not live data</span>
+        </div>
+        <div class="p-card">
+          <b>22.6 kg</b>
+          <span>Sample CO₂e estimate · not verified impact</span>
+        </div>
+        <div class="p-card">
+          <b>One clear close</b>
+          <span>Count → offer → sale, pickup or rescue</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="origin-section story" id="origin" aria-labelledby="originTitle">
+      <div class="sec-header">
+        <span class="eyebrow">WHY ORBYTE BUILT NEXGEN</span>
+        <h2 id="originTitle">Closing work was scattered. Good bread was getting left behind.</h2>
+        <p>Small bakery teams often count surplus by hand, work out discounts separately, write promotions after the rush, then decide what to sell, box, donate or discard with information spread across notes and messages. The result is extra closing work and little clarity about what happened next.</p>
+      </div>
+      <div class="origin-grid">
+        <article class="origin-card">
+          <span class="origin-num">01 · COUNT BY HAND</span>
+          <h3>One more task at closing</h3>
+          <p>Leftover quantities can be recorded in different places, making the final count slow to reconcile.</p>
+        </article>
+        <article class="origin-card">
+          <span class="origin-num">02 · OFFERS IN A RUSH</span>
+          <h3>Pricing and promos split apart</h3>
+          <p>Markdowns, cost checks and customer messages are easy to handle as separate tasks.</p>
+        </article>
+        <article class="origin-card">
+          <span class="origin-num">03 · OUTCOMES UNCLEAR</span>
+          <h3>No simple record of the next step</h3>
+          <p>Sale, pickup, donation and waste decisions can be hard to review together the next day.</p>
+        </article>
+      </div>
+      <p class="origin-callout">Orbyte built Nexgen to connect that last-hour routine: count once, check a fair next step, and keep an honest record of the outcome.</p>
+    </section>
+
+    <section class="features" id="features" aria-labelledby="featuresTitle">
+      <div class="sec-header">
+        <span class="eyebrow">THE NEXGEN TOOLKIT</span>
+        <h2 id="featuresTitle">Six practical parts of a clearer close</h2>
+        <p>Deterministic pricing checks protect the margin; lightweight AI and templates help prepare offers for owner review.</p>
+      </div>
+      <div class="feat-grid">
+        <article class="feat-card" id="feature-stocktake">
+          <div class="feat-icon" aria-hidden="true">01</div>
+          <h3>End-of-day stocktake</h3>
+          <p>Record leftover quantities once and organize the count against the product catalogue. The sample YOLO scan below is separate from live stock.</p>
+        </article>
+        <article class="feat-card" id="feature-pricing">
+          <div class="feat-icon" aria-hidden="true">02</div>
+          <h3>Clearance pricing &amp; margin guard</h3>
+          <p>Check markdown prices against product cost and flag below-cost offers before an owner approves them.</p>
+        </article>
+        <article class="feat-card" id="feature-offers">
+          <div class="feat-icon" aria-hidden="true">03</div>
+          <h3>Owner-reviewed customer offers</h3>
+          <p>Prepare AI-assisted or template promo copy for review. WhatsApp messages are not sent from this page.</p>
+        </article>
+        <article class="feat-card" id="feature-dashboard">
+          <div class="feat-icon" aria-hidden="true">04</div>
+          <h3>Surprise box to pickup</h3>
+          <p>Prepare a surplus offer, review the customer quote and checkout flow, confirm pickup and track loyalty points.</p>
+        </article>
+        <article class="feat-card" id="feature-owner">
+          <div class="feat-icon" aria-hidden="true">05</div>
+          <h3>Food rescue &amp; handover</h3>
+          <p>Record safe surplus as a donation and confirm the handover. Recipient profiles here are placeholders.</p>
+        </article>
+        <article class="feat-card" id="feature-impact">
+          <div class="feat-icon" aria-hidden="true">06</div>
+          <h3>Dashboard &amp; impact visibility</h3>
+          <p>Review paid sales, pickups and donations alongside an estimated CO₂e footprint. Impact estimates are not certified.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="yolo-workspace" id="yolo-workspace" aria-label="YOLO scan interface">
+      <div class="scanner-intro" id="yolo-preview">
+        <div><h2>YOLO bakery scan</h2></div>
+        <p class="experimental">Choose a sample to see its fixed detection boxes and count. This is not live, connected to Nexgen, or saved to stock.</p>
+      </div>
 
     <section class="card" aria-labelledby="trayH">
-      <div class="head-row"><span class="mono" id="trayH">Photos</span><span class="mono muted">Five training-set samples</span></div>
+      <div class="head-row"><span class="mono" id="trayH">Choose a sample</span><span class="mono muted">Sample photos</span></div>
       <div class="tray" id="tray">
         <label class="upload"><input type="file" id="upload" accept="image/*"><span><b>+</b>Upload photo</span></label>
       </div>
@@ -212,7 +846,7 @@ footer.legal a { text-decoration: none; border-bottom: 1px solid currentColor; }
 
     <div class="work">
       <section class="card stage" aria-label="Detection preview">
-        <div class="head-row"><span class="mono">Detection</span><span class="mono muted">Dashed box = under 50% sure</span></div>
+        <div class="head-row"><span class="mono">Sample detections</span><span class="mono muted">Dashed box = lower confidence</span></div>
         <div class="frame" id="frame">
           <img id="photo" alt="" hidden>
           <div class="placeholder" id="placeholder">Pick a sample photo to preview the count.</div>
@@ -231,19 +865,47 @@ footer.legal a { text-decoration: none; border-bottom: 1px solid currentColor; }
           <button class="btn" type="button" id="addBtn">Add</button>
         </div>
         <button class="btn primary" type="button" id="confirmBtn" disabled>Confirm count</button>
-        <p class="note" id="confirmNote">Demo only — the count stays on this page and is never written to NexFlow stock.</p>
+        <p class="note" id="confirmNote">This count stays on this page; it is not saved to Nexgen stock.</p>
       </section>
     </div>
 
-    <section class="card log" aria-labelledby="logH">
-      <div class="head-row"><span class="mono" id="logH">Recent confirmations</span><span class="mono muted">This page only</span></div>
-      <ul id="log"><li class="empty">No confirmations yet.</li></ul>
+      <section class="card log" aria-labelledby="logH">
+        <div class="head-row"><span class="mono" id="logH">Recent confirmations</span><span class="mono muted">This page only</span></div>
+        <ul id="log"><li class="empty">No confirmations yet.</li></ul>
+      </section>
     </section>
-  </div>
+    <section class="testimonials" id="testimonials" aria-labelledby="storiesTitle">
+      <div class="sec-header">
+        <span class="eyebrow">EXAMPLE CLOSING STORIES</span>
+        <h2 id="storiesTitle">A smoother handoff at the end of the day</h2>
+        <p>These short examples show the kinds of problems Nexgen is designed to address.</p>
+      </div>
+      <p class="testi-disclaimer">These are fictional examples, not real customer testimonials.</p>
+      <div class="testi-grid">
+        <article class="testi-card">
+          <p>“I used to count leftover bread by hand at closing. Having the count and cost warning together makes it easier to review a markdown first.”</p>
+          <div class="testi-author"><span class="testi-avatar" aria-hidden="true">UW</span><span><b>Uncle Wong</b></span></div>
+        </article>
+        <article class="testi-card">
+          <p>“A customer offer, pickup record and donation handoff are easier to follow when they belong to the same closing routine.”</p>
+          <div class="testi-author"><span class="testi-avatar" aria-hidden="true">AL</span><span><b>Auntie Lim</b></span></div>
+        </article>
+        <article class="testi-card">
+          <p>“Seeing what was sold, collected or donated gives the team a clearer view of what happened after the last tray came out.”</p>
+          <div class="testi-author"><span class="testi-avatar" aria-hidden="true">F</span><span><b>Farid</b></span></div>
+        </article>
+      </div>
+    </section>
+    <section class="cta-banner" aria-labelledby="ctaTitle">
+      <h2 id="ctaTitle">Make the next close easier to follow.</h2>
+      <p>Explore the product flow, inspect a YOLO sample count, and see how a leftover item can move toward a sale, pickup or rescue record.</p>
+      <a href="/?view=yolo" class="btn" data-testid="link-final-scan">Open the YOLO interface</a>
+    </section>
+  </main>
 
-  <aside class="buddy" aria-label="NexFlow monster">
-    <div class="bubble" id="bubble" role="status">Hi! Pick a sample photo and I’ll show you how the count works.</div>
-    <button class="monster" id="monster" type="button" aria-label="NexFlow monster. Click or rub me.">
+  <aside class="buddy" aria-label="Nexgen monster">
+      <div class="bubble" id="bubble" role="status">I’m Crumb. My eyes follow your pointer; a gentle head rub opens the bakery workspace.</div>
+    <button class="monster" id="monster" type="button" aria-label="Crumb, the Nexgen mascot. Eyes follow your pointer. Rub the head to open the bakery workspace, or press Enter while focused.">
       <svg viewBox="0 0 400 420" aria-hidden="true">
         <defs>
           <filter id="fluff" x="-8%" y="-8%" width="116%" height="116%">
@@ -298,13 +960,87 @@ footer.legal a { text-decoration: none; border-bottom: 1px solid currentColor; }
         </g></g></g>
       </svg>
     </button>
+    <p class="monster-hint mono">RUB MY HEAD TO ENTER · KEYBOARD: ENTER</p>
+    <button class="guide-toggle" id="guideToggle" type="button" aria-expanded="false" aria-controls="guidePanel" data-testid="button-open-guide">
+      <span><span class="mono">Explore Nexgen</span><br><span>Features &amp; ask Crumb</span></span>
+      <span class="guide-toggle-mark" aria-hidden="true">+</span>
+    </button>
+    <section class="guide-panel" id="guidePanel" aria-label="Nexgen guide and Crumb chat" hidden>
+      <div class="guide-head">
+        <h2>Explore Nexgen</h2>
+        <button class="guide-close" id="guideClose" type="button" aria-label="Close guide" data-testid="button-close-guide">×</button>
+      </div>
+      <p class="guide-caption">Quick links</p>
+      <nav class="guide-links" aria-label="Welcome page sections">
+        <a href="#preview" data-testid="link-preview">Dashboard preview <span aria-hidden="true">↗</span></a>
+        <a href="#features" data-testid="link-features">Six features <span aria-hidden="true">↗</span></a>
+        <details class="guide-steps">
+          <summary>Why Orbyte built Nexgen</summary>
+          <p class="guide-detail">Independent bakeries often count leftovers by hand, write offers after closing and make surplus decisions with scattered information. Nexgen brings the count, fair next steps and outcome records into one clear routine.</p>
+          <div class="guide-sub-links"><a href="#origin" data-testid="link-origin">Go to the welcome story</a></div>
+        </details>
+        <details class="guide-steps">
+          <summary>Six capabilities</summary>
+          <div class="guide-sub-links">
+            <details class="guide-feature">
+              <summary>01 · End-of-day stocktake</summary>
+              <p class="guide-detail">Record leftover quantities once. The YOLO sample below is a separate fixed replay and never changes stock.</p>
+              <a href="#feature-stocktake" data-testid="link-feature-stocktake">Go to this feature</a>
+            </details>
+            <details class="guide-feature">
+              <summary>02 · Clearance &amp; margin guard</summary>
+              <p class="guide-detail">Check clearance prices against cost and flag below-cost offers before owner approval.</p>
+              <a href="#feature-pricing" data-testid="link-feature-pricing">Go to this feature</a>
+            </details>
+            <details class="guide-feature">
+              <summary>03 · Customer offers</summary>
+              <p class="guide-detail">Prepare promo copy for owner review. WhatsApp messages are not sent from this page.</p>
+              <a href="#feature-offers" data-testid="link-feature-offers">Go to this feature</a>
+            </details>
+            <details class="guide-feature">
+              <summary>04 · Surprise box to pickup</summary>
+              <p class="guide-detail">Review a surplus offer and customer checkout, then confirm pickup and loyalty points.</p>
+              <a href="#feature-dashboard" data-testid="link-feature-dashboard">Go to this feature</a>
+            </details>
+            <details class="guide-feature">
+              <summary>05 · Food rescue handover</summary>
+              <p class="guide-detail">Record a donation handover; recipient profiles are placeholders.</p>
+              <a href="#feature-owner" data-testid="link-feature-owner">Go to this feature</a>
+            </details>
+            <details class="guide-feature">
+              <summary>06 · Dashboard &amp; impact</summary>
+              <p class="guide-detail">Review paid, pickup and donated outcomes with estimated, not certified, CO₂e.</p>
+              <a href="#feature-impact" data-testid="link-feature-impact">Go to this feature</a>
+            </details>
+          </div>
+        </details>
+        <a href="/?view=yolo" data-testid="link-yolo">YOLO interface <span aria-hidden="true">↗</span></a>
+        <a href="#testimonials" data-testid="link-stories">Closing stories <span aria-hidden="true">↗</span></a>
+      </nav>
+      <div class="crumb-chat">
+        <h3 class="crumb-chat-title">Ask Crumb</h3>
+        <div class="crumb-log" id="crumbLog" role="log" aria-live="polite" aria-relevant="additions">
+          <p class="crumb-message">I can tell you why Nexgen exists, explain its six feature areas, or describe the sample scan.</p>
+        </div>
+        <div class="quick-prompts" aria-label="Suggested questions">
+          <button type="button" data-crumb-prompt="Why was Nexgen built?" data-testid="button-ask-purpose">Why Nexgen?</button>
+          <button type="button" data-crumb-prompt="What are the six features?" data-testid="button-ask-features">Six features</button>
+          <button type="button" data-crumb-prompt="Is the YOLO scan live?" data-testid="button-ask-scan">Is the scan live?</button>
+        </div>
+        <form class="crumb-form" id="crumbForm">
+          <label class="sr-only" for="crumbInput">Ask Crumb a question</label>
+          <input id="crumbInput" type="text" maxlength="120" placeholder="Ask Crumb…" autocomplete="off" data-testid="input-crumb-question">
+          <button type="submit" data-testid="button-send-crumb">Send</button>
+        </form>
+        <p class="crumb-chat-note">Crumb answers with a small set of prepared replies.</p>
+      </div>
+    </section>
   </aside>
 </div>
 
 <footer class="legal wrap mono muted">
-  <span>NexFlow · Bread Count — hackathon prototype</span>
-  <span>Sample photos come from the team’s YOLOv8 bread-count prototype; boxes and counts on this page are a fixed preview, not live inference.</span>
-  <a href="/login">Sign-in page →</a>
+  <span>Orbyte Smart Yield · Nexgen</span>
+  <span>Sample figures are not live · WhatsApp messages aren’t sent · YOLO counts don’t update stock · CO₂e estimates aren’t verified.</span>
 </footer>
 
 <script>
@@ -672,6 +1408,63 @@ const cur = pupils.map(() => ({x: 0, y: 0}));
 let target = null, lastMove = 0, focusEl = null, moodTimer = null;
 
 function say(text){ const b = $('#bubble'); b.textContent = text; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+const guideToggle = $('#guideToggle'), guidePanel = $('#guidePanel'), guideClose = $('#guideClose');
+const crumbForm = $('#crumbForm'), crumbInput = $('#crumbInput'), crumbLog = $('#crumbLog');
+function setGuideOpen(open, returnFocus = false){
+  guidePanel.hidden = !open;
+  guideToggle.setAttribute('aria-expanded', String(open));
+  if(open) guideClose.focus();
+  else if(returnFocus) guideToggle.focus({preventScroll:true});
+}
+guideToggle.addEventListener('click', () => setGuideOpen(guidePanel.hidden));
+guideClose.addEventListener('click', () => setGuideOpen(false, true));
+guidePanel.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ e.preventDefault(); setGuideOpen(false, true); }
+});
+guidePanel.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setGuideOpen(false, true)));
+
+function addCrumbMessage(text, who = 'crumb'){
+  const message = document.createElement('p');
+  message.className = `crumb-message${who === 'user' ? ' user' : ''}`;
+  message.textContent = text;
+  crumbLog.append(message);
+  crumbLog.scrollTop = crumbLog.scrollHeight;
+}
+function crumbReply(question){
+  const q = question.toLowerCase();
+  if(/\b(yolo|scan|scanning|detect|camera|imbas|imbasan|kamera)\b|扫描|识别/.test(q)){
+    return 'The YOLO sample scan is below the six feature cards. It uses fixed examples, is not live, and does not update stock.';
+  }
+  if(/\b(why|purpose|waste|built|reason|kenapa|mengapa|tujuan|pembaziran)\b|为什么|初衷|目的|浪费/.test(q)){
+    return 'Independent bakeries count leftovers by hand after long shifts while good bread goes unsold. Nexgen brings fair pricing, customer offers and food rescue into one clear close.';
+  }
+  if(/\b(feature|features|step|steps|what can|what does|ciri|fungsi|langkah)\b|功能|步骤/.test(q)){
+    return 'The six feature areas are stocktake, cost-checked clearance pricing, owner-reviewed offers, surprise boxes and pickup, food rescue, and outcome reporting.';
+  }
+  if(/\b(login|log in|sign in|workspace|enter|log masuk|masuk)\b|登录|登入|进入/.test(q)){
+    return 'Rub the top of my head back and forth to enter the bakery workspace, or focus me and press Enter.';
+  }
+  return 'I can tell you why Nexgen exists, explain its six feature areas, show where the YOLO sample scan is, or help you enter.';
+}
+function askCrumb(raw){
+  const question = String(raw || '').trim().slice(0, 120);
+  if(!question) return;
+  addCrumbMessage(question, 'user');
+  const reply = crumbReply(question);
+  addCrumbMessage(reply);
+  say(reply);
+  mood('happy', 1100);
+}
+crumbForm.addEventListener('submit', e => {
+  e.preventDefault();
+  if(!crumbInput.value.trim()) return;
+  askCrumb(crumbInput.value);
+  crumbInput.value = '';
+  crumbInput.focus();
+});
+document.querySelectorAll('[data-crumb-prompt]').forEach(button => {
+  button.addEventListener('click', () => askCrumb(button.dataset.crumbPrompt));
+});
 function mood(name, ms){
   monster.classList.remove('thinking', 'happy', 'worried', 'cheer');
   clearTimeout(moodTimer);
@@ -679,42 +1472,91 @@ function mood(name, ms){
   if(ms) moodTimer = setTimeout(() => mood(null), ms);
 }
 function toSvg(x, y){ const p = svg.createSVGPoint(); p.x = x; p.y = y; return p.matrixTransform(svg.getScreenCTM().inverse()); }
-addEventListener('pointermove', e => { target = {x: e.clientX, y: e.clientY}; lastMove = performance.now(); }, {passive: true});
+function applyLook(look, immediate = false){
+  pupils.forEach((p, k) => {
+    const dx = look.x - p.cx, dy = look.y - p.cy, d = Math.hypot(dx, dy) || 1, m = Math.min(p.r, d / 6);
+    const factor = immediate ? 1 : .16;
+    cur[k].x += (dx / d * m - cur[k].x) * factor; cur[k].y += (dy / d * m - cur[k].y) * factor;
+    p.el.setAttribute('transform', `translate(${cur[k].x.toFixed(2)} ${cur[k].y.toFixed(2)})`);
+  });
+  lean.style.transform = `rotate(${Math.max(-5, Math.min(5, (look.x - 200) / 60)).toFixed(2)}deg)`;
+}
+const pointerEventsAvailable = 'PointerEvent' in window;
+const pointerMoveEvent = pointerEventsAvailable ? 'pointermove' : 'mousemove';
+addEventListener(pointerMoveEvent, e => {
+  target = {x: e.clientX, y: e.clientY}; lastMove = performance.now();
+  if(reduced) applyLook(toSvg(e.clientX, e.clientY), true);
+}, {passive: true});
 
 function tick(t){
   let look;
   if(focusEl){ const r = focusEl.getBoundingClientRect(); look = toSvg(r.left + r.width / 2 + Math.sin(t / 300) * r.width / 4, r.top + r.height / 2); }
   else if(target && t - lastMove < 3000) look = toSvg(target.x, target.y);
   else { const a = t / 1500; look = {x: 200 + Math.sin(a) * 170, y: 160 + Math.sin(a * .7) * 70}; }
-  pupils.forEach((p, k) => {
-    const dx = look.x - p.cx, dy = look.y - p.cy, d = Math.hypot(dx, dy) || 1, m = Math.min(p.r, d / 6);
-    cur[k].x += (dx / d * m - cur[k].x) * .16; cur[k].y += (dy / d * m - cur[k].y) * .16;
-    p.el.setAttribute('transform', `translate(${cur[k].x.toFixed(2)} ${cur[k].y.toFixed(2)})`);
-  });
-  lean.style.transform = `rotate(${Math.max(-5, Math.min(5, (look.x - 200) / 60)).toFixed(2)}deg)`;
+  applyLook(look);
   if(!reduced) requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
 (function blink(){ setTimeout(() => { monster.classList.add('blink'); setTimeout(() => { monster.classList.remove('blink'); blink(); }, 130); }, 2600 + Math.random() * 3400); })();
 
-// Rub or click the monster: it giggles
-let rub = 0, lastX = null, lastDir = 0, decay = null;
-const GIGGLES = ['Hehe, that tickles!', 'Again? Okay, okay!', 'I’m a counting monster, not a pillow!', 'More bread, please!'];
-monster.addEventListener('pointermove', e => {
-  if(e.pointerType !== 'mouse' && e.buttons === 0) return;
+// Pet the monster's head with a short back-and-forth gesture to open sign in.
+let rub = 0, lastX = null, lastDir = 0, decay = null, pettingHead = false, petTriggered = false;
+monster.addEventListener('keydown', e => {
+  if(e.key === 'Enter' || e.key === ' '){
+    e.preventDefault();
+    say('Opening the bakery workspace.');
+    window.location.assign('/login');
+  }
+});
+function isHeadPoint(x, y){
+  const bounds = monster.getBoundingClientRect();
+  const nx = (x - bounds.left) / bounds.width, ny = (y - bounds.top) / bounds.height;
+  return nx >= .28 && nx <= .72 && ny >= .08 && ny <= .5;
+}
+monster.addEventListener(pointerEventsAvailable ? 'pointerdown' : 'mousedown', e => {
+  monster.setPointerCapture?.(e.pointerId);
+  monster.classList.add('squish');
+  pettingHead = isHeadPoint(e.clientX, e.clientY);
+  petTriggered = false;
+  rub = 0; lastDir = 0; lastX = pettingHead ? e.clientX : null;
+  clearTimeout(decay);
+  if(pettingHead) say('Pet my head back and forth to open sign in.');
+});
+monster.addEventListener(pointerMoveEvent, e => {
+  if(!pettingHead || e.buttons === 0) return;
+  if(!isHeadPoint(e.clientX, e.clientY)){ lastX = null; lastDir = 0; return; }
   if(lastX === null){ lastX = e.clientX; return; }
   const dx = e.clientX - lastX;
   if(Math.abs(dx) > 6){
     const dir = Math.sign(dx);
-    if(lastDir && dir !== lastDir){ rub++; monster.classList.add('rubbing'); if(rub === 4){ mood('happy cheer', 1600); say(GIGGLES[Math.floor(Math.random() * GIGGLES.length)]); } }
+    if(lastDir && dir !== lastDir){
+      rub++;
+      monster.classList.add('rubbing');
+      if(rub >= 4 && !petTriggered){
+        petTriggered = true;
+        clearTimeout(decay);
+        mood('happy cheer', 1600);
+        say('Thanks for the head rub! Taking you to sign in.');
+        setTimeout(() => window.location.assign('/login'), 900);
+        return;
+      }
+    }
     lastDir = dir; lastX = e.clientX;
   }
   clearTimeout(decay);
   decay = setTimeout(() => { rub = 0; lastX = null; lastDir = 0; monster.classList.remove('rubbing'); }, 600);
 });
-monster.addEventListener('pointerdown', e => { monster.setPointerCapture?.(e.pointerId); monster.classList.add('squish'); });
-['pointerup', 'pointercancel'].forEach(t => monster.addEventListener(t, () => monster.classList.remove('squish')));
-monster.addEventListener('click', () => { if(!busy){ mood('happy', 900); say(current ? `We have ${current.total} items on the sheet. Looking good!` : 'Pick a sample photo on the left and I’ll show you how counting works.'); } });
+monster.addEventListener(pointerEventsAvailable ? 'pointerenter' : 'mouseenter', () => {
+  if(!pettingHead) say('Hi, I’m Crumb. Open the guide to ask me about Nexgen.');
+});
+monster.addEventListener('focus', () => say('Ask me in the guide, or rub my head to enter the bakery workspace.'));
+function endPetting(){ monster.classList.remove('squish'); pettingHead = false; lastX = null; }
+(pointerEventsAvailable ? ['pointerup', 'pointercancel'] : ['mouseup', 'mouseleave'])
+  .forEach(t => addEventListener(t, endPetting));
+monster.addEventListener('click', () => {
+  if(petTriggered){ petTriggered = false; return; }
+  if(!busy){ mood('happy', 900); say(current ? `We have ${current.total} items on the sheet. Looking good!` : 'Pick a sample photo on the left and I’ll show you how counting works.'); }
+});
 
 /* ---------- Photo tray ---------- */
 $('#tray').insertAdjacentHTML('beforeend', Object.entries(SAMPLES).map(([file, s]) =>
@@ -763,7 +1605,7 @@ async function previewSample(file){
   $('#aiNote').textContent = '';
   $('#confirmBtn').disabled = true;
   $('#confirmNote').className = 'note';
-  $('#confirmNote').textContent = 'Demo only — the count stays on this page and is never written to NexFlow stock.';
+  $('#confirmNote').textContent = 'This count stays on this page; it is not saved to Nexgen stock.';
   focusEl = $('#frame');
   mood('thinking');
   say('Counting… let me look closely.');
@@ -780,7 +1622,7 @@ async function previewSample(file){
   const ai = {}, low = {};
   sample.detections.forEach(d => { ai[d.label] = (ai[d.label] || 0) + 1; if(d.low) low[d.label] = (low[d.label] || 0) + 1; });
   current = {file, caption: sample.caption, ai, low, qty: {...ai}, total: sample.detections.length};
-  $('#meta').innerHTML = `<span>${esc(sample.caption)}</span><span>${sample.w}×${sample.h}</span><span>${sample.detections.length} boxes</span><span class="sim">Simulated preview</span>`;
+  $('#meta').innerHTML = `<span>${esc(sample.caption)}</span><span>${sample.w}×${sample.h}</span><span>${sample.detections.length} boxes</span><span class="sim">Sample scan</span>`;
   renderSheet();
   busy = false; focusEl = null;
 
@@ -883,7 +1725,42 @@ $('#upload').addEventListener('change', e => {
 });
 
 /* ---------- Start ---------- */
+/* Near-field reveal for editorial purpose and feature tiles. Focus/click are equivalent. */
+const revealTiles = [...document.querySelectorAll('.origin-card, .feat-card')];
+const motionOff = matchMedia('(prefers-reduced-motion: reduce)').matches;
+revealTiles.forEach((tile, index) => {
+  tile.classList.add('reveal-tile');
+  tile.tabIndex = 0;
+  tile.setAttribute('aria-label', `${tile.querySelector('h3')?.textContent || 'Nexgen detail'}. Focus or select to reveal.`);
+  tile.addEventListener('focus', () => tile.classList.add('revealed'));
+  tile.addEventListener('blur', () => {
+    if(!tile.matches(':hover')) tile.classList.remove('revealed');
+  });
+  tile.addEventListener('click', () => tile.classList.toggle('revealed'));
+  tile.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tile.classList.toggle('revealed'); }
+  });
+});
+if(!motionOff && matchMedia('(hover: hover) and (pointer: fine)').matches){
+  let revealFrame = 0;
+  addEventListener('pointermove', e => {
+    if(revealFrame) cancelAnimationFrame(revealFrame);
+    revealFrame = requestAnimationFrame(() => {
+      revealTiles.forEach(tile => {
+        const rect = tile.getBoundingClientRect();
+        const dx = Math.max(rect.left - e.clientX, 0, e.clientX - rect.right);
+        const dy = Math.max(rect.top - e.clientY, 0, e.clientY - rect.bottom);
+        const distance = Math.hypot(dx, dy);
+        const proximity = Math.max(0, Math.min(1, 1 - distance / 230));
+        tile.style.setProperty('--reveal', proximity.toFixed(3));
+        tile.classList.toggle('revealed', proximity > .18 || tile.matches(':focus'));
+      });
+      revealFrame = 0;
+    });
+  }, {passive:true});
+}
 previewSample(Object.keys(SAMPLES)[0]);
 </script>
+<script src="/app/assets/i18n.js"></script>
 </body>
 </html>

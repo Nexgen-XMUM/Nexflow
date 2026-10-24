@@ -1,4 +1,4 @@
-"""展示外壳的三语言接入：欢迎页与登录/注册页共用 frontend/i18n.js 与 nexflow_lang。
+"""展示外壳的三语言接入：欢迎页与登录/注册页使用 frontend/i18n.js。
 
 只校验接入契约（字典、切换器、键覆盖），业务流程校验见 test_showcase_pages.py。
 """
@@ -23,16 +23,19 @@ def fetch_pages(tmp_path):
 
 
 def test_login_page_keeps_the_three_language_dictionary(tmp_path):
-    """登录页继续使用共享字典；欢迎页已改为纯英文的 Bread Count 演示。"""
+    """登录页接入不变；欢迎页默认英文，并提供独立的三语言选择。"""
     welcome, login, _ = fetch_pages(tmp_path)
     assert '<script src="/app/assets/i18n.js">' in login
     assert 'id="langSelect"' in login
     assert 'value="en"' in login and 'value="ms"' in login and 'value="zh-CN"' in login
     assert 'data-i18n-aria="app.langLabel"' in login
     assert "localStorage.setItem('nexflow_lang'" not in login
-    # 欢迎页保持英文单语，不引入第二套 i18n
+    # 初始 HTML 为英文；欢迎页使用当前文案的三语字典，不复用旧促销文案。
     assert '<html lang="en">' in welcome
-    assert "/app/assets/i18n.js" not in welcome
+    assert '<script src="/app/assets/i18n.js">' in welcome
+    assert 'id="welcomeLanguage"' in welcome
+    for language in ("en", "zh-CN", "ms"):
+        assert f'value="{language}"' in welcome
     assert 'id="langSelect"' not in welcome
 
 
