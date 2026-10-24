@@ -1,0 +1,11 @@
+{
+  "scan": "Current tracked small text files; not history, binary weights or remote secrets",
+  "credential_pattern_files": [],
+  "readme_missing_relative_targets": [],
+  "machine_path_files": [
+    "docs/audit-20261023/HANDOFF.md",
+    "docs/desktop-integration/handoff-checklist.md",
+    "docs/desktop-integration/phase-1-handoff.md",
+    "docs/desktop-integration/project-handoff.md"
+  ]
+}

@@ -1,8 +1,181 @@
+> [!IMPORTANT]
+> ## 📁 Submission Documents & Templates
+> Official submission templates are available in the Google Drive folder below. NexFlow's prepared documents are in [`submission/`](submission/).
+>
+> ### 👉 [OPEN THE GOOGLE DRIVE FOLDER](https://drive.google.com/drive/folders/1xw7c2aN8N-at8hPEULzkcU76e_FFb0Ef) 👈
+
+---
+
+# NexFlow
+
+> A bakery closing-time workspace for surplus stock entry, clearance offers, customer pickup and food-rescue records.
+
+## Team Information
+
+| Field | Details |
+|---|---|
+| Team Name | Nexgen |
+| Team Domain | Domain 2 — Orbyte Smart SME |
+| Main SDG Track | SDG 8 — Decent Work and Economic Growth |
+| Related SDG | SDG 12 — Responsible Consumption and Production |
+| Team Leader | YEO JIN HONG |
+| University | Xiamen University Malaysia (XMUM) |
+| Number of Members | 5 |
+
+## Links
+
+| Resource | Link |
+|---|---|
+| GitHub Repository | [Nexgen-XMUM/Nexflow](https://github.com/Nexgen-XMUM/Nexflow) |
+| Live Demo | [Orbyte Smart Yield on Replit](https://orbyte-smart-yield-nexgen.replit.app/) |
+| RunPod Endpoint | None — RunPod was not used |
+| Slide Deck | [NexFlow presentation on Canva](https://canva.link/1k1qd953gwbq3gp) |
+| Demo Video | [NexFlow project video](https://youtu.be/RVNASReQL-Y) |
+
+## Overview
+
+### Problem
+
+Small bakeries must count unsold food, decide clearance prices, write promotions and arrange surplus handovers at closing. These repeated tasks create fragmented records and extra work for staff. Owners need a simple approval step and a clear view of the day's results.
+
+### Solution
+
+NexFlow connects stock entry, calculated clearance offers, owner-reviewed promotional copy, surprise-box purchases, pickup and food-rescue records in one three-language workspace. DeepSeek can draft promotional wording; the competition runner uses a local template by default. People retain control over approval and handover.
+
+### Key Features
+
+- Surplus entry with backend pricing and food-footprint estimates.
+- Owner approval and simulated WhatsApp promotion.
+- Surprise-box quotes, simulated payment, pickup and loyalty points.
+- Remaining-food handover records and a business dashboard.
+- English, Bahasa Melayu and Chinese interfaces.
+- An independent YOLOv8 still-image counting prototype, separate from the main inventory workflow; the welcome-page detection animation is preset.
+
+### Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | HTML, CSS and native JavaScript |
+| Backend | Python, FastAPI, Pydantic and Uvicorn |
+| Database | SQLite; JSON product fixtures |
+| AI / Compute | Optional DeepSeek API; independent local Ultralytics YOLOv8 prototype |
+| Hosting | Replit public deployment; local competition runner |
+
+## Project Structure
+
+```text
+.
+├── backend/                 # FastAPI and business rules
+│   ├── desktop_demo.py      # Competition startup module
+│   ├── blind_boxes/         # Quotes, orders, points and food rescue
+│   ├── tests/               # Backend tests
+│   └── .env.example         # Optional backend configuration
+├── frontend/                # Main workspace and frontend tests
+├── data/                    # Shared demonstration fixtures
+├── impeccable/              # Independent local YOLO image prototype
+├── train_bread/             # Browser / ONNX experiments
+├── docs/                    # Screenshots, handover and submission evidence
+├── submission/              # Prepared submission documents
+│   ├── SDC2026_Nexgen_Preliminary.pdf
+│   ├── SDC2026_Nexgen_TechDeclaration.pdf
+│   └── SDC2026_Nexgen_Replit_POU.pdf
+├── requirements.txt
+├── .gitignore
+├── LICENSE
+└── README.md
+```
+
+### Architecture
+
+```text
+Browser workspace -> FastAPI -> SQLite / product JSON
+                         |
+                         +-> Local promotional template (demo default)
+                         +-> DeepSeek API (optional)
+
+Independent YOLO image prototype -> Staff review -> Local confirmation record
+```
+
+The local vision confirmation does not automatically update the main inventory. Payments, WhatsApp messages and recipient handovers are simulated; CO₂e is an estimate.
+
+## How to Run
+
+### Option 1 — Open the Replit Demo
+
+Open https://orbyte-smart-yield-nexgen.replit.app/ . No local installation is needed to view the public deployment. Some deployed files differ from the checked-out GitHub baseline; complete parity has not been verified.
+
+### Option 2 — Run Locally
+
+From the repository root on macOS / Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m backend.desktop_demo
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m backend.desktop_demo
+```
+
+Use Python 3.10 or newer. Open http://127.0.0.1:8000/app . The competition runner uses a temporary database and local promotional text; no API key is required. See the existing detailed documentation below for the welcome page, role windows, independent YOLO startup and demonstration order.
+
+### Run Tests
+
+```bash
+# macOS / Linux
+.venv/bin/python -m pytest backend/tests -q
+node --test frontend/tests/*.test.cjs
+```
+
+On Windows, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`.
+
+## How We Use Replit
+
+The public deployment is available at https://orbyte-smart-yield-nexgen.replit.app/ . Its homepage rendered and sampled pages, scripts and read-only APIs returned HTTP 200 during the 2026-10-24 verification. This provides evidence of public hosting; account ownership, deployment-source commit and sponsor-credit use still need owner confirmation.
+
+Proof: [Replit public-access evidence](submission/SDC2026_Nexgen_Replit_POU.pdf).
+
+## How We Use RunPod
+
+RunPod was not used. No endpoint, handler or proof-of-use document is claimed. The team accepts the official template's possible scoring or format consequences.
+
+## Challenges & Learnings
+
+The workflow distinguishes price forecasts from simulated receipts, generated copy from calculated facts, and recommended handovers from completed records. Backend request identifiers protect repeated submissions. A fixed demonstration order and clear boundaries between the main workspace, deployed snapshot and independent vision prototype make the project easier to explain and reproduce.
+
+## Future Improvements
+
+Pilot with bakery staff to measure closing time and count corrections; connect reviewed image counts to stock; add production authentication and reviewed messaging/payment integrations.
+
+## Team
+
+All five members are affiliated with Xiamen University Malaysia (XMUM).
+
+| Name | Role | Contact |
+|---|---|---|
+| YEO JIN HONG | Team leader; full-project development | kadenyeojinhong@gmail.com |
+| QIU BOCHUAN | Full-project development | 194019687@qq.com |
+| CHEN ZHENGXI | Backend development and presentation slides | fengmichouzi9@gmail.com |
+| PAN SHIQI | Backend development and presentation slides | 482477276@qq.com |
+| Chong Thing Wei | Full-project development | ivanchongtw1021@gmail.com |
+
+## License
+
+Project code retains the [Apache License 2.0](LICENSE). Third-party libraries, model weights and datasets retain their own terms; see the [technical declaration](submission/SDC2026_Nexgen_TechDeclaration.pdf). The official forms still contain human-verification fields and unsigned declarations.
+
+---
+
 <div align="center">
 
 <h1>NexFlow</h1>
 
-**Closing-time automation for small bakeries — clearance pricing, AI promo copy, surprise boxes and food rescue in one workspace.**
+**Closing-time automation for small bakeries — one workspace for surplus stocktaking, clearance decisions, customer pickup and food-rescue records.**
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](#requirements)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.156-009688?logo=fastapi&logoColor=white)](#technology-stack)
@@ -12,11 +185,48 @@
 [![Status](https://img.shields.io/badge/Status-Hackathon%20prototype-orange)](#demo-scope--limitations)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
 
-[Why NexFlow](#why-nexflow) · [Features](#key-features) · [Screenshots](#screenshots) · [Quick start](#quick-start) · [Walkthrough](#demo-walkthrough) · [Architecture](#architecture) · [Testing](#testing) · [中文快速开始](#中文快速开始)
+[SDC Domain 2](#sdc-hackathon-2026--domain-2) · [Why NexFlow](#why-nexflow) · [Features](#key-features) · [Local YOLO demo](#local-yolo-image-demo) · [Screenshots](#screenshots) · [Quick start](#quick-start) · [Walkthrough](#demo-walkthrough) · [Architecture](#architecture) · [Testing](#testing) · [中文快速开始](#中文快速开始)
 
 </div>
 
 > NexFlow is the project name. The store-facing web app served by this repository is branded **Orbyte Smart Yield** (v1.2.2) — same code base, same demo.
+
+## SDC Hackathon 2026 — Domain 2
+
+| Submission item | Details |
+|---|---|
+| Team | Nexgen |
+| Project | NexFlow / Orbyte Smart Yield |
+| University / registered leader / member count | TODO — HUMAN VERIFICATION: confirm registered team details; do not infer from Git handles |
+| Deployment address | https://orbyte-smart-yield-nexgen.replit.app/ |
+| Domain | **Domain 2 — Orbyte Smart SME Challenge** |
+| Main SDG | **SDG 8**, especially Targets 8.2 (productivity through technology) and 8.3 (MSME growth) |
+| Related SDGs | SDG 12 (Responsible Consumption and Production), related to the food-surplus use case. |
+| GitHub repository | [Nexgen-XMUM/Nexflow](https://github.com/Nexgen-XMUM/Nexflow) |
+| Live Demo | [Public Replit deployment](https://orbyte-smart-yield-nexgen.replit.app/) · [Local workspace](#4-open-the-app) · [Standalone local YOLO](#local-yolo-image-demo) |
+| Demo video | [Watch the NexFlow project video on YouTube](https://youtu.be/RVNASReQL-Y) |
+| Slide deck / PRD | TODO — HUMAN VERIFICATION: add final share links |
+| Replit proof | [Public-access evidence PDF](submission/SDC2026_Nexgen_Replit_POU.pdf); owner deployment screenshot still needed |
+| Technical declaration | [Official form filled as unsigned draft](submission/SDC2026_Nexgen_TechDeclaration.pdf) |
+| RunPod | Not used. No endpoint or proof-of-use PDF; team accepts the template-compliance risk. |
+
+The Domain 2 challenge asks for an easy-to-learn automation product that removes a recurring SME burden and demonstrates a complete journey: **trigger → connected data → decision → human approval → visible, recorded outcome**. NexFlow targets the end-of-day bakery surplus workflow.
+
+### Domain 2 fit and current scope
+
+| Challenge expectation | NexFlow response and current status |
+|---|---|
+| One meaningful SME problem | Bakery staff manually count and route unsold products at closing; details can be fragmented across paper and messages. |
+| Core automated journey | The main app demonstrates the closing workflow with demo inventory and simulated business actions. The separate local YOLO app runs inference on a single still image; these two paths are **not yet connected end-to-end**. |
+| Accuracy and ease of learning | The local detector suggests counts; staff can review and correct them before confirming. Measure count corrections and stocktake time in a future pilot; no measured field results are claimed. |
+| People stay in control | Count confirmation is manual; the owner reviews the promotion draft. Demo identities and external actions are simulated, not production permissions or integrations. |
+| Orbyte fit and reuse | The product is framed as a reusable SME workflow that could connect stock, promotions, pickup and food-rescue services through a shared business hub. This prototype does not connect to Orbyte's live platform. |
+| Business benefit and SDG | Intended benefits are fewer manual steps and a more consistent closing record. The project aligns primarily with SDG 8; food-waste reduction can support SDG 12. Benefits are expected, not yet measured. |
+
+**CCTV roadmap, not a current feature:** continuous camera monitoring, tracking likely customer removals across video frames, and automatically syncing changed quantities to NexFlow inventory are not implemented. The local detector currently analyzes uploaded still images, then saves a staff-confirmed record on the local machine.
+
+> **Competition data rule:** The Domain 2 materials say to use team-created synthetic data and not real customer or company records. The repository's YOLO materials attribute the model/sample data to the Roboflow Universe `breaddetector/bread-detector` dataset (CC BY 4.0). Declare the model and dataset in the Technical & Tools Declaration and confirm with the organizers whether this third-party training/test material is permitted. For a judged demo, use team-created synthetic test images unless the organizers approve otherwise; do not present a random Google image as synthetic data.
+
 
 <img src="docs/readme-assets/owner-dashboard.png" alt="NexFlow owner dashboard after one simulated business day: RM9.60 paid, 3 items picked up, 11 items handed over for donation" width="860">
 
@@ -24,6 +234,8 @@
 
 ## Table of contents
 
+- [SDC Hackathon 2026 — Domain 2](#sdc-hackathon-2026--domain-2)
+- [Local YOLO image demo](#local-yolo-image-demo)
 - [Why NexFlow](#why-nexflow)
 - [Key features](#key-features)
 - [Screenshots](#screenshots)
@@ -74,7 +286,8 @@ It is scoped as a **local, demo-grade product for a single store**, not a produc
 | **Business dashboard** | Paid amount, items picked up, items donated, footprint estimate — and "no data yet" instead of invented metrics | ✅ Implemented |
 | **Language switching** | English · Bahasa Melayu · 简体中文 from one dropdown, remembered per browser | ✅ Implemented |
 | **Light / dark theme** | Shell-only preference, persisted per browser | ✅ Implemented |
-| **Bread detection (YOLO)** | Training script and weights for counting bread types from photos | 🧬 Experimental — standalone, **not wired into the web app** |
+| **Bread Count welcome-page showcase** | Fixed front-end replay with pre-generated boxes and counts; uploading an image only previews it | 🎞️ Animation only — no inference on this page |
+| **Standalone local YOLO image counter** | `impeccable/` runs the model on an uploaded still image or bundled sample; staff can adjust and confirm counts, saved as local JSON | ✅ Real local image inference; **not synced to main inventory** |
 
 ### Honest status of the "smart" parts
 
@@ -83,11 +296,13 @@ It is scoped as a **local, demo-grade product for a single store**, not a produc
 - Donations are a **local handover record**. Recipient profiles are demo placeholders and no institution is contacted.
 - CO₂e values are **estimates** from fixed factors, not verified avoided emissions.
 - The DeepSeek copy path is optional; the default demo runs fully offline with the local template.
-- The YOLO module in `train_bread/` is a separate experiment. NexFlow does not currently count stock from photos.
+- The main welcome-page Bread Count experience is a **fixed animation/replay**; its displayed detections are pre-generated and it does not run YOLO inference.
+- Real still-image inference runs only in the separate local app at `impeccable/`. Staff can correct and confirm model counts; confirmations are stored as JSON on that computer and are not synced to NexFlow's main inventory.
+- **Live CCTV/video detection, tracking likely removals, automatic inventory updates, and backend synchronization are not implemented.**
 
 ## Screenshots
 
-Captured from this repository running locally (branch `main-simplify2`), after one full simulated day: count → leftover registration → customer purchase and pickup → closing → donation handover.
+Captured during a local simulated demo session: count → leftover registration → customer purchase and pickup → closing → donation handover. The interactions shown are demo flows, not live external transactions.
 
 <table>
 <tr>
@@ -115,17 +330,10 @@ Captured from this repository running locally (branch `main-simplify2`), after o
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Nexgen-XMUM/Nexflow.git
+git clone --branch submission https://github.com/Nexgen-XMUM/Nexflow.git
 cd Nexflow
 ```
 
-> **Branch note:** the latest demo build (three-language UI, reworked closing flow) is on **`main-simplify2`**; the default branch `main` does not contain the last two commits yet.
->
-> ```bash
-> git switch main-simplify2
-> ```
->
-> Until that branch is merged or fast-forwarded into `main`, a plain clone of `main` gives an older build — and the screenshots above come from `main-simplify2`.
 
 ### 2. Windows (PowerShell)
 
@@ -170,6 +378,24 @@ Local copy; temporary database; application clock starts at 21:35 UTC+08:00.
 The three role entries are **demo personas in the browser**, not accounts, logins or permissions — the URL only selects which tab set is visible. There is no authentication anywhere in this build.
 
 Use another port with `python -m backend.desktop_demo --port 8080`.
+
+### Local YOLO image demo (separate service)
+
+The main welcome page's Bread Count display is an animation. To run actual YOLO inference, start the standalone app in `impeccable/`. It analyzes a **single uploaded image** (or a bundled sample), lets staff review/edit the count, and saves confirmations in `impeccable/confirmed/` as local JSON. It does not process a live CCTV stream or sync counts to the main NexFlow inventory.
+
+**Windows:** from the repository root, run `impeccable\start.bat`. On first launch it creates a virtual environment and installs that app's dependencies; internet access is needed for this initial installation.
+
+**macOS / Linux:**
+
+```bash
+cd impeccable
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+Open <http://127.0.0.1:8100>, choose a bundled sample or upload a team-approved test image, review/correct the detected quantities, then confirm. The run record remains on the local machine. The model weights are bundled at `impeccable/weights/best.pt`; dependencies are isolated from the main NexFlow app.
 
 ### Demo runtime notes
 
@@ -236,22 +462,22 @@ flowchart LR
   DB[("SQLite<br/>blind-box ledger")]
   AI["DeepSeek API<br/>optional"]
   COPY["Local copy template<br/>default"]
-  CV["train_bread/ YOLO<br/>experimental"]
+  CV["Standalone local YOLO<br/>impeccable/; still images"]
 
   UI --> PROMO
   UI --> BOX
   UI --> DEMO
   I18N -.-> UI
-  PROMO --> DB
+  PROMO --> CATALOGUE[("Read-only catalogue JSON")]
   BOX --> DB
   DEMO --> DB
   PROMO -.-> AI
   PROMO -.-> COPY
-  CV -. "not wired" .-> PROMO
+  %% Local YOLO app is separate: no live CCTV stream and no inventory sync.
 ```
 
 - The **catalogue** (`data/inventory.json`) is read-only product data: name, prices, weight, CO₂e factor and stock.
-- The **blind-box ledger** is a separate SQLite database (batches, quotes, orders, donations, points). It is deliberately not derived from the catalogue.
+- The **blind-box ledger** is a separate SQLite database. The demo explicitly registers submitted catalogue quantities as synthetic batches; customer-first auto-seeding is a different path.
 - The **demo session** wraps the same app with a temporary database and a controllable clock.
 
 ## Technology stack
@@ -267,7 +493,7 @@ flowchart LR
 | AI copy | **DeepSeek API (optional)** | `AI_PROVIDER=deepseek`; the local template keeps the demo offline-safe |
 | Backend tests | **pytest + httpx** | API contracts, demo clock, pricing, blind-box rules, asset wiring |
 | Frontend tests | **`node:test` + `vm`** | DOM-level behaviour of the page scripts, no browser needed |
-| Computer vision | **Ultralytics YOLO + OpenCV** | `train_bread/` experiment only; **not** part of the running app |
+| Computer vision | **Ultralytics YOLO + OpenCV** | Independent `impeccable/` image prototype; browser ONNX experiments in `train_bread/`; not main-inventory integration |
 
 ## Project structure
 
@@ -295,7 +521,8 @@ Nexflow/
 │   ├── readme-assets/           # screenshots used by this README
 │   ├── desktop-integration/     # handover, quickstart, demo script, acceptance notes
 │   └── ...                      # audit and integration notes
-├── train_bread/                 # experimental YOLO bread detection
+├── impeccable/                  # standalone FastAPI + YOLO local image-counting demo
+├── train_bread/                 # legacy browser/ONNX detector assets
 ├── deliveries/                  # zipped handoff build (historical)
 ├── requirements.txt
 └── LICENSE
@@ -368,7 +595,7 @@ Errors use one envelope: `{"error": {"code", "message", "details"}}` — `422` f
 
 ## Demo scope & limitations
 
-**This is a hackathon prototype.** It is intentionally narrow: one store, one browser, local demo data, no deployment, no accounts.
+**This is a hackathon prototype.** A related public Replit deployment is linked above; the reproducible main workflow and independent YOLO counter can run locally. No production readiness or public YOLO inference endpoint is claimed. The workflows use demo data and do not implement real accounts.
 
 **Implemented end to end:** stocktake entry, clearance pricing, promo drafting with local/AI copy, the owner approval gate, blind-box search and pricing, quote → simulated payment → reserved order → pickup, points earning and redemption caps, the closing sweep, donation handover records, and the dashboard.
 
@@ -378,18 +605,18 @@ Errors use one envelope: `{"error": {"code", "message", "details"}}` — `422` f
 
 **Not implemented (and not claimed):** real authentication or roles, real payments, real WhatsApp integration, delivery logistics, multi-store operation, procurement forecasting, and carbon trading.
 
-**Experimental:** `train_bread/` holds a YOLO training script and weights for counting bread from photos. It runs separately, is not imported by the app, and needs its own dependencies (`ultralytics`, `opencv-python`).
+**YOLO split:** the homepage's Bread Count panel is a visual replay. The separate `impeccable/` app performs local model inference on uploaded still images only; confirmed quantities are stored locally and are not sent to NexFlow's inventory API. It does not monitor CCTV video or automatically detect removals. See [Local YOLO image demo](#local-yolo-image-demo).
 
 **Known issues:**
 
 1. **Customer-before-leftovers ordering.** If a customer requests a quote while blind-box stock is empty, the customer module auto-prepares synthetic sample batches; a later `/api/demo/leftovers` call then returns `409`. Confirm leftovers first (walkthrough step 2), or restart the demo server.
 2. **Demo endpoints carry no authorisation.** `/api/demo/*` is a competition helper, not a security boundary; role rules (owner-only closing, staff counts) are UI conventions.
 3. **Draft state is not persisted.** Reloading drops the current stocktake draft; backend orders, donations and points survive.
-4. **`main` lags behind `main-simplify2`** until the final commits are merged.
+4. **The homepage detector is not live inference.** Use the separate `impeccable/` app for actual still-image model inference; do not rely on the animated showcase to count stock.
 
 ## Team
 
-Built at a hackathon by the Nexgen team (GitHub org `Nexgen-XMUM`).
+Built at a hackathon by Nexgen (GitHub org `Nexgen-XMUM`). The roles below come from the existing README, not a verified registration record. Registered leader, full roster, institution and contact details: TODO — HUMAN VERIFICATION.
 
 | Role | Member |
 |---|---|
@@ -397,6 +624,45 @@ Built at a hackathon by the Nexgen team (GitHub org `Nexgen-XMUM`).
 | Backend · integration | QIU BO CHUAN |
 
 Additional contributors appear in the commit history under the handles `panpan54847`, `feng-0823` and `navi1021`. Assignments beyond the two roles above are not recorded in this repository, so they are intentionally left out rather than guessed.
+
+## How We Use Replit
+
+The team supplied https://orbyte-smart-yield-nexgen.replit.app/ as its public deployment. On 2026-10-24 the homepage rendered in a browser; `/login`, `/app`, two sampled scripts and read-only demo/inventory APIs returned HTTP 200. `integration.js` matches the checked-out main baseline byte-for-byte, while sampled HTML and `i18n.js` differ. Full feature/source parity is not asserted. No public checkout or paid API call was performed.
+
+[Replit proof PDF](submission/SDC2026_Nexgen_Replit_POU.pdf) includes a real screenshot and public checks. TODO — HUMAN VERIFICATION: owner project/deployment dashboard, source commit, plan/region and sponsor-voucher redemption. No unverified `.replit` configuration was added.
+
+## How We Use RunPod
+
+**Not used.** The team explicitly chose not to add integration or produce a proof-of-use PDF. The official submission template labels RunPod use and proof as required. This is an acknowledged compliance risk, not a satisfied condition; [audit](docs/submission-compliance-audit.md) records it.
+
+## AI Tools and Dataset Disclosure
+
+- Optional runtime API: DeepSeek for promotional wording; the competition launcher forces a local template. [Historical live-call record](docs/deepseek-live-validation.md) is evidence of earlier calls, not a call made during this submission pass.
+- Independent vision: Ultralytics YOLOv8 in `impeccable/`; ONNX Runtime Web 1.17.3 in browser experiments. Neither is a live main-inventory pipeline. Weight training lineage and exact exports require team verification.
+- Dataset: [Bread Detector by breaddetector](https://universe.roboflow.com/breaddetector/bread-detector), publisher lists CC BY 4.0. Preserve attribution; confirm dataset version, modifications and competition permission. Publisher benchmark metrics are not this project's results.
+- AI-assisted development: ChatGPT/Codex and DeepSeek harness (team confirmed); repository notes also link a Claude artifact. Exact models, extent of Claude use, other tools and sponsor credits: TODO — HUMAN VERIFICATION.
+- Main project Apache-2.0 does not relicense third-party assets. Ultralytics AGPL-3.0/Enterprise terms and model provenance require review. See the [technology declaration](submission/SDC2026_Nexgen_TechDeclaration.pdf).
+
+## Submission Documents
+
+| Document | Status |
+|---|---|
+| [Preliminary](submission/SDC2026_Nexgen_Preliminary.pdf) | Official form populated; unsigned draft; identity, KPI target, workshops and IP questions need human confirmation |
+| [Technical declaration](submission/SDC2026_Nexgen_TechDeclaration.pdf) | Official form populated plus appendix; unsigned draft; license/tool completeness needs team review |
+| [Replit proof](submission/SDC2026_Nexgen_Replit_POU.pdf) | Actual public-access evidence; owner dashboard evidence pending |
+| RunPod proof | Intentionally absent: not used, team accepts risk |
+| [Submission status](docs/submission-status.md) | Remaining actions, checks and final upload steps |
+| [Compliance audit](docs/submission-compliance-audit.md) | Required vs example vs organizer confirmation |
+
+Deadline in the supplied official Preliminary form: **25 October 2026**. Exact time/timezone and latest notification: TODO — HUMAN VERIFICATION. No unverified cutoff time is asserted.
+
+## Challenges and Learnings
+
+The project separates generated copy from deterministic prices, predicted clearance from simulated receipts, and recommendations from completed handovers. Idempotent backend operations protect retries. The independent vision prototype and deployed snapshot also showed why explicit integration boundaries and a fixed demonstration order matter. These are engineering observations, not measured customer impact.
+
+## Future Improvements
+
+Validate the workflow with real bakery staff; measure closing time and corrections; connect confirmed vision counts to stock; add real authentication and separately reviewed external integrations. These are future work, not submission blockers to implement now.
 
 ## License
 
@@ -421,12 +687,11 @@ Released under the [Apache License 2.0](LICENSE).
 ### 2. 克隆仓库
 
 ```bash
-git clone https://github.com/Nexgen-XMUM/Nexflow.git
+git clone --branch submission https://github.com/Nexgen-XMUM/Nexflow.git
 cd Nexflow
-git switch main-simplify2
 ```
 
-> 最新演示版本（三语言界面、新的打烊流程）在 **`main-simplify2`** 分支；默认分支 `main` 还差最后两个提交，直接克隆 `main` 会拿到旧版本。等该分支合并或快进到 `main` 后，这一行可以省略。
+> 本提交材料位于 `submission` 分支，业务代码基于 `origin/main` 的 `7e264ee`。首页 Bread Count 是动画；真实 YOLO 图片检测请按上方“Local YOLO image demo”在本地启动 `impeccable/`。
 
 ### 3. Windows 启动（PowerShell）
 
@@ -475,7 +740,14 @@ python -m backend.desktop_demo
 
 ⚠️ **第 2 步一定要在第 4 步之前。** 如果顾客先报价而盲盒库存为空，顾客模块会自动准备合成样品，之后再来「确认余货」会返回 `409`，当晚真实的余货就进不了流程。遇到这种情况重启演示服务即可重来。
 
-### 7. 运行测试
+### 7. 本地 YOLO 图片检测（单独运行）
+
+- Windows：在仓库根目录双击 `impeccable\start.bat`。首次运行需要联网安装 YOLO 依赖。
+- macOS / Linux：进入 `impeccable/`，创建并激活 Python 虚拟环境，运行 `pip install -r requirements.txt`，再运行 `python app.py`。
+- 打开 <http://127.0.0.1:8100>，上传单张图片或选择样图；店员核对、修改数量后确认。确认记录只写入本机 `impeccable/confirmed/`，不会更新主网站库存。
+- 目前不支持连续 CCTV 视频识别、追踪顾客拿取动作或自动回写库存。比赛演示图片须遵守 Domain 2 的团队自制合成数据要求；仓库现有 Roboflow 样图/模型请先向主办方确认。
+
+### 8. 运行测试
 
 ```bash
 # 后端（不需要网络和 Key）
@@ -487,7 +759,7 @@ node --test frontend/tests/*.test.cjs
 
 Windows 把第一行换成 `.\.venv\Scripts\python.exe -m pytest backend/tests -q`。前端测试会调用 `.venv` 里的 Python，所以要先建好虚拟环境。
 
-### 8. 常见注意事项
+### 9. 常见注意事项
 
 - **临时数据库**：演示启动器使用系统临时目录里的 SQLite，退出即删除；重启后订单、捐赠、积分都会清空。
 - **独立应用时钟**：演示从 21:35 开始，「结束当日营业」推进到 22:31；**不会修改电脑时间**。

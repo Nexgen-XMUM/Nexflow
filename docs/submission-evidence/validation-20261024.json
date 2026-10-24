@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-24",
+  "timezone": "Asia/Kuala_Lumpur",
+  "backend_tests": {
+    "passed": 285,
+    "warnings": 1
+  },
+  "frontend_tests": {
+    "passed": 49,
+    "failed": 0,
+    "skipped": 0
+  },
+  "pip_check": "No broken requirements found",
+  "paid_calls": 0,
+  "business_source_changes": false,
+  "pdf_pages": {
+    "Preliminary": 14,
+    "TechDeclaration": 17,
+    "Replit_POU": 1
+  },
+  "visual_review": "All pages rendered at original page size and inspected; corrected Preliminary third-party table column order and re-rendered affected page.",
+  "excluded_checks": [
+    "YOLO inference/training",
+    "Windows clean install",
+    "public deployment business mutation",
+    "full browser regression",
+    "secret scan of full Git history and binary weights"
+  ]
+}

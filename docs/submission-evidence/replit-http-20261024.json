@@ -1,0 +1,59 @@
+[
+  {
+    "path": "/",
+    "response": "200|text/html; charset=utf-8",
+    "bytes": 100979,
+    "sha256": "7773405c54a8352c89e4a6c30f0369dfdffb600f725eaa658f1a1cfe62515c02",
+    "matches_local": false
+  },
+  {
+    "path": "/login",
+    "response": "200|text/html; charset=utf-8",
+    "bytes": 51292,
+    "sha256": "5874029e105dc8dc28c9982e1fdda506f32285f791ec2a5f5d1ce625baec83f6",
+    "matches_local": false
+  },
+  {
+    "path": "/app",
+    "response": "200|text/html; charset=utf-8",
+    "bytes": 126587,
+    "sha256": "58e514b31860ee9a9e9234ade623d3c4ba159b661893d0114b33edc038184da3",
+    "matches_local": false
+  },
+  {
+    "path": "/app/assets/integration.js",
+    "response": "200|text/javascript; charset=utf-8",
+    "bytes": 19054,
+    "sha256": "004b4c023ce74aa7ba3d82c75be1e2641a27ae7fd7d1e824df00d68cbc1a372d",
+    "matches_local": true
+  },
+  {
+    "path": "/app/assets/i18n.js",
+    "response": "200|text/javascript; charset=utf-8",
+    "bytes": 159935,
+    "sha256": "f5076bf3f78dae898ffcf58a79380139554f241f904c3da6bbd80cf6e0979182",
+    "matches_local": false
+  },
+  {
+    "path": "/api/demo/session",
+    "response": "200|application/json",
+    "bytes": 107,
+    "sha256": "79652dfec433002fb8e796dd4e50db81abef1d8b77932248ad42f266db2c5ce5",
+    "json_keys": [
+      "demo_only",
+      "temporary_database",
+      "now",
+      "leftovers_registered"
+    ]
+  },
+  {
+    "path": "/api/inventory",
+    "response": "200|application/json",
+    "bytes": 278,
+    "sha256": "466b916bf2d3ddfcbacd3b1a1089774becddd6437052b745e42e858b9a9b267c",
+    "json_keys": [
+      "currency",
+      "products"
+    ]
+  }
+]
