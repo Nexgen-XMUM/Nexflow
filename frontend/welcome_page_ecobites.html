@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NexFlow — Welcome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500;62..125,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Swiss grid: 12 columns, hairline rules, flush-left type, one accent.
+   Fold 1 = header + headline + [Purpose | Monster | Features]; everything else lives below the fold. */
+:root {
+  --paper: #f4f4f0;      /* cool off-white */
+  --ink: #121412;
+  --muted: #6b6e68;
+  --line: #d6d7d0;
+  --green: #1e6b47;      /* rescue green — the one accent */
+  --lilac: #c4b0f0;      /* the monster */
+  --lilac-deep: #9d84e0;
+  --pink: #f2a3b9;
+  --mustard: #e3a03a;
+  --font-display: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Instrument Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --gutter: clamp(16px, 3vw, 40px);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.mono { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.muted { color: var(--muted); }
+
+/* ---------- Fold 1 ---------- */
+.fold { min-height: 100svh; display: grid; grid-template-rows: auto auto 1fr auto; padding: 0 max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left)); }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 20px; }
+
+.top { align-items: center; padding: 18px 0 14px; border-bottom: 1px solid var(--ink); }
+.brand { grid-column: 1 / 4; font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -.02em; text-decoration: none; }
+.brand sup { font-family: var(--font-mono); font-weight: 400; font-size: 9px; color: var(--muted); margin-left: 4px; }
+.top nav { grid-column: 4 / 10; display: flex; gap: 28px; }
+.top nav a { text-decoration: none; }
+.top nav a:hover { color: var(--green); }
+.top .hint { grid-column: 10 / 13; text-align: right; }
+.top .hint button { background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+.headline { padding: clamp(20px, 4vh, 44px) 0 clamp(14px, 3vh, 28px); align-items: end; border-bottom: 1px solid var(--line); }
+.headline h1 { grid-column: 1 / 10; margin: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 82%; font-size: clamp(40px, 7.4vw, 112px); line-height: .9; letter-spacing: -.035em; text-wrap: balance; }
+.headline h1 em { font-style: normal; color: var(--green); }
+.headline p { grid-column: 10 / 13; margin: 0; max-width: 32ch; color: var(--muted); font-size: 14px; }
+
+.stage { align-items: stretch; min-height: 0; }
+.col { padding: clamp(16px, 3vh, 28px) 0; display: flex; flex-direction: column; min-width: 0; }
+.col.purpose { grid-column: 1 / 5; }
+.col.monster-col { grid-column: 5 / 9; align-items: center; justify-content: center; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+.col.features { grid-column: 9 / 13; }
+
+.slider-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.slides { position: relative; flex: 1; min-height: 190px; margin-top: 18px; }
+.slide { position: absolute; inset: 0; opacity: 0; transform: translateY(8px); transition: opacity .45s, transform .45s; pointer-events: none; }
+.slide.on { opacity: 1; transform: none; pointer-events: auto; }
+.slide .idx { font-family: var(--font-display); font-weight: 500; font-size: 13px; color: var(--green); }
+.slide h3 { margin: 8px 0 10px; font-family: var(--font-display); font-weight: 800; font-stretch: 90%; font-size: clamp(22px, 2.3vw, 32px); line-height: 1.02; letter-spacing: -.02em; text-wrap: balance; }
+.slide p { margin: 0; color: var(--muted); max-width: 40ch; font-size: 14px; }
+.slide code { font-family: var(--font-mono); font-size: 12px; color: var(--ink); background: #e8e8e2; padding: 2px 8px; }
+.slider-nav { display: flex; gap: 8px; align-items: center; }
+.slider-nav button { width: 30px; height: 30px; border: 1px solid var(--ink); background: transparent; cursor: pointer; display: grid; place-items: center; }
+.slider-nav button:hover { background: var(--ink); color: var(--paper); }
+.bar { flex: 1; height: 1px; background: var(--line); position: relative; }
+.bar i { position: absolute; left: 0; top: -1px; height: 3px; background: var(--ink); transition: width .45s; }
+
+/* Monster */
+.monster { position: relative; width: min(100%, 340px); aspect-ratio: 1; border: 0; background: none; padding: 0; cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.monster svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.monster .body { transform-origin: 50% 92%; transition: transform .35s cubic-bezier(.3,1.6,.5,1); }
+.monster.rubbing .body { animation: wiggle .28s ease-in-out infinite; }
+.monster.squish .body { transform: scale(1.06, .93); }
+.monster .heart { transform-origin: 200px 250px; animation: beat 2.6s ease-in-out infinite; }
+.monster .brow { transition: transform .25s; }
+.monster:hover .brow, .monster.rubbing .brow { transform: translateY(-6px); }
+.monster .lid { transform: scaleY(0); transition: transform .09s; }
+.monster.blink .lid, .monster.happy .lid { transform: scaleY(1); }
+.monster .happy-eye { opacity: 0; transition: opacity .15s; }
+.monster.happy .happy-eye { opacity: 1; }
+.monster.happy .eye-ball { opacity: 0; }
+@keyframes wiggle { 0%,100% { transform: rotate(-2.2deg) scale(1.02,.98); } 50% { transform: rotate(2.2deg) scale(.98,1.02); } }
+@keyframes beat { 0%,100% { transform: scale(1); } 8% { transform: scale(1.06); } 16% { transform: scale(.98); } 24% { transform: scale(1.04); } }
+.rub { margin-top: 10px; display: grid; justify-items: center; gap: 8px; text-align: center; }
+.meter { width: 140px; height: 3px; background: var(--line); position: relative; }
+.meter i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--green); transition: width .15s; }
+
+.foot { padding: 12px 0 max(14px, env(safe-area-inset-bottom)); border-top: 1px solid var(--ink); align-items: center; }
+.foot .l { grid-column: 1 / 7; }
+.foot .r { grid-column: 7 / 13; text-align: right; }
+.foot a { text-decoration: none; }
+.foot a:hover { color: var(--green); }
+
+/* ---------- Below the fold ---------- */
+.below { padding: 0 max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left)); }
+.section { padding: clamp(48px, 9vh, 96px) 0; border-bottom: 1px solid var(--line); row-gap: 28px; }
+.section-label { grid-column: 1 / 4; }
+.section-label h2 { margin: 6px 0 0; font-family: var(--font-display); font-weight: 800; font-stretch: 85%; font-size: clamp(26px, 3vw, 40px); line-height: 1; letter-spacing: -.02em; }
+.stats { grid-column: 4 / 13; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px; }
+.stat { border-top: 1px solid var(--ink); padding-top: 12px; }
+.stat b { display: block; font-family: var(--font-display); font-weight: 800; font-stretch: 80%; font-size: clamp(38px, 5vw, 72px); line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat span { display: block; margin-top: 10px; color: var(--muted); font-size: 14px; max-width: 26ch; }
+.quotes { grid-column: 4 / 13; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px; }
+.quote { border-top: 1px solid var(--ink); padding-top: 14px; display: flex; flex-direction: column; gap: 16px; }
+.quote p { margin: 0; font-size: 16px; line-height: 1.45; }
+.quote footer b { display: block; font-weight: 600; }
+.cta { align-items: end; }
+.cta h2 { grid-column: 1 / 9; margin: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 82%; font-size: clamp(34px, 5.5vw, 80px); line-height: .92; letter-spacing: -.03em; text-wrap: balance; }
+.cta .go { grid-column: 9 / 13; justify-self: end; display: grid; gap: 10px; justify-items: end; }
+.btn { display: inline-flex; align-items: center; gap: 12px; height: 48px; padding: 0 22px; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); text-decoration: none; font-weight: 600; cursor: pointer; }
+.btn:hover { background: var(--green); border-color: var(--green); }
+.legal { padding: 18px 0 max(24px, env(safe-area-inset-bottom)); }
+.legal p { grid-column: 1 / 13; margin: 0; text-transform: none; letter-spacing: 0; font-size: 12px; }
+
+/* ---------- Login card ---------- */
+.scrim { position: fixed; inset: 0; background: rgba(18, 20, 18, .35); display: grid; place-items: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 50; }
+.scrim.open { opacity: 1; pointer-events: auto; }
+.card { width: min(420px, 100%); background: var(--paper); border: 1px solid var(--ink); padding: 26px; transform: translateY(16px) scale(.98); transition: transform .3s cubic-bezier(.3,1.4,.5,1); }
+.scrim.open .card { transform: none; }
+.card-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--ink); padding-bottom: 10px; }
+.card h2 { margin: 18px 0 4px; font-family: var(--font-display); font-weight: 800; font-stretch: 85%; font-size: 34px; line-height: 1; letter-spacing: -.02em; }
+.card form { display: grid; gap: 14px; margin-top: 18px; }
+.field { display: grid; gap: 6px; }
+.field input { height: 44px; border: 0; border-bottom: 1px solid var(--ink); background: transparent; font: inherit; font-size: 16px; padding: 0; color: var(--ink); }
+.field input:focus { outline: none; border-bottom: 2px solid var(--green); }
+.roles { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--ink); }
+.roles label { position: relative; text-align: center; padding: 10px 4px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.roles label + label { border-left: 1px solid var(--ink); }
+.roles input { position: absolute; opacity: 0; }
+.roles label:has(input:checked) { background: var(--ink); color: var(--paper); }
+.roles label:has(input:focus-visible) { outline: 2px solid var(--green); outline-offset: 2px; }
+.card .btn { width: 100%; justify-content: space-between; }
+.close { background: none; border: 0; cursor: pointer; padding: 0; }
+.err { color: #b3261e; min-height: 1em; margin: 0; font-size: 13px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .top nav { display: none; }
+  .brand { grid-column: 1 / 7; } .top .hint { grid-column: 7 / 13; }
+  .headline h1 { grid-column: 1 / 13; } .headline p { grid-column: 1 / 13; margin-top: 14px; }
+  .col.purpose, .col.features { grid-column: 1 / 13; }
+  .col.monster-col { grid-column: 1 / 13; order: -1; border: 0; border-bottom: 1px solid var(--line); }
+  .col.features { border-top: 1px solid var(--line); }
+  .monster { width: min(72vw, 280px); }
+  .foot .l, .foot .r { grid-column: 1 / 13; text-align: left; }
+  .section-label, .stats, .quotes, .cta h2, .cta .go { grid-column: 1 / 13; }
+  .cta .go { justify-self: start; justify-items: start; }
+}
+@media (max-width: 600px) { .stats, .quotes { grid-template-columns: 1fr; row-gap: 24px; } }
+@media (prefers-reduced-motion: reduce) {
+  .slide, .monster .body, .bar i, .card, .scrim { transition: none; }
+  .monster .heart, .monster.rubbing .body { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="fold">
+  <header class="top grid">
+    <a class="brand" href="#">NexFlow<sup>ORBYTE SMART YIELD</sup></a>
+    <nav class="mono" aria-label="Sections">
+      <a href="#purpose">Purpose</a>
+      <a href="#features">Features</a>
+      <a href="#numbers">Numbers</a>
+      <a href="#voices">Voices</a>
+    </nav>
+    <p class="hint mono muted" style="margin:0">Rub the monster to log in · <button type="button" id="loginLink">Log in</button></p>
+  </header>
+
+  <section class="headline grid">
+    <h1>Every leftover loaf, <em>sold before close.</em></h1>
+    <p>AI closing-time clearance for bakeries. Staff count in one line, the system prices it safely, and regulars get the deal on WhatsApp.</p>
+  </section>
+
+  <main class="stage grid">
+    <section class="col purpose" id="purpose" aria-roledescription="carousel" aria-label="Purpose">
+      <div class="slider-head">
+        <span class="mono">Purpose</span>
+        <span class="mono muted" data-count></span>
+      </div>
+      <div class="slides" aria-live="polite">
+        <article class="slide">
+          <span class="idx">01</span>
+          <h3>1.3 billion tonnes of food is thrown away every year.</h3>
+          <p>A lot of it is perfectly good bread at 9 pm. We give the last batch of the day a second shot instead of the bin.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">02</span>
+          <h3>Saving food should feel like a treat.</h3>
+          <p>No lectures. A surprise box at a third of the price turns rescuing food into an everyday find for the neighbourhood.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">03</span>
+          <h3>Good for the shop, good for the street.</h3>
+          <p>Independent bakeries win back their costs, and regulars get great bakes at a fair price.</p>
+        </article>
+      </div>
+      <div class="slider-nav">
+        <button type="button" data-prev aria-label="Previous purpose">←</button>
+        <button type="button" data-next aria-label="Next purpose">→</button>
+        <span class="bar"><i></i></span>
+      </div>
+    </section>
+
+    <div class="col monster-col">
+      <button class="monster" id="monster" type="button" aria-label="Rub the monster to log in (or press Enter)">
+        <svg viewBox="0 0 400 400" aria-hidden="true">
+          <defs>
+            <!-- knitted fuzz -->
+            <filter id="fuzz" x="-10%" y="-10%" width="120%" height="120%">
+              <feTurbulence type="fractalNoise" baseFrequency="1.4 .35" numOctaves="2" seed="3" result="n"/>
+              <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .22 0" result="w"/>
+              <feComposite in="w" in2="SourceGraphic" operator="in" result="t"/>
+              <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="t"/></feMerge>
+            </filter>
+            <filter id="soft"><feGaussianBlur stdDeviation="10"/></filter>
+            <radialGradient id="bodyG" cx="42%" cy="30%" r="75%">
+              <stop offset="0" stop-color="#e2d6fb"/><stop offset=".55" stop-color="#c4b0f0"/><stop offset="1" stop-color="#9d84e0"/>
+            </radialGradient>
+            <radialGradient id="heartG" cx="40%" cy="30%" r="80%">
+              <stop offset="0" stop-color="#fbd0dc"/><stop offset="1" stop-color="#e98aa6"/>
+            </radialGradient>
+            <radialGradient id="eyeG" cx="40%" cy="35%" r="70%">
+              <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e4e2ee"/>
+            </radialGradient>
+            <clipPath id="eyeL"><ellipse cx="160" cy="150" rx="27" ry="31"/></clipPath>
+            <clipPath id="eyeR"><ellipse cx="236" cy="146" rx="29" ry="33"/></clipPath>
+          </defs>
+          <ellipse cx="200" cy="378" rx="140" ry="14" fill="#121412" opacity=".08" filter="url(#soft)"/>
+          <g class="body">
+            <!-- body blob -->
+            <path filter="url(#fuzz)" fill="url(#bodyG)" d="M200 42c62 0 98 40 112 96 14 56 54 92 54 158 0 58-50 78-166 78S34 354 34 296c0-66 40-102 54-158C102 82 138 42 200 42z"/>
+            <!-- brows -->
+            <g class="brow" stroke="#e3a03a" stroke-width="11" stroke-linecap="round" fill="none">
+              <path d="M138 104q14-12 30-10"/><path d="M226 92q18-6 32 6"/>
+            </g>
+            <!-- eyes -->
+            <g class="eye-ball">
+              <ellipse cx="160" cy="150" rx="27" ry="31" fill="url(#eyeG)"/>
+              <ellipse cx="236" cy="146" rx="29" ry="33" fill="url(#eyeG)"/>
+              <g id="pupilL"><ellipse cx="160" cy="150" rx="14" ry="17" fill="#121412"/><circle cx="155" cy="143" r="4" fill="#fff"/></g>
+              <g id="pupilR"><ellipse cx="236" cy="146" rx="15" ry="18" fill="#121412"/><circle cx="231" cy="139" r="4.5" fill="#fff"/></g>
+              <!-- eyelids for blinking -->
+              <rect class="lid" clip-path="url(#eyeL)" x="130" y="116" width="60" height="68" fill="#b9a3ee" style="transform-origin:160px 119px"/>
+              <rect class="lid" clip-path="url(#eyeR)" x="204" y="110" width="64" height="72" fill="#b9a3ee" style="transform-origin:236px 113px"/>
+            </g>
+            <!-- happy ^ ^ eyes while being rubbed -->
+            <g class="happy-eye" stroke="#121412" stroke-width="7" stroke-linecap="round" fill="none">
+              <path d="M142 156q18-22 36 0"/><path d="M216 152q20-24 40 0"/>
+            </g>
+            <!-- mouth -->
+            <path d="M248 188q4 22-28 22" stroke="#e3a03a" stroke-width="12" stroke-linecap="round" fill="none"/>
+            <g transform="translate(40 84) scale(.8)">
+            <!-- heart -->
+            <path class="heart" filter="url(#fuzz)" fill="url(#heartG)" d="M200 318c-58-30-98-62-98-104 0-28 22-46 46-46 22 0 40 14 52 32 12-18 30-32 52-32 24 0 46 18 46 46 0 42-40 74-98 104z"/>
+            <!-- mitten hands -->
+            <path filter="url(#fuzz)" fill="#b9a3ee" d="M96 300c-6-26 14-40 30-30 4-14 22-16 30-4 8-10 26-6 28 8 10-4 24 6 18 22l-8 50H104c-8-14-10-30-8-46z"/>
+            <path filter="url(#fuzz)" fill="#b9a3ee" d="M304 300c6-26-14-40-30-30-4-14-22-16-30-4-8-10-26-6-28 8-10-4-24 6-18 22l8 50h90c8-14 10-30 8-46z"/>
+            </g>
+          </g>
+        </svg>
+      </button>
+      <div class="rub">
+        <span class="meter" aria-hidden="true"><i id="meter"></i></span>
+        <span class="mono muted" id="rubText">Rub me to log in</span>
+      </div>
+    </div>
+
+    <section class="col features" id="features" aria-roledescription="carousel" aria-label="Features">
+      <div class="slider-head">
+        <span class="mono">Features</span>
+        <span class="mono muted" data-count></span>
+      </div>
+      <div class="slides" aria-live="polite">
+        <article class="slide">
+          <span class="idx">01</span>
+          <h3>Count leftovers in one line.</h3>
+          <p>Staff type or say <code>12 croissants, 5 chocolate slices</code> before closing. NexFlow matches each item and its cost price.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">02</span>
+          <h3>Auto pricing with a margin floor.</h3>
+          <p>The owner sets the clearance discount. Built-in checks stop any price from dropping below cost.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">03</span>
+          <h3>One-tap WhatsApp to regulars.</h3>
+          <p>Once approved, the deal goes to the regulars group, with read ticks and reservations simulated for the demo.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">04</span>
+          <h3>A dashboard the owner reads at a glance.</h3>
+          <p>Monthly target, recovered revenue, food saved by weight, and which categories sell best.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">05</span>
+          <h3>Owner admin panel.</h3>
+          <p>Edit cost prices, slide the discount rate, and set the message header and group name. Changes sync both ways.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">06</span>
+          <h3>SDG 12.3 carbon footprint.</h3>
+          <p>Every clearance logs the CO₂e and grams of food kept out of the bin, ready for the shop's ESG story.</p>
+        </article>
+      </div>
+      <div class="slider-nav">
+        <button type="button" data-prev aria-label="Previous feature">←</button>
+        <button type="button" data-next aria-label="Next feature">→</button>
+        <span class="bar"><i></i></span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot grid mono">
+    <span class="l muted">Hackathon prototype · 2026</span>
+    <span class="r"><a href="#numbers">Scroll for numbers &amp; voices ↓</a></span>
+  </footer>
+</div>
+
+<div class="below">
+  <section class="section grid" id="numbers">
+    <div class="section-label">
+      <span class="mono muted">Demo figures</span>
+      <h2>One evening, one shop.</h2>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>RM 180.00</b><span>Revenue recovered tonight from bakes that would have been binned.</span></div>
+      <div class="stat"><b>22.6 kg</b><span>CO₂e avoided, counted toward UN SDG 12.3.</span></div>
+      <div class="stat"><b>100%</b><span>Automated, from the POS count to the WhatsApp message.</span></div>
+    </div>
+  </section>
+
+  <section class="section grid" id="voices">
+    <div class="section-label">
+      <span class="mono muted">Sample testimonials for the demo</span>
+      <h2>Bakers in Southeast Asia.</h2>
+    </div>
+    <div class="quotes">
+      <blockquote class="quote" style="margin:0">
+        <p>“Counting leftover bread every night was a headache. Now staff type it on their phone, my wife approves on WhatsApp, and regulars clear the croissants in ten minutes.”</p>
+        <footer><b>Uncle Wong</b><span class="muted">Owner, Uncle Wong’s Bakery</span></footer>
+      </blockquote>
+      <blockquote class="quote" style="margin:0">
+        <p>“The dashboard shows recovered revenue and carbon saved every month. Less waste, and a WhatsApp group of very loyal regulars.”</p>
+        <footer><b>Auntie Lim</b><span class="muted">Operations, Penang Artisan Bakes</span></footer>
+      </blockquote>
+      <blockquote class="quote" style="margin:0">
+        <p>“The margin guard is the best part. It warns us when a clearance price gets close to cost, so nobody discounts us into a loss.”</p>
+        <footer><b>Farid</b><span class="muted">Founder, KL Star Pastry</span></footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="section grid cta">
+    <h2>Ready to stop binning tonight’s bread?</h2>
+    <div class="go">
+      <button class="btn" type="button" id="ctaLogin">Launch the demo <span aria-hidden="true">→</span></button>
+      <span class="mono muted">No setup. No account check.</span>
+    </div>
+  </section>
+
+  <footer class="legal grid mono muted">
+    <p>© 2026 NexFlow · Orbyte Smart Yield — hackathon prototype. Figures and testimonials on this page are demo examples, not real shop data.</p>
+  </footer>
+</div>
+
+<!-- Login card: opens after rubbing the monster -->
+<div class="scrim" id="scrim" aria-hidden="true">
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="card-head">
+      <span class="mono">Log in · Demo</span>
+      <button class="close mono" type="button" id="closeLogin" aria-label="Close">Close ✕</button>
+    </div>
+    <h2 id="loginTitle">Hey, you found me.</h2>
+    <p class="muted" style="margin:0">Demo entry: any email and password work. No account is checked.</p>
+    <form id="loginForm" novalidate>
+      <div class="roles" role="radiogroup" aria-label="Enter as">
+        <label><input type="radio" name="role" value="boss" checked>Owner</label>
+        <label><input type="radio" name="role" value="staff">Staff</label>
+        <label><input type="radio" name="role" value="customer">Customer</label>
+      </div>
+      <label class="field"><span class="mono muted">Email</span><input id="email" type="email" autocomplete="email" placeholder="you@bakery.com"></label>
+      <label class="field"><span class="mono muted">Password</span><input id="password" type="password" autocomplete="current-password" placeholder="••••••••"></label>
+      <p class="err" id="err" role="alert"></p>
+      <button class="btn" type="submit" id="submitBtn">Enter NexFlow <span aria-hidden="true">→</span></button>
+      <a class="mono muted" href="/login" style="justify-self:start">New here? Create an account →</a>
+    </form>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Sliders (Purpose left, Features right) ---------- */
+document.querySelectorAll('.col[aria-roledescription="carousel"]').forEach(col => {
+  const slides = [...col.querySelectorAll('.slide')], count = col.querySelector('[data-count]'), bar = col.querySelector('.bar i');
+  let i = 0, timer = null;
+  const show = n => {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, k) => { s.classList.toggle('on', k === i); s.setAttribute('aria-hidden', String(k !== i)); });
+    count.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+  };
+  const auto = () => { clearInterval(timer); if(!reduced) timer = setInterval(() => show(i + 1), 6500); };
+  col.querySelector('[data-prev]').onclick = () => { show(i - 1); auto(); };
+  col.querySelector('[data-next]').onclick = () => { show(i + 1); auto(); };
+  col.addEventListener('mouseenter', () => clearInterval(timer));
+  col.addEventListener('mouseleave', auto);
+  show(0); auto();
+});
+
+/* ---------- Monster eyes ---------- */
+const monster = $('#monster'), svg = monster.querySelector('svg');
+const pupils = [{el: $('#pupilL'), cx: 160, cy: 150, r: 11}, {el: $('#pupilR'), cx: 236, cy: 146, r: 12}];
+let target = null, lastMove = 0, cur = pupils.map(() => ({x: 0, y: 0}));
+
+function toSvg(x, y){
+  const p = svg.createSVGPoint(); p.x = x; p.y = y;
+  return p.matrixTransform(svg.getScreenCTM().inverse());
+}
+addEventListener('pointermove', e => { target = toSvg(e.clientX, e.clientY); lastMove = performance.now(); }, {passive: true});
+
+function tick(t){
+  let look = target;
+  if(!look || t - lastMove > 3000){ // idle: look around on its own
+    const a = t / 1400;
+    look = {x: 200 + Math.sin(a) * 160, y: 150 + Math.sin(a * .7) * 60};
+  }
+  pupils.forEach((p, k) => {
+    const dx = look.x - p.cx, dy = look.y - p.cy, d = Math.hypot(dx, dy) || 1;
+    const m = Math.min(p.r, d / 6);
+    const tx = dx / d * m, ty = dy / d * m;
+    cur[k].x += (tx - cur[k].x) * .18; cur[k].y += (ty - cur[k].y) * .18;
+    p.el.setAttribute('transform', `translate(${cur[k].x.toFixed(2)} ${cur[k].y.toFixed(2)})`);
+  });
+  if(!reduced) requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+(function blink(){
+  setTimeout(() => {
+    monster.classList.add('blink');
+    setTimeout(() => { monster.classList.remove('blink'); blink(); }, 140);
+  }, 2800 + Math.random() * 3200);
+})();
+
+/* ---------- Rub to log in ---------- */
+const NEED = 8; // direction changes needed
+let rub = 0, lastX = null, lastDir = 0, decay = null;
+const meter = $('#meter'), rubText = $('#rubText');
+
+function setRub(v){
+  rub = Math.max(0, v);
+  meter.style.width = Math.min(100, rub / NEED * 100) + '%';
+  monster.classList.toggle('rubbing', rub > 0);
+  monster.classList.toggle('happy', rub >= 3);
+  rubText.textContent = rub === 0 ? 'Rub me to log in' : rub < NEED ? 'Keep rubbing…' : 'Hehe, okay!';
+}
+monster.addEventListener('pointermove', e => {
+  if(e.pointerType !== 'mouse' && e.buttons === 0) return;
+  if(lastX !== null){
+    const dx = e.clientX - lastX;
+    if(Math.abs(dx) > 6){
+      const dir = Math.sign(dx);
+      if(lastDir && dir !== lastDir) setRub(rub + 1);
+      lastDir = dir; lastX = e.clientX;
+      if(rub >= NEED){ setRub(0); openLogin(); }
+    }
+  } else lastX = e.clientX;
+  clearTimeout(decay);
+  decay = setTimeout(() => { setRub(0); lastX = null; lastDir = 0; }, 700);
+});
+monster.addEventListener('pointerleave', () => { lastX = null; lastDir = 0; });
+monster.addEventListener('pointerdown', e => { monster.setPointerCapture?.(e.pointerId); monster.classList.add('squish'); });
+monster.addEventListener('pointerup', () => monster.classList.remove('squish'));
+monster.addEventListener('pointercancel', () => monster.classList.remove('squish'));
+monster.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openLogin(); } });
+
+/* ---------- Login card ---------- */
+const scrim = $('#scrim');
+let opener = null;
+function openLogin(){
+  opener = document.activeElement;
+  scrim.classList.add('open'); scrim.setAttribute('aria-hidden', 'false');
+  setTimeout(() => $('#email').focus(), 120);
+}
+function closeLogin(){
+  scrim.classList.remove('open'); scrim.setAttribute('aria-hidden', 'true');
+  opener?.focus?.();
+}
+$('#loginLink').onclick = openLogin;
+$('#ctaLogin').onclick = openLogin;
+$('#closeLogin').onclick = closeLogin;
+scrim.addEventListener('click', e => { if(e.target === scrim) closeLogin(); });
+addEventListener('keydown', e => { if(e.key === 'Escape' && scrim.classList.contains('open')) closeLogin(); });
+
+// Demo entry, same as login_signup_page.html: no account check, go straight to the workspace
+$('#loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = $('#email').value.trim(), role = new FormData(e.target).get('role');
+  if(!/^\S+@\S+\.\S+$/.test(email)){ $('#err').textContent = 'Enter an email like you@bakery.com.'; $('#email').focus(); return; }
+  if(!$('#password').value){ $('#err').textContent = 'Enter any password to continue.'; $('#password').focus(); return; }
+  $('#err').textContent = '';
+  try { localStorage.setItem('orbyte_demo_user', JSON.stringify({email, role})); } catch {}
+  $('#submitBtn').firstChild.textContent = 'Opening… ';
+  setTimeout(() => location.assign('/app#' + role), 500);
+});
+</script>
+</body>
+</html>
