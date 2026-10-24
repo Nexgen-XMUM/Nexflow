@@ -146,3 +146,6 @@ service-account*.json
 
 # Local backend plans, task briefs, and stage summaries.
 /backend/docs/
+
+# Local image-prototype confirmation records
+/impeccable/confirmed/

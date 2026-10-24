@@ -10,7 +10,7 @@
 [![Storage](https://img.shields.io/badge/Storage-SQLite-003B57?logo=sqlite&logoColor=white)](#technology-stack)
 [![i18n](https://img.shields.io/badge/i18n-EN%20%7C%20MS%20%7C%20ZH-6E56CF)](#key-features)
 [![Status](https://img.shields.io/badge/Status-Hackathon%20prototype-orange)](#demo-scope--limitations)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue)](../LICENSE)
 
 [SDC Domain 2](#sdc-hackathon-2026--domain-2) · [Why NexFlow](#why-nexflow) · [Features](#key-features) · [Local YOLO demo](#local-yolo-image-demo) · [Screenshots](#screenshots) · [Quick start](#quick-start) · [Walkthrough](#demo-walkthrough) · [Architecture](#architecture) · [Testing](#testing) · [中文快速开始](#中文快速开始)
 
@@ -52,7 +52,7 @@ The Domain 2 challenge asks for an easy-to-learn automation product that removes
 > **Competition data rule:** The Domain 2 materials say to use team-created synthetic data and not real customer or company records. The repository's YOLO materials attribute the model/sample data to the Roboflow Universe `breaddetector/bread-detector` dataset (CC BY 4.0). Declare the model and dataset in the Technical & Tools Declaration and confirm with the organizers whether this third-party training/test material is permitted. For a judged demo, use team-created synthetic test images unless the organizers approve otherwise; do not present a random Google image as synthetic data.
 
 
-<img src="docs/readme-assets/owner-dashboard.png" alt="NexFlow owner dashboard after one simulated business day: RM9.60 paid, 3 items picked up, 11 items handed over for donation" width="860">
+<img src="../docs/readme-assets/owner-dashboard.png" alt="NexFlow owner dashboard after one simulated business day: RM9.60 paid, 3 items picked up, 11 items handed over for donation" width="860">
 
 ---
 
@@ -130,12 +130,12 @@ Captured during a local simulated demo session: count → leftover registration 
 
 <table>
 <tr>
-<td width="50%"><img src="docs/readme-assets/closing-count.png" alt="Staff closing count page with quick entry, stock steppers and the leftovers card"><br><sub><b>Staff · Closing count</b> — one-line entry, clearance draft, and the leftovers card.</sub></td>
-<td width="50%"><img src="docs/readme-assets/customer-purchase.png" alt="Customer purchase page with surprise box quote form and loyalty account"><br><sub><b>Customer · Purchase</b> — pickup slot, quote form, loyalty account and orders.</sub></td>
+<td width="50%"><img src="../docs/readme-assets/closing-count.png" alt="Staff closing count page with quick entry, stock steppers and the leftovers card"><br><sub><b>Staff · Closing count</b> — one-line entry, clearance draft, and the leftovers card.</sub></td>
+<td width="50%"><img src="../docs/readme-assets/customer-purchase.png" alt="Customer purchase page with surprise box quote form and loyalty account"><br><sub><b>Customer · Purchase</b> — pickup slot, quote form, loyalty account and orders.</sub></td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/readme-assets/end-of-day-handover.png" alt="End-of-day handover page with pending donations and confirmed handovers"><br><sub><b>End-of-day handover</b> — remaining food, pending donations, confirmed handovers.</sub></td>
-<td width="50%"><img src="docs/readme-assets/owner-dashboard-zh.png" alt="The same owner dashboard in Simplified Chinese with identical numbers"><br><sub><b>Owner · Dashboard (简体中文)</b> — same day, same numbers, switched language.</sub></td>
+<td width="50%"><img src="../docs/readme-assets/end-of-day-handover.png" alt="End-of-day handover page with pending donations and confirmed handovers"><br><sub><b>End-of-day handover</b> — remaining food, pending donations, confirmed handovers.</sub></td>
+<td width="50%"><img src="../docs/readme-assets/owner-dashboard-zh.png" alt="The same owner dashboard in Simplified Chinese with identical numbers"><br><sub><b>Owner · Dashboard (简体中文)</b> — same day, same numbers, switched language.</sub></td>
 </tr>
 </table>
 
@@ -451,7 +451,7 @@ Additional contributors appear in the commit history under the handles `panpan54
 
 ## License
 
-Released under the [Apache License 2.0](LICENSE).
+Released under the [Apache License 2.0](../LICENSE).
 
 ---
 
