@@ -1,3 +1,176 @@
+> [!IMPORTANT]
+> ## 📁 Submission Documents & Templates
+> Official submission templates are available in the Google Drive folder below. NexFlow's prepared documents are in [`submission/`](submission/).
+>
+> ### 👉 [OPEN THE GOOGLE DRIVE FOLDER](https://drive.google.com/drive/folders/1xw7c2aN8N-at8hPEULzkcU76e_FFb0Ef) 👈
+
+---
+
+# NexFlow
+
+> A bakery closing-time workspace for surplus stock entry, clearance offers, customer pickup and food-rescue records.
+
+## Team Information
+
+| Field | Details |
+|---|---|
+| Team Name | Nexgen |
+| Team Domain | Domain 2 — Orbyte Smart SME |
+| Main SDG Track | SDG 8 — Decent Work and Economic Growth |
+| Related SDG | SDG 12 — Responsible Consumption and Production |
+| Team Leader | YEO JIN HONG |
+| University | Xiamen University Malaysia (XMUM) |
+| Number of Members | 5 |
+
+## Links
+
+| Resource | Link |
+|---|---|
+| GitHub Repository | [Nexgen-XMUM/Nexflow](https://github.com/Nexgen-XMUM/Nexflow) |
+| Live Demo | [Orbyte Smart Yield on Replit](https://orbyte-smart-yield-nexgen.replit.app/) |
+| RunPod Endpoint | None — RunPod was not used |
+| Slide Deck | Not yet available |
+| Demo Video | [NexFlow project video](https://youtu.be/RVNASReQL-Y) |
+
+## Overview
+
+### Problem
+
+Small bakeries must count unsold food, decide clearance prices, write promotions and arrange surplus handovers at closing. These repeated tasks create fragmented records and extra work for staff. Owners need a simple approval step and a clear view of the day's results.
+
+### Solution
+
+NexFlow connects stock entry, calculated clearance offers, owner-reviewed promotional copy, surprise-box purchases, pickup and food-rescue records in one three-language workspace. DeepSeek can draft promotional wording; the competition runner uses a local template by default. People retain control over approval and handover.
+
+### Key Features
+
+- Surplus entry with backend pricing and food-footprint estimates.
+- Owner approval and simulated WhatsApp promotion.
+- Surprise-box quotes, simulated payment, pickup and loyalty points.
+- Remaining-food handover records and a business dashboard.
+- English, Bahasa Melayu and Chinese interfaces.
+- An independent YOLOv8 still-image counting prototype, separate from the main inventory workflow; the welcome-page detection animation is preset.
+
+### Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | HTML, CSS and native JavaScript |
+| Backend | Python, FastAPI, Pydantic and Uvicorn |
+| Database | SQLite; JSON product fixtures |
+| AI / Compute | Optional DeepSeek API; independent local Ultralytics YOLOv8 prototype |
+| Hosting | Replit public deployment; local competition runner |
+
+## Project Structure
+
+```text
+.
+├── backend/                 # FastAPI and business rules
+│   ├── desktop_demo.py      # Competition startup module
+│   ├── blind_boxes/         # Quotes, orders, points and food rescue
+│   ├── tests/               # Backend tests
+│   └── .env.example         # Optional backend configuration
+├── frontend/                # Main workspace and frontend tests
+├── data/                    # Shared demonstration fixtures
+├── impeccable/              # Independent local YOLO image prototype
+├── train_bread/             # Browser / ONNX experiments
+├── docs/                    # Screenshots, handover and submission evidence
+├── submission/              # Prepared submission documents
+│   ├── SDC2026_Nexgen_Preliminary.pdf
+│   ├── SDC2026_Nexgen_TechDeclaration.pdf
+│   └── SDC2026_Nexgen_Replit_POU.pdf
+├── requirements.txt
+├── .gitignore
+├── LICENSE
+└── README.md
+```
+
+### Architecture
+
+```text
+Browser workspace -> FastAPI -> SQLite / product JSON
+                         |
+                         +-> Local promotional template (demo default)
+                         +-> DeepSeek API (optional)
+
+Independent YOLO image prototype -> Staff review -> Local confirmation record
+```
+
+The local vision confirmation does not automatically update the main inventory. Payments, WhatsApp messages and recipient handovers are simulated; CO₂e is an estimate.
+
+## How to Run
+
+### Option 1 — Open the Replit Demo
+
+Open https://orbyte-smart-yield-nexgen.replit.app/ . No local installation is needed to view the public deployment. Some deployed files differ from the checked-out GitHub baseline; complete parity has not been verified.
+
+### Option 2 — Run Locally
+
+From the repository root on macOS / Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m backend.desktop_demo
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m backend.desktop_demo
+```
+
+Use Python 3.10 or newer. Open http://127.0.0.1:8000/app . The competition runner uses a temporary database and local promotional text; no API key is required. See the existing detailed documentation below for the welcome page, role windows, independent YOLO startup and demonstration order.
+
+### Run Tests
+
+```bash
+# macOS / Linux
+.venv/bin/python -m pytest backend/tests -q
+node --test frontend/tests/*.test.cjs
+```
+
+On Windows, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`.
+
+## How We Use Replit
+
+The public deployment is available at https://orbyte-smart-yield-nexgen.replit.app/ . Its homepage rendered and sampled pages, scripts and read-only APIs returned HTTP 200 during the 2026-10-24 verification. This provides evidence of public hosting; account ownership, deployment-source commit and sponsor-credit use still need owner confirmation.
+
+Proof: [Replit public-access evidence](submission/SDC2026_Nexgen_Replit_POU.pdf).
+
+## How We Use RunPod
+
+RunPod was not used. No endpoint, handler or proof-of-use document is claimed. The team accepts the official template's possible scoring or format consequences.
+
+## Challenges & Learnings
+
+The workflow distinguishes price forecasts from simulated receipts, generated copy from calculated facts, and recommended handovers from completed records. Backend request identifiers protect repeated submissions. A fixed demonstration order and clear boundaries between the main workspace, deployed snapshot and independent vision prototype make the project easier to explain and reproduce.
+
+## Future Improvements
+
+Pilot with bakery staff to measure closing time and count corrections; connect reviewed image counts to stock; add production authentication and reviewed messaging/payment integrations.
+
+## Team
+
+All five members are affiliated with Xiamen University Malaysia (XMUM).
+
+| Name | Role | Contact |
+|---|---|---|
+| YEO JIN HONG | Team leader; full-project development | kadenyeojinhong@gmail.com |
+| QIU BOCHUAN | Full-project development | 194019687@qq.com |
+| CHEN ZHENGXI | Backend development and presentation slides | fengmichouzi9@gmail.com |
+| PAN SHIQI | Backend development and presentation slides | 482477276@qq.com |
+| Chong Thing Wei | Full-project development | ivanchongtw1021@gmail.com |
+
+## License
+
+Project code retains the [Apache License 2.0](LICENSE). Third-party libraries, model weights and datasets retain their own terms; see the [technical declaration](submission/SDC2026_Nexgen_TechDeclaration.pdf). The official forms still contain human-verification fields and unsigned declarations.
+
+---
+
 <div align="center">
 
 <h1>NexFlow</h1>
@@ -31,7 +204,7 @@
 | Related SDGs | SDG 12 (Responsible Consumption and Production), related to the food-surplus use case. |
 | GitHub repository | [Nexgen-XMUM/Nexflow](https://github.com/Nexgen-XMUM/Nexflow) |
 | Live Demo | [Public Replit deployment](https://orbyte-smart-yield-nexgen.replit.app/) · [Local workspace](#4-open-the-app) · [Standalone local YOLO](#local-yolo-image-demo) |
-| Demo video | TODO — HUMAN VERIFICATION: add the final public video link and confirm organizer duration |
+| Demo video | [Watch the NexFlow project video on YouTube](https://youtu.be/RVNASReQL-Y) |
 | Slide deck / PRD | TODO — HUMAN VERIFICATION: add final share links |
 | Replit proof | [Public-access evidence PDF](submission/SDC2026_Nexgen_Replit_POU.pdf); owner deployment screenshot still needed |
 | Technical declaration | [Official form filled as unsigned draft](submission/SDC2026_Nexgen_TechDeclaration.pdf) |
