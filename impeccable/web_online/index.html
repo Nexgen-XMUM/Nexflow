@@ -1,0 +1,356 @@
+<title>NexFlow 面包盘点</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a working counter — photo tray on top, the photo with boxes on the left, the count sheet the staff signs off on the right */
+:root {
+  --bg: #f3f4f1; --surface: #ffffff; --sunk: #e9ebe6; --line: #d5d9d1;
+  --fg: #1d221c; --muted: #5f675d;
+  --crust: #b5651d; --crust-ink: #ffffff; --crust-soft: #f6e6d6;
+  --ok: #2f7d4f; --warn: #a35c00; --warn-soft: #fbeed9;
+  --font-display: "Sora", "Noto Sans SC", system-ui, sans-serif;
+  --font-body: "Noto Sans SC", system-ui, -apple-system, "Microsoft YaHei", sans-serif;
+  --font-num: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #151814; --surface: #1d211c; --sunk: #252a24; --line: #343a32;
+  --fg: #e8ebe5; --muted: #9aa396;
+  --crust: #e08a3c; --crust-ink: #1a1208; --crust-soft: #3a2a1a;
+  --ok: #6cc28e; --warn: #f0a94a; --warn-soft: #3a2c16; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #151814; --surface: #1d211c; --sunk: #252a24; --line: #343a32;
+  --fg: #e8ebe5; --muted: #9aa396;
+  --crust: #e08a3c; --crust-ink: #1a1208; --crust-soft: #3a2a1a;
+  --ok: #6cc28e; --warn: #f0a94a; --warn-soft: #3a2c16; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 18px; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 20px; }
+h1 { font-family: var(--font-display); font-size: 1.75rem; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h1 span { color: var(--crust); }
+.lede { margin: 2px 0 0; color: var(--muted); max-width: 62ch; }
+.status { font-size: .82rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.dot.ready { background: var(--ok); } .dot.err { background: var(--warn); }
+h2 { font-family: var(--font-display); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; font-weight: 500; }
+
+.tray { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+.thumb { flex: 0 0 auto; width: 132px; border: 2px solid transparent; border-radius: 10px; padding: 0; background: var(--sunk); cursor: pointer; overflow: hidden; text-align: left; color: var(--fg); font: inherit; }
+.thumb img { display: block; width: 100%; height: 88px; object-fit: cover; }
+.thumb span { display: block; font-size: .72rem; padding: 4px 8px 6px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.thumb[aria-pressed="true"] { border-color: var(--crust); }
+.thumb:focus-visible, button:focus-visible, input:focus-visible, label.upload:focus-within { outline: 2px solid var(--crust); outline-offset: 2px; }
+label.upload { flex: 0 0 auto; width: 132px; border: 2px dashed var(--line); border-radius: 10px; display: grid; place-items: center; text-align: center; color: var(--muted); font-size: .82rem; cursor: pointer; padding: 8px; }
+label.upload b { display: block; color: var(--fg); font-size: 1.4rem; font-weight: 500; }
+label.upload input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 820px) { .main { grid-template-columns: 1fr; } }
+.stage { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; min-width: 0; }
+.stage canvas { display: block; width: 100%; height: auto; border-radius: 8px; background: var(--sunk); }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .8rem; color: var(--muted); margin-top: 8px; font-family: var(--font-num); }
+
+.sheet { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 14px; min-width: 0; }
+.total { display: flex; align-items: baseline; gap: 10px; }
+.total strong { font-family: var(--font-num); font-size: 2.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.total span { color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th { text-align: left; font-weight: 500; font-size: .75rem; color: var(--muted); padding: 0 6px 6px; border-bottom: 1px solid var(--line); }
+td { padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.num { font-family: var(--font-num); text-align: right; }
+th.num { text-align: right; }
+.name small { display: block; color: var(--muted); font-size: .75rem; }
+.chip { display: inline-block; font-size: .7rem; padding: 1px 7px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); margin-left: 6px; white-space: nowrap; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; vertical-align: 0; }
+.qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.qty button { width: 30px; height: 32px; border: 0; background: var(--sunk); color: var(--fg); font-size: 1rem; cursor: pointer; }
+.qty input { width: 44px; height: 32px; border: 0; text-align: center; font-family: var(--font-num); font-size: .95rem; background: var(--surface); color: var(--fg); }
+.qty.changed { border-color: var(--crust); }
+.add { display: flex; gap: 8px; flex-wrap: wrap; }
+.add select { flex: 1; min-width: 0; height: 36px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); padding: 0 8px; font: inherit; }
+.btn { height: 38px; padding: 0 16px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: inherit; font-weight: 500; cursor: pointer; }
+.btn.main-btn { background: var(--crust); color: var(--crust-ink); border-color: var(--crust); width: 100%; height: 44px; font-size: 1rem; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.note { font-size: .82rem; color: var(--muted); margin: 0; }
+.note.ok { color: var(--ok); }
+.empty { color: var(--muted); font-size: .9rem; padding: 10px 0; }
+
+.log { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.log ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.log li { display: grid; grid-template-columns: 9.5em minmax(0, 1fr) auto; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); font-size: .88rem; align-items: baseline; }
+.log li:first-child { border-top: 0; }
+.log time { font-family: var(--font-num); color: var(--muted); font-size: .8rem; }
+.log .diff { color: var(--crust); font-family: var(--font-num); font-size: .8rem; white-space: nowrap; }
+@media (max-width: 560px) { .log li { grid-template-columns: 1fr auto; } .log time { grid-column: 1 / -1; } }
+footer { font-size: .75rem; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) { .thumb { transition: border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>NexFlow <span>面包盘点</span></h1>
+      <p class="lede">选一张面包照片，AI 先数一遍；店员核对、改正后确认。识别在你的浏览器里完成，照片不会上传。</p>
+    </div>
+    <div class="status" role="status"><i class="dot" id="dot"></i><span id="status">正在载入识别模型（约 20 MB，首次需要几秒）…</span></div>
+  </header>
+
+  <section aria-labelledby="tray-h">
+    <h2 id="tray-h">样图（训练集原图，文件名是标注的真实数量）</h2>
+    <div class="tray" id="tray">
+      <label class="upload"><input type="file" id="upload" accept="image/*"><span><b>＋</b>上传照片</span></label>
+    </div>
+  </section>
+
+  <div class="main">
+    <section class="stage" aria-label="识别结果">
+      <canvas id="canvas" width="1200" height="800"></canvas>
+      <div class="meta" id="meta"><span>等待模型载入</span></div>
+    </section>
+
+    <section class="sheet" aria-labelledby="sheet-h">
+      <div>
+        <h2 id="sheet-h">盘点单</h2>
+        <div class="total"><strong id="total">–</strong><span id="totalNote">件</span></div>
+      </div>
+      <div id="rows"><p class="empty">识别完成后，这里按品种列出数量。</p></div>
+      <div class="add">
+        <select id="addSel" aria-label="补一个 AI 漏掉的品种"></select>
+        <button class="btn" id="addBtn" type="button">补品种</button>
+      </div>
+      <button class="btn main-btn" id="confirmBtn" type="button" disabled>确认盘点</button>
+      <p class="note" id="confirmNote">虚线框是置信度低于 50% 的识别，请重点核对。</p>
+    </section>
+  </div>
+
+  <section class="log" aria-labelledby="log-h">
+    <h2 id="log-h">最近确认记录</h2>
+    <ul id="log"><li class="empty">还没有确认记录。核对完数量后点“确认盘点”，记录会出现在这里。</li></ul>
+  </section>
+
+  <footer>模型：YOLO bread_finetune（15 个品种，2026-10-23 训练）· 数据集：Roboflow Universe breaddetector/bread-detector，CC BY 4.0 · Demo：确认记录只保存在本页，未同步 NexFlow 库存。</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.3/dist/ort.min.js"></script>
+<script>
+const CLASSES = ['baguette','binangkal','bonete','cornbread','croissant','ensaymada','flatbread','kalihim','monay','pandesal','sourdough','spanish-bread','wheat-bread','white-bread','whole-grain-bread'];
+const ZH = {baguette:'法棍', binangkal:'芝麻炸面团', bonete:'软帽面包', cornbread:'玉米面包', croissant:'可颂', ensaymada:'奶油卷', flatbread:'薄饼', kalihim:'红馅面包', monay:'莫奈面包', pandesal:'盐面包', sourdough:'酸种面包', 'spanish-bread':'西班牙卷', 'wheat-bread':'麦面包', 'white-bread':'白吐司', 'whole-grain-bread':'全麦面包'};
+const SAMPLES = ['1_croissant_9.jpg','2_sourdough_4.jpg','3_croissant2_whitebread3.jpg','4_croissant1_sourdough1.jpg','5_croissant_6.jpg'];
+const SIZE = 640, CONF = 0.35, LOW_CONF = 0.5, IOU = 0.7;
+const COLORS = ['#c0392b','#8e44ad','#2c7fb8','#16a085','#d35400','#7f8c8d','#b7950b','#e84393','#2d3436','#00838f','#6d4c41','#5e35b1','#558b2f','#ef6c00','#37474f'];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let session = null, busy = false, current = null; // current = {source, ai:{label:n}, qty:{label:n}}
+let db = null, localLog = [];
+
+function setStatus(text, cls){ $('#status').textContent = text; $('#dot').className = 'dot ' + (cls || ''); }
+
+// ---------- 模型 ----------
+async function loadModel(){
+  ort.env.wasm.wasmPaths = new URL('./', location.href).href; // 用本页自带的 wasm 文件
+  ort.env.wasm.numThreads = 1;
+  try{
+    // 模型以 base64 文本发布（网页只允许常见文件类型），这里还原成二进制
+    const res = await fetch('model.b64.txt');
+    if(!res.ok) throw new Error('模型文件 HTTP ' + res.status);
+    const bin = atob((await res.text()).trim()), bytes = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    session = await ort.InferenceSession.create(bytes, {executionProviders: ['wasm']});
+    setStatus('模型已就绪，可以盘点', 'ready');
+    return true;
+  }catch(e){
+    setStatus('模型载入失败：' + (e.message || e), 'err');
+    return false;
+  }
+}
+
+// 与 Ultralytics 相同的 letterbox：等比缩放到 640，四周用灰色 114 填充
+function preprocess(img){
+  const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+  const r = Math.min(SIZE / w, SIZE / h);
+  const nw = Math.round(w * r), nh = Math.round(h * r);
+  const left = Math.round((SIZE - nw) / 2 - 0.1), top = Math.round((SIZE - nh) / 2 - 0.1);
+  const c = document.createElement('canvas'); c.width = c.height = SIZE;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgb(114,114,114)'; g.fillRect(0, 0, SIZE, SIZE);
+  g.drawImage(img, left, top, nw, nh);
+  const px = g.getImageData(0, 0, SIZE, SIZE).data, n = SIZE * SIZE;
+  const t = new Float32Array(3 * n);
+  for(let i = 0; i < n; i++){ t[i] = px[i*4] / 255; t[n+i] = px[i*4+1] / 255; t[2*n+i] = px[i*4+2] / 255; }
+  return {tensor: new ort.Tensor('float32', t, [1, 3, SIZE, SIZE]), r, left, top, w, h};
+}
+
+function iou(a, b){
+  const x1 = Math.max(a[0], b[0]), y1 = Math.max(a[1], b[1]), x2 = Math.min(a[2], b[2]), y2 = Math.min(a[3], b[3]);
+  const inter = Math.max(0, x2 - x1) * Math.max(0, y2 - y1);
+  return inter / ((a[2]-a[0])*(a[3]-a[1]) + (b[2]-b[0])*(b[3]-b[1]) - inter);
+}
+
+// 输出 [1, 4+15, 8400]：前 4 行是框（中心点、宽高），后 15 行是各品种分数；按品种做 NMS
+function postprocess(out, pre){
+  const d = out.data, N = out.dims[2], nc = out.dims[1] - 4, cand = [];
+  for(let i = 0; i < N; i++){
+    let best = 0, cls = -1;
+    for(let c = 0; c < nc; c++){ const s = d[(4+c)*N + i]; if(s > best){ best = s; cls = c; } }
+    if(best < CONF) continue;
+    const cx = d[i], cy = d[N+i], bw = d[2*N+i], bh = d[3*N+i];
+    cand.push({cls, conf: best, box: [cx-bw/2, cy-bh/2, cx+bw/2, cy+bh/2]});
+  }
+  cand.sort((a, b) => b.conf - a.conf);
+  const keep = [];
+  for(const c of cand){
+    if(keep.length >= 300) break;
+    if(keep.every(k => k.cls !== c.cls || iou(k.box, c.box) <= IOU)) keep.push(c);
+  }
+  return keep.map(k => ({
+    label: CLASSES[k.cls], conf: k.conf, low: k.conf < LOW_CONF,
+    box: k.box.map((v, j) => Math.min(Math.max((v - (j % 2 ? pre.top : pre.left)) / pre.r, 0), j % 2 ? pre.h : pre.w)),
+  }));
+}
+
+function draw(img, dets){
+  const cv = $('#canvas'), w = img.naturalWidth, h = img.naturalHeight;
+  cv.width = w; cv.height = h;
+  const g = cv.getContext('2d');
+  g.drawImage(img, 0, 0);
+  const lw = Math.max(2, Math.round(Math.max(w, h) / 400)), fs = Math.max(14, Math.round(Math.max(w, h) / 55));
+  g.font = `600 ${fs}px "JetBrains Mono", monospace`;
+  for(const d of dets){
+    const col = COLORS[CLASSES.indexOf(d.label)];
+    const [x1, y1, x2, y2] = d.box;
+    g.lineWidth = lw; g.strokeStyle = col; g.setLineDash(d.low ? [lw*4, lw*3] : []);
+    g.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    g.setLineDash([]);
+    const tag = `${d.label} ${Math.round(d.conf * 100)}%`, tw = g.measureText(tag).width + fs * .6;
+    const ty = y1 > fs * 1.4 ? y1 - fs * 1.35 : y1;
+    g.fillStyle = col; g.fillRect(x1, ty, tw, fs * 1.35);
+    g.fillStyle = '#fff'; g.fillText(tag, x1 + fs * .3, ty + fs * 1.02);
+  }
+}
+
+async function loadImage(src){
+  const img = new Image();
+  img.src = src;
+  await img.decode();
+  return img;
+}
+
+async function detect(src, source){
+  if(busy) return;
+  if(!session){ setStatus('模型还没载入完，请稍等', 'err'); return; }
+  busy = true;
+  document.querySelectorAll('.thumb').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.name === source)));
+  setStatus('正在识别…');
+  try{
+    const img = await loadImage(src);
+    const pre = preprocess(img);
+    const t0 = performance.now();
+    const out = await session.run({images: pre.tensor});
+    const dets = postprocess(out[session.outputNames[0]], pre);
+    const ms = Math.round(performance.now() - t0);
+    draw(img, dets);
+    const ai = {}, low = {};
+    for(const d of dets){ ai[d.label] = (ai[d.label] || 0) + 1; if(d.low) low[d.label] = (low[d.label] || 0) + 1; }
+    current = {source, ai, low, qty: {...ai}};
+    $('#meta').innerHTML = `<span>${esc(source)}</span><span>${img.naturalWidth}×${img.naturalHeight}</span><span>${dets.length} 个框</span><span>${ms} ms</span>`;
+    $('#confirmNote').className = 'note';
+    $('#confirmNote').textContent = '虚线框是置信度低于 50% 的识别，请重点核对。';
+    renderSheet();
+    setStatus('识别完成，请核对数量', 'ready');
+  }catch(e){
+    setStatus('识别失败：' + (e.message || e), 'err');
+  }finally{ busy = false; }
+}
+
+// ---------- 盘点单 ----------
+function renderSheet(){
+  const labels = Object.keys(current.qty).sort((a, b) => (current.qty[b] - current.qty[a]) || a.localeCompare(b));
+  const total = labels.reduce((s, k) => s + current.qty[k], 0);
+  const aiTotal = Object.values(current.ai).reduce((s, v) => s + v, 0);
+  $('#total').textContent = total;
+  $('#totalNote').textContent = total === aiTotal ? '件，与 AI 一致' : `件（AI 数了 ${aiTotal}）`;
+  $('#rows').innerHTML = labels.length ? `<table><thead><tr><th>品种</th><th class="num">AI</th><th class="num">确认数量</th></tr></thead><tbody>${labels.map(k => `
+    <tr><td class="name"><i class="sw" style="background:${COLORS[CLASSES.indexOf(k)]}"></i>${esc(k)}${current.low[k] ? `<span class="chip">${current.low[k]} 个待复核</span>` : ''}<small>${esc(ZH[k] || '')}</small></td>
+    <td class="num">${current.ai[k] || 0}</td>
+    <td class="num"><span class="qty${current.qty[k] !== (current.ai[k] || 0) ? ' changed' : ''}"><button type="button" data-dec="${esc(k)}" aria-label="${esc(k)} 减一">−</button><input id="q-${esc(k)}" inputmode="numeric" value="${current.qty[k]}" data-k="${esc(k)}" aria-label="${esc(k)} 确认数量"><button type="button" data-inc="${esc(k)}" aria-label="${esc(k)} 加一">＋</button></span></td></tr>`).join('')}</tbody></table>`
+    : '<p class="empty">AI 没有识别到面包。如果照片里有，请用下面的“补品种”手动加上。</p>';
+  $('#addSel').innerHTML = CLASSES.filter(c => !(c in current.qty)).map(c => `<option value="${c}">${c} · ${ZH[c]}</option>`).join('');
+  $('#confirmBtn').disabled = false;
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.name){ detect('images/' + b.dataset.name, b.dataset.name); return; }
+  const k = b.dataset.inc || b.dataset.dec;
+  if(k && current){ current.qty[k] = Math.max(0, current.qty[k] + (b.dataset.inc ? 1 : -1)); renderSheet(); }
+});
+$('#rows').addEventListener('change', e => {
+  const k = e.target.dataset.k; if(!k) return;
+  const v = Number(e.target.value);
+  if(Number.isInteger(v) && v >= 0) current.qty[k] = v;
+  renderSheet();
+});
+$('#addBtn').addEventListener('click', () => {
+  const k = $('#addSel').value; if(!current || !k) return;
+  current.qty[k] = 1; renderSheet();
+});
+$('#upload').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const url = URL.createObjectURL(f);
+  detect(url, f.name).finally(() => URL.revokeObjectURL(url));
+  e.target.value = '';
+});
+
+// ---------- 确认 ----------
+$('#confirmBtn').addEventListener('click', async () => {
+  if(!current) return;
+  const confirmed = Object.fromEntries(Object.entries(current.qty).filter(([, v]) => v > 0));
+  const corrections = {};
+  for(const k of new Set([...Object.keys(current.ai), ...Object.keys(confirmed)])){
+    const d = (confirmed[k] || 0) - (current.ai[k] || 0);
+    if(d) corrections[k] = d;
+  }
+  const record = {
+    confirmed_at: new Date().toISOString(), source: current.source, model: 'bread_finetune',
+    ai_counts: current.ai, confirmed_counts: confirmed, corrections,
+    ai_total: Object.values(current.ai).reduce((s, v) => s + v, 0),
+    confirmed_total: Object.values(confirmed).reduce((s, v) => s + v, 0),
+  };
+  const btn = $('#confirmBtn'), note = $('#confirmNote');
+  btn.disabled = true;
+  try{
+    if(db){ await db.collection('confirmations').add(record); note.textContent = `已确认 ${record.confirmed_total} 件，记录已保存。`; }
+    else { localLog.unshift(record); renderLog(localLog); note.textContent = `已确认 ${record.confirmed_total} 件。当前没有登录 claude.ai，记录只显示在本次打开的页面里。`; }
+    note.className = 'note ok';
+  }catch(e){
+    note.className = 'note';
+    note.textContent = e.code === 'invalid_argument' ? '你只有查看权限，不能保存确认记录。' : '保存失败：' + (e.message || e.code) + '，请再点一次确认。';
+    btn.disabled = false;
+  }
+});
+
+function renderLog(rows){
+  $('#log').innerHTML = rows.length ? rows.map(r => {
+    const t = new Date(r.confirmed_at);
+    const counts = Object.entries(r.confirmed_counts || {}).map(([k, v]) => `${v} ${k}`).join('、') || '0 件';
+    const diff = Object.entries(r.corrections || {}).map(([k, v]) => `${k} ${v > 0 ? '+' : ''}${v}`).join(' ');
+    return `<li><time datetime="${esc(r.confirmed_at)}">${t.toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})}</time><span>${esc(counts)} <small style="color:var(--muted)">· ${esc(r.source)}</small></span><span class="diff">${diff ? '改 ' + esc(diff) : '与 AI 一致'}</span></li>`;
+  }).join('') : '<li class="empty">还没有确认记录。核对完数量后点“确认盘点”，记录会出现在这里。</li>';
+}
+
+// ---------- 启动 ----------
+$('#tray').insertAdjacentHTML('beforeend', SAMPLES.map(n => `<button class="thumb" type="button" data-name="${n}" aria-pressed="false"><img src="images/${n}" alt="${n}"><span>${n.replace(/\.\w+$/, '')}</span></button>`).join(''));
+
+(async () => {
+  if(await loadModel()) detect('images/' + SAMPLES[0], SAMPLES[0]); // 打开就先演示第一张
+})();
+
+(async () => {
+  db = await window.claude?.use?.('db').catch(() => null) ?? null;
+  if(!db) return;
+  db.collection('confirmations').orderBy('confirmed_at', 'desc').limit(10)
+    .onSnapshot(s => renderLog(s.docs.map(d => d.data())), () => {});
+})();
+</script>

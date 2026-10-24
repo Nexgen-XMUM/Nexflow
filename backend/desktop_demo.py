@@ -19,6 +19,16 @@ from backend.blind_boxes.schemas import Batch
 # 展示外壳页面与主工作台放在同一目录，由 FastAPI 直接返回，无需额外静态服务器。
 SHOWCASE = Path(__file__).resolve().parents[1] / "frontend"
 
+# 欢迎页只用 impeccable/ 原型里的这五张样图；白名单同时挡住了其它任何文件。
+SHOWCASE_IMAGE_DIR = Path(__file__).resolve().parents[1] / "impeccable" / "demo_images"
+SHOWCASE_IMAGES = frozenset({
+    "1_croissant_9.jpg",
+    "2_sourdough_4.jpg",
+    "3_croissant2_whitebread3.jpg",
+    "4_croissant1_sourdough1.jpg",
+    "5_croissant_6.jpg",
+})
+
 
 def create_demo_app(database: Path, day=None):
     # Force local copy before create_app loads optional .env settings.
@@ -50,6 +60,18 @@ def create_demo_app(database: Path, day=None):
     @application.get("/login", include_in_schema=False)
     def login_signup_page():
         return FileResponse(SHOWCASE / "login_signup_page.html")
+
+    @application.get("/showcase/images/{filename}", include_in_schema=False)
+    def showcase_image(filename: str):
+        """只提供欢迎页使用的五张内置样图。
+
+        impeccable/ 是队友的独立 YOLO 原型，这里仅按文件名白名单取图，不暴露目录、
+        不提供模型/源码/JSON，也不提供任何推理接口。
+        """
+        if filename not in SHOWCASE_IMAGES:
+            raise HTTPException(status_code=404, detail="Image not found")
+        path = SHOWCASE_IMAGE_DIR / filename
+        return FileResponse(path, media_type="image/jpeg")
 
     @application.get("/api/demo/session", tags=["Competition demo only"])
     def demo_session():
