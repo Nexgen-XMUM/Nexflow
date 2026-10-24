@@ -29,7 +29,7 @@
 | GitHub Repository | [Nexgen-XMUM/Nexflow](https://github.com/Nexgen-XMUM/Nexflow) |
 | Live Demo | [Orbyte Smart Yield on Replit](https://orbyte-smart-yield-nexgen.replit.app/) |
 | RunPod Endpoint | None — RunPod was not used |
-| Slide Deck | Not yet available |
+| Slide Deck | [NexFlow presentation on Canva](https://canva.link/1k1qd953gwbq3gp) |
 | Demo Video | [NexFlow project video](https://youtu.be/RVNASReQL-Y) |
 
 ## Overview
