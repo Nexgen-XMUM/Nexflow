@@ -27,7 +27,7 @@
 | Resource | Link |
 |---|---|
 | GitHub Repository | [Nexgen-XMUM/Nexflow](https://github.com/Nexgen-XMUM/Nexflow) |
-| Live Demo | [Orbyte Smart Yield on Replit](https://orbyte-smart-yield-nexgen.replit.app/) |
+| Live Demo | [NexFlow on Replit](https://nexflow-kadenyeojinhong.replit.app/) |
 | RunPod Endpoint | None — RunPod was not used |
 | Slide Deck | [NexFlow presentation on Canva](https://canva.link/1k1qd953gwbq3gp) |
 | Demo Video | [NexFlow project video](https://youtu.be/RVNASReQL-Y) |
@@ -104,7 +104,7 @@ The local vision confirmation does not automatically update the main inventory. 
 
 ### Option 1 — Open the Replit Demo
 
-Open https://orbyte-smart-yield-nexgen.replit.app/ . No local installation is needed to view the public deployment. The code in `main` is the same build that is deployed: Replit reads `.replit` and runs `python replit_run.py`, which starts the competition runner on Replit's public port with a temporary database.
+Open https://nexflow-kadenyeojinhong.replit.app/ . No local installation is needed to view the public deployment. The code in `main` is the same build that is deployed: Replit reads `.replit` and runs `python replit_run.py`, which starts the competition runner on Replit's public port with a temporary database.
 
 To run it in your own Repl: **Create Repl → Import from GitHub**, paste `https://github.com/Nexgen-XMUM/Nexflow`, then click **Run**. No secrets are required.
 
@@ -141,7 +141,7 @@ On Windows, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`. The fr
 
 ## How We Use Replit
 
-- **Hosting:** The public deployment is available at https://orbyte-smart-yield-nexgen.replit.app/ . Its homepage rendered and sampled pages, scripts and read-only APIs returned HTTP 200 during the 2026-10-24 verification.
+- **Hosting:** The public deployment is https://nexflow-kadenyeojinhong.replit.app/ , published from this repository's `.replit` (`python replit_run.py`). On 2026-10-25 the welcome page, `/login` and `/app` returned HTTP 200, the demo and blind-box APIs (`/api/demo/session`, `/api/products`, `/api/blind-boxes/inventory`, `/api/blind-boxes/dashboard`) returned HTTP 200, and the product tour passed at 1366×768, 1440×900 and 1920×1080 in headless Edge.
 - **Run configuration:** `.replit` runs `python replit_run.py`, which binds the competition runner to `0.0.0.0:$PORT` with a temporary SQLite database, so every restart is a clean demo.
 - **Secrets:** None are needed; the runner forces the local promotional template, so no API key is stored in the Repl or the repository.
 
@@ -218,12 +218,12 @@ Project code retains the [Apache License 2.0](LICENSE). Third-party libraries, m
 | Team | Nexgen |
 | Project | NexFlow / Orbyte Smart Yield |
 | University / registered leader / member count | TODO — HUMAN VERIFICATION: confirm registered team details; do not infer from Git handles |
-| Deployment address | https://orbyte-smart-yield-nexgen.replit.app/ |
+| Deployment address | https://nexflow-kadenyeojinhong.replit.app/ |
 | Domain | **Domain 2 — Orbyte Smart SME Challenge** |
 | Main SDG | **SDG 8**, especially Targets 8.2 (productivity through technology) and 8.3 (MSME growth) |
 | Related SDGs | SDG 12 (Responsible Consumption and Production), related to the food-surplus use case. |
 | GitHub repository | [Nexgen-XMUM/Nexflow](https://github.com/Nexgen-XMUM/Nexflow) |
-| Live Demo | [Public Replit deployment](https://orbyte-smart-yield-nexgen.replit.app/) · [Local workspace](#4-open-the-app) · [Standalone local YOLO](#local-yolo-image-demo) |
+| Live Demo | [Public Replit deployment](https://nexflow-kadenyeojinhong.replit.app/) · [Local workspace](#4-open-the-app) · [Standalone local YOLO](#local-yolo-image-demo) |
 | Demo video | [Watch the NexFlow project video on YouTube](https://youtu.be/RVNASReQL-Y) |
 | Slide deck / PRD | TODO — HUMAN VERIFICATION: add final share links |
 | Replit proof | Proof-of-use PDF pending (`submission/SDC2026_Nexgen_Replit_POU.pdf`); public deployment is live |
@@ -648,7 +648,7 @@ Additional contributors appear in the commit history under the handles `panpan54
 
 ## How We Use Replit
 
-The team supplied https://orbyte-smart-yield-nexgen.replit.app/ as its public deployment. On 2026-10-24 the homepage rendered in a browser; `/login`, `/app`, two sampled scripts and read-only demo/inventory APIs returned HTTP 200. `integration.js` matches the checked-out main baseline byte-for-byte, while sampled HTML and `i18n.js` differ. Full feature/source parity is not asserted. No public checkout or paid API call was performed.
+The current public deployment is https://nexflow-kadenyeojinhong.replit.app/ (see How We Use Replit above). Earlier evidence: the team's previous deployment, https://orbyte-smart-yield-nexgen.replit.app/ ; on 2026-10-24 the homepage rendered in a browser; `/login`, `/app`, two sampled scripts and read-only demo/inventory APIs returned HTTP 200. `integration.js` matches the checked-out main baseline byte-for-byte, while sampled HTML and `i18n.js` differ. Full feature/source parity is not asserted. No public checkout or paid API call was performed.
 
 Replit proof PDF (`submission/SDC2026_Nexgen_Replit_POU.pdf`) is still to be added. TODO — HUMAN VERIFICATION: owner project/deployment dashboard, source commit, plan/region and sponsor-voucher redemption. `.replit` runs `python replit_run.py`, the same entry point as the public deployment.
 
