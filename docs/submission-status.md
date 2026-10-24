@@ -18,7 +18,7 @@ Date: 2026-10-24, Asia/Kuala_Lumpur. Branch: submission, based on origin/main `7
 | submission/SDC2026_Nexgen_Preliminary.pdf | Filled official form; DRAFT / HUMAN REVIEW REQUIRED |
 | submission/SDC2026_Nexgen_TechDeclaration.pdf | Filled official form plus appendix; DRAFT / HUMAN REVIEW REQUIRED |
 | submission/SDC2026_Nexgen_Replit_POU.pdf | Real public-access evidence; owner dashboard evidence pending |
-| submission/SDC2026_Nexgen_Runpod_POU.pdf | Intentionally absent: not used |
+| submission/SDC2026_Nexgen_Runpod_POU.pdf |Real screenshort evidence;  dashboard |
 | docs/submission-compliance-audit.md | Requirements, source and exceptions |
 | docs/submission-evidence/ | Public screenshot, HTTP hashes, local smoke and repository-check records |
 | docs/submission-source/generate_pdfs.py | Reproducible form population; PDF-only dependencies separate from app |
