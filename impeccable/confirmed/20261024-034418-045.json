@@ -1,0 +1,16 @@
+{
+  "id": "20261024-034418-045",
+  "confirmed_at": "2026-10-24T03:44:18",
+  "source": "1_croissant_9.jpg",
+  "model": "best.pt",
+  "ai_counts": {
+    "croissant": 9
+  },
+  "confirmed_counts": {
+    "croissant": 9
+  },
+  "ai_total": 9,
+  "confirmed_total": 9,
+  "corrections": {},
+  "note": "Demo: saved locally only, not synced to NexFlow stock"
+}
