@@ -22,35 +22,34 @@ def fetch_pages(tmp_path):
     return welcome.text, login.text, dictionary.text
 
 
-def test_showcase_pages_share_the_workspace_dictionary(tmp_path):
-    for page in fetch_pages(tmp_path)[:2]:
-        # 复用同一个字典文件与同一套语言状态，不另起一套 i18n 实现
-        assert '<script src="/app/assets/i18n.js">' in page
-        # 语言切换器：原生 select（键盘可用）、三种语言、可访问名称
-        assert 'id="langSelect"' in page
-        assert 'value="en"' in page and 'value="ms"' in page and 'value="zh-CN"' in page
-        assert 'data-i18n-aria="app.langLabel"' in page
-        # 页面自己不写语言状态，交给 i18n.js 的 localStorage 键
-        assert "localStorage.setItem('nexflow_lang'" not in page
-
-
-def test_showcase_pages_use_translation_keys_instead_of_hardcoded_copy(tmp_path):
+def test_login_page_keeps_the_three_language_dictionary(tmp_path):
+    """登录页继续使用共享字典；欢迎页已改为纯英文的 Bread Count 演示。"""
     welcome, login, _ = fetch_pages(tmp_path)
-    assert welcome.count('data-i18n="home.') >= 30
+    assert '<script src="/app/assets/i18n.js">' in login
+    assert 'id="langSelect"' in login
+    assert 'value="en"' in login and 'value="ms"' in login and 'value="zh-CN"' in login
+    assert 'data-i18n-aria="app.langLabel"' in login
+    assert "localStorage.setItem('nexflow_lang'" not in login
+    # 欢迎页保持英文单语，不引入第二套 i18n
+    assert '<html lang="en">' in welcome
+    assert "/app/assets/i18n.js" not in welcome
+    assert 'id="langSelect"' not in welcome
+
+
+def test_login_page_uses_translation_keys_instead_of_hardcoded_copy(tmp_path):
+    _, login, _ = fetch_pages(tmp_path)
     assert login.count('data-i18n="auth.') >= 15
-    assert '<title data-i18n="home.pageTitle">' in welcome
     assert '<title data-i18n="auth.pageTitle">' in login
     # 动态文案也走字典：登录页的 Toast、校验提示与成功弹窗
     for key in ("auth.toast.filled", "auth.err.emailInvalid", "auth.modal.title", "auth.login.submitting"):
         assert key in login
 
 
-def test_dictionary_carries_every_key_used_by_the_showcase_pages(tmp_path):
-    welcome, login, dictionary = fetch_pages(tmp_path)
+def test_dictionary_carries_every_key_used_by_the_login_page(tmp_path):
+    _, login, dictionary = fetch_pages(tmp_path)
     used = set()
-    for page in (welcome, login):
-        used.update(re.findall(r'data-i18n(?:-ph|-aria|-title)?="([a-z][A-Za-z.]+)"', page))
-        used.update(re.findall(r"'((?:auth|home|welcome)\.[A-Za-z.]+)'", page))
+    used.update(re.findall(r'data-i18n(?:-ph|-aria|-title)?="([a-z][A-Za-z.]+)"', login))
+    used.update(re.findall(r"'((?:auth|welcome)\.[A-Za-z.]+)'", login))
     used.discard("auth.role.")  # 运行时拼接，实际键是 auth.role.owner/staff/user
     assert used, "没有解析到任何展示页词条"
     missing = sorted(key for key in used if "'" + key + "': [" not in dictionary)
