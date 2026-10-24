@@ -16,38 +16,60 @@ def demo_client(tmp_path):
     return TestClient(create_demo_app(tmp_path / "demo.sqlite3", DAY))
 
 
-def test_welcome_page_is_served_at_root_with_live_links(tmp_path):
+def test_welcome_page_is_served_at_root_as_the_bread_count_demo(tmp_path):
     with demo_client(tmp_path) as client:
         response = client.get("/")
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
         page = response.text
-        # 小怪兽欢迎页：顶部 Log in 与底部 Launch the demo 都打开内嵌登录弹窗
-        assert 'id="loginLink"' in page and 'id="ctaLogin"' in page
-        assert 'id="monster"' in page and 'id="loginForm"' in page
-        # 唯一指向 /login 的入口是「创建账号」
-        assert page.count('href="/login"') == 1
-        # 顶部导航的四个锚点都必须有真实落点
-        for anchor in ("purpose", "features", "numbers", "voices"):
-            assert f'href="#{anchor}"' in page
-            assert f'id="{anchor}"' in page
-        # 旧文件链接与失效锚点都已修掉，不允许再指向不存在的页面
-        assert "orbyte_smart_yield_with_onboarding.html" not in page
-        assert 'href="#benefits"' not in page
+    # Bread Count 欢迎页：样图托盘、识别预览、计数表、确认按钮、小怪兽
+    for element in ('id="tray"', 'id="frame"', 'id="rows"', 'id="confirmBtn"', 'id="log"', 'id="monster"'):
+        assert element in page
+    assert "YOLOv8 Detection Preview · Simulated Results" in page
+    assert 'href="/app#boss"' in page  # Enter NexFlow
+    assert page.count('href="/login"') == 1  # 页脚保留登录页入口
+    assert 'src="/showcase/images/' in page  # 样图走白名单静态路由
+    assert "orbyte_smart_yield_with_onboarding.html" not in page
 
 
-def test_welcome_demo_entry_always_opens_the_owner_workspace(tmp_path):
-    """任意邮箱、任意密码、任意角色都直接进入 /app#boss，不做校验也不分角色跳转。"""
+def test_welcome_preview_never_calls_an_inference_backend(tmp_path):
+    """识别是纯前端预设动画：不连 8100、不调 /api/detect，也不写主系统数据。"""
     with demo_client(tmp_path) as client:
         page = client.get("/").text
-    start = page.index("$('#loginForm').addEventListener('submit'")
-    handler = page[start:page.index("});", start) + 3]
-    assert "location.assign('/app#boss')" in handler
-    assert "'/app#' + role" not in page  # 不再按角色分别跳转
-    assert "return;" not in handler.split("location.assign")[0]  # 提交前没有验证拦截
-    assert "orbyte_demo_user" in handler  # 只记录演示身份用于回显
-    # 密码不会写入任何存储
-    assert "password" not in handler.lower().replace("$('#password')", "")
+    for forbidden in ("/api/detect", "/api/confirm", "/api/images", "/api/meta", "onxxruntime", "8100", "127.0.0.1"):
+        assert forbidden not in page, f"欢迎页不应引用 {forbidden}"
+    assert "live detection is not enabled" in page  # 上传照片只做预览
+    assert "Simulated" in page and "never written to NexFlow stock" in page
+
+
+def test_showcase_images_route_serves_only_the_five_samples(tmp_path):
+    names = ["1_croissant_9.jpg", "2_sourdough_4.jpg", "3_croissant2_whitebread3.jpg",
+             "4_croissant1_sourdough1.jpg", "5_croissant_6.jpg"]
+    with demo_client(tmp_path) as client:
+        for name in names:
+            response = client.get(f"/showcase/images/{name}")
+            assert response.status_code == 200
+            assert response.headers["content-type"] == "image/jpeg"
+        # 目录内其它文件、模型、源码、路径穿越都不提供
+        for name in ("best.pt", "model.b64.txt", "app.py", "index.html", "..%2Fweights%2Fbest.pt", "nothing.jpg"):
+            assert client.get(f"/showcase/images/{name}").status_code == 404
+        assert client.get("/showcase/images/").status_code == 404
+        assert client.get("/impeccable/app.py").status_code == 404
+        # 主工作台与 Demo 接口保持可用
+        assert client.get("/app").status_code == 200
+        assert client.get("/api/demo/session").status_code == 200
+
+
+def test_welcome_page_assets_exist_on_disk(tmp_path):
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[2]
+    for rel in ("impeccable/app.py", "impeccable/requirements.txt", "impeccable/start.bat",
+                "impeccable/static/index.html", "impeccable/weights/best.pt",
+                "impeccable/web_online/index.html"):
+        assert (root / rel).is_file(), f"缺少独立原型文件 {rel}"
+    for name in ("1_croissant_9.jpg", "2_sourdough_4.jpg", "3_croissant2_whitebread3.jpg",
+                 "4_croissant1_sourdough1.jpg", "5_croissant_6.jpg"):
+        assert (root / "impeccable" / "demo_images" / name).is_file()
 
 
 def test_login_page_points_at_the_workspace(tmp_path):
