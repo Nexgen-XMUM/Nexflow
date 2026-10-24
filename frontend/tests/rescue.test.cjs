@@ -86,11 +86,12 @@ async function page(routes) {
       return typeof route === 'function' ? route(options) : ok(route);
     },
   });
+  p.ctx = ctx;
     // 模块现在依赖 i18n.js：在 VM 里加载同一份字典并固定为中文，断言保持原样。
     vm.runInContext(fs.readFileSync(path.join(root,'frontend/i18n.js'),'utf8'), ctx);
     vm.runInContext("window.NexFlowI18N.setLang('zh-CN',{silent:true})", ctx);
   vm.runInContext(script, ctx);
-  p.run = (code) => vm.runInContext(code.replace(/\b(calculate|openHandoff|handoff|loadDonations)\(/g,'window.NexflowRescue.$1('), ctx);
+  p.run = (code) => vm.runInContext(code.replace(/\b(calculate|openHandoff|handoff|loadDonations|openReceipt)\(/g,'window.NexflowRescue.$1('), ctx);
   p.settle = () => new Promise(setImmediate);
   await vm.runInContext('window.NexflowRescue.refresh()',ctx);
   await p.settle();
@@ -206,6 +207,20 @@ test('pending handoff: operator confirms once, repeat clicks send one request, s
   assert.match(p.node('status').textContent, /模拟交接.*不代表运输已完成/);
   assert.match(p.node('donations').innerHTML, /已交接（模拟）· Demo Orphanage A/);
   assert.doesNotMatch(p.node('donations').innerHTML, /data-handoff/);
+  assert.match(p.node('donations').innerHTML, new RegExp(`data-receipt="${pending.id}"`));
+  assert.equal(p.node('receiptDialog').open, true, 'successful confirmation opens the handover record');
+  const receipt = p.node('receiptContent').innerHTML;
+  assert.match(receipt, new RegExp(pending.id));
+  assert.match(receipt, /Demo Orphanage A/);
+  assert.match(receipt, /Blind Tea/);
+  assert.match(receipt, /不是接收机构签发或签署的正式收据/);
+  let printed = 0;
+  p.ctx.window.print = () => { printed += 1; };
+  p.ctx.setTimeout = callback => callback();
+  p.node('receiptPrint').onclick();
+  assert.equal(printed, 1, 'record supports browser print and Save as PDF');
+  p.run(`openReceipt(${JSON.stringify(pending.id)})`);
+  assert.equal(p.node('receiptDialog').open, true, 'saved records can be reopened from the donated row');
   assert.match(p.node('stats').innerHTML, new RegExp(`已交接件数</small><b class="num">${f.dashboard_done.donated_qty}<`));
 
   // Backend is idempotent: the repeat returns the same record and stock/stats moved only once.

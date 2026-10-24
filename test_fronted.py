@@ -44,17 +44,18 @@ def test_frontend_entry_does_not_expose_repository():
         page = client.get("/app")
         assert page.status_code == 200
         assert "text/html" in page.headers["content-type"]
-        assert page.text.replace("\r\n", "\n") == (Path(__file__).resolve().parents[2] / "frontend" / "index.html").read_text(encoding="utf-8")
+        assert page.text.replace("\r\n", "\n") == (Path(__file__).resolve().parent / "frontend" / "index.html").read_text(encoding="utf-8")
         assert "/api/products" in page.text
         assert 'id="guide-sidebar"' in page.text
         assert 'id="themeToggleBtn"' in page.text
         assert 'id="tab-blind"' in page.text
         assert 'id="quote-form"' in page.text
-        assert 'id="redeem-form"' in page.text
+        assert 'id="pay-submit"' in page.text
+        assert 'id="redeem-form"' not in page.text
         for asset in ('customer.js', 'customer.css'):
             response = client.get('/app/assets/' + asset)
             assert response.status_code == 200
-            expected = (Path(__file__).resolve().parents[2] / 'frontend' / asset).read_text(encoding='utf-8')
+            expected = (Path(__file__).resolve().parent / 'frontend' / asset).read_text(encoding='utf-8')
             assert response.text.replace('\r\n', '\n') == expected.replace('\r\n', '\n')
         assert 'id="consumerShop"' in page.text
         assert '/api/blind-boxes/inventory' in page.text

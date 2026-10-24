@@ -168,7 +168,7 @@ test('recorded leftovers use the submitted draft quantities and cannot register 
   const request=p.bodies.find(x=>x.route==='/api/demo/leftovers');
   assert.deepEqual(JSON.parse(JSON.stringify(request.body)),[{item:'croissant',qty:10}]);
   assert.equal(p.api.getContext().leftoversRegistered,true);
-  assert.equal(p.state.tab,'pos');                            // 确认余货留在盘点页，不跳到打烊去向
+  assert.equal(p.state.tab,'rescue');                         // 成功确认后自动进入打烊去向
   assert.equal(p.node('registerLeftoversAction').disabled,true);
   assert.match(p.node('leftoversFlowHint').textContent,/余货已经确认 10 件/);   // 成功后回到默认提示，仍显示已登记数量
   assert.equal(p.node('leftoversFlowHint').dataset.error,'false');
@@ -274,6 +274,21 @@ test('staff can still confirm leftovers, the owner box is shared by both store r
   await p.node('registerLeftoversAction').onclick();
   assert.equal(p.api.getContext().leftoversRegistered,true);
   assert.equal(p.calls.filter(x=>x==='/api/demo/leftovers').length,1);
+  assert.equal(p.state.tab,'rescue');                       // 余货登记成功后自动进入打烊去向
+});
+
+test('failed leftovers registration stays on the current page for retry',async()=>{
+  const p=page();
+  p.setResponse(route=>route==='/api/demo/session'?{demo_only:true,now:'2026-10-22T21:35:00+08:00'}:
+    route==='/api/demo/leftovers'?(()=>{throw new Error('offline');})():
+    {simulated_revenue_sen:0});
+  await p.events.load();
+  p.state.role='staff';p.api.roleChanged();
+  p.state.draft={items:[{item:'croissant',qty:4}],text:'Promo'};
+  p.api.busyChanged();
+  await p.node('registerLeftoversAction').onclick();
+  assert.equal(p.state.tab,'pos');
+  assert.match(p.node('leftoversFlowHint').textContent,/offline/);
 });
 
 test('closing without confirmed leftovers says so instead of inventing donations', async()=>{

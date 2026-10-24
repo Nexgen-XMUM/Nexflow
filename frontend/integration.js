@@ -290,6 +290,8 @@
       registeredQty = Number.isSafeInteger(result?.registered_qty) ? result.registered_qty : before;
       setStatus('leftovers', 'store.registered', {n:registeredQty}, false);
       await changed(t('logEntry.kindLeftovers'));
+      navigate('rescue');
+      toast(t('store.registered', {n:registeredQty}));
     } catch (err) {
       setStatus('leftovers', 'store.registerFail', {err:err.message}, true);
     } finally {

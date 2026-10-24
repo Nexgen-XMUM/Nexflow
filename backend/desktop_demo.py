@@ -18,6 +18,11 @@ from backend.blind_boxes.schemas import Batch
 
 # 展示外壳页面与主工作台放在同一目录，由 FastAPI 直接返回，无需额外静态服务器。
 SHOWCASE = Path(__file__).resolve().parents[1] / "frontend"
+SOURCE_ZIP_DOWNLOAD = (
+    Path(__file__).resolve().parents[1]
+    / "downloads"
+    / "Orbyte-Smart-Yield-Nexgen-source.zip"
+)
 
 # 欢迎页只用 impeccable/ 原型里的这五张样图；白名单同时挡住了其它任何文件。
 SHOWCASE_IMAGE_DIR = Path(__file__).resolve().parents[1] / "impeccable" / "demo_images"
@@ -60,6 +65,16 @@ def create_demo_app(database: Path, day=None):
     @application.get("/login", include_in_schema=False)
     def login_signup_page():
         return FileResponse(SHOWCASE / "login_signup_page.html")
+
+    @application.get("/download/source.zip", include_in_schema=False)
+    def download_source_zip():
+        if not SOURCE_ZIP_DOWNLOAD.is_file():
+            raise HTTPException(status_code=404, detail="Source ZIP not available")
+        return FileResponse(
+            SOURCE_ZIP_DOWNLOAD,
+            media_type="application/zip",
+            filename="Orbyte-Smart-Yield-Nexgen-source.zip",
+        )
 
     @application.get("/showcase/images/{filename}", include_in_schema=False)
     def showcase_image(filename: str):

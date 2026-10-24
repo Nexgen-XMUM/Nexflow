@@ -72,7 +72,12 @@ async function page() {
   }
   const location = { hash: '' };
   const ctx = vm.createContext({
-    document: { querySelector: node, querySelectorAll: () => [node('#resetBtn'), node('#submitBtn')],
+    document: { querySelector: node, querySelectorAll: selector => {
+      const matches = [];
+      if (selector.includes('#resetBtn')) matches.push(node('#resetBtn'));
+      if (selector.includes('#submitBtn')) matches.push(node('#submitBtn'));
+      return matches;
+    },
       createElement: () => node(Symbol()), addEventListener: (type, fn) => { events[type] = fn; } },
     // 角色窗口由网址决定：内联脚本在初始化时读取 window.location.hash，
     // 切换页面时用 history.replaceState 回写。假浏览器必须提供这两个 API。
@@ -94,7 +99,10 @@ async function page() {
 
 test('real catalogue and generation responses render without invented fields or calculations', async () => {
   const p = await page();
+  assert.match(p.calls[0].url, /\/api\/products$/);
   assert.match(p.node('#posRows').innerHTML, /Butter Croissant/);
+  assert.equal(p.node('#catalogState').hidden, true);
+  assert.equal(p.node('#submitBtn').disabled, false);
   assert.doesNotMatch(p.node('#posRows').innerHTML, /undefined|NaN|成本|RM/);
   assert.equal('cost_price' in responses.products.products[0], false);
   assert.equal('cost_price' in responses.inventory.products[0], false);
@@ -197,19 +205,76 @@ test('source labels, warnings and simulation preserve backend text and totals', 
   assert.equal(p.run('state.busy'), false);
 });
 
-test('catalogue failure can be retried by reset and leaves no enabled stale result', async () => {
+test('catalogue failure has a dedicated retry and never enables a stale submit', async () => {
   const p = await page();
   p.ctx.fetch = async () => { throw new Error('offline'); };
   p.node('#resetBtn').click();
   await new Promise(setImmediate);
   assert.equal(p.node('#posRows').innerHTML, '');
-  assert.match(p.node('#posHint').textContent, /商品加载失败/);
+  assert.equal(p.node('#catalogState').hidden, false);
+  assert.match(p.node('#catalogStateMessage').textContent, /无法从后端加载商品/);
+  assert.equal(p.node('#retryProductsBtn').hidden, false);
+  assert.equal(p.node('#submitBtn').disabled, true);
   assert.equal(p.node('#resetBtn').disabled, false);
   p.ctx.fetch = async () => ({ ok: true, json: async () => responses.products });
-  p.node('#resetBtn').click();
+  p.node('#retryProductsBtn').click();
   await new Promise(setImmediate);
   assert.match(p.node('#posRows').innerHTML, /Butter Croissant/);
+  assert.equal(p.node('#catalogState').hidden, true);
+  assert.equal(p.node('#retryProductsBtn').hidden, true);
+  assert.equal(p.node('#submitBtn').disabled, false);
   assert.equal(p.node('#posHint').textContent, '');
+});
+
+test('workspace reset is confirmed and explains that server-side actions cannot be undone', async () => {
+  const p = await page();
+  p.ctx.window.confirm = () => false;
+  p.run('state.qty = {croissant: "4"}; state.draft = {items: [], text: "Pending"}');
+  const callsBefore = p.calls.length;
+  p.node('#resetBtn').click();
+  assert.equal(p.run('state.qty.croissant'), '4');
+  assert.equal(p.run('state.draft.text'), 'Pending');
+  assert.equal(p.calls.length, callsBefore);
+
+  let confirmation = '';
+  p.ctx.window.confirm = message => { confirmation = message; return true; };
+  p.node('#resetBtn').click();
+  await new Promise(setImmediate);
+  assert.match(confirmation, /后端操作不会撤销/);
+  assert.equal(p.run('Object.keys(state.qty).length'), 0);
+  assert.equal(p.run('state.draft'), null);
+  assert.equal(p.calls.length, callsBefore + 1, 'reset only reloads the existing product GET');
+});
+
+test('activity log explains how its first entry appears', async () => {
+  const p = await page();
+  p.run('state.log = []; renderLog()');
+  assert.match(p.node('#logList').innerHTML, /提交一次打烊盘点/);
+  p.run(`state.log = [{type:'info',who:'Staff',act:'Count submitted',detail:'1 item',sdg:'',t:'Today',fresh:false}]; renderLog()`);
+  assert.match(p.node('#logList').innerHTML, /Count submitted/);
+  assert.doesNotMatch(p.node('#logList').innerHTML, /提交一次打烊盘点/);
+});
+
+test('product tour is opt-in; the workspace loads backend data and posts user counts', () => {
+  assert.match(html, /#startTourBtn'\)\.addEventListener\('click', start\)/);
+  assert.doesNotMatch(html, /if\s*\(!store\('orbyte_v122_tour_shown'\)\)/);
+  assert.doesNotMatch(html, /\.lang-switch\s*\{\s*display:\s*none\s*!important/);
+  assert.match(html, /await api\('\/api\/products'\)/);
+  assert.match(html, /await api\('\/api\/generate-promo', payload\)/);
+});
+
+test('product tour scrolls to below-the-fold targets before positioning its spotlight', () => {
+  const helper = html.match(/function tourTargetNeedsScroll\(rect, viewportHeight\)\s*\{[\s\S]*?\n  \}/);
+  assert.ok(helper, 'tour visibility check exists');
+  const needsScroll = vm.runInNewContext(`(${helper[0]})`);
+  assert.equal(needsScroll({ top: 820, bottom: 900 }, 800), true);
+  assert.equal(needsScroll({ top: 40, bottom: 700 }, 800), false);
+  const start = html.indexOf('  function place(){');
+  const end = html.indexOf("\n  $('#startTourBtn')", start);
+  const place = html.slice(start, end);
+  assert.match(place, /tourTargetNeedsScroll\(r, window\.innerHeight\)/);
+  assert.match(place, /block:'center', inline:'nearest'/);
+  assert.match(place, /if\(tourOn\) place\(\)/);
 });
 
 test('stepper does not rewrite invalid values and role controls remain simulated', async () => {
@@ -304,7 +369,7 @@ test('blind failure clears previous advice, unlocks retry, and pending results r
   assert.equal(p.run('state.blind.result'), null);
   assert.equal(p.node('#rescuePanel').hidden, true);
   assert.doesNotMatch(p.node('#promotionBox').innerHTML, /DEMO Donation/);
-  assert.match(p.node('#blindHint').textContent, /失败.*offline/);
+  assert.match(p.node('#blindHint').textContent, /失败.*无法连接服务/);
   assert.equal(p.node('#resetBtn').disabled, false);
   await p.run('loadBlindInventory()');
   assert.match(p.node('#blindHint').textContent, /库存加载失败/);
