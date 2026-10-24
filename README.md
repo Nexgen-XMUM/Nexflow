@@ -31,7 +31,7 @@
 | Related SDGs | SDG 12 (Responsible Consumption and Production), related to the food-surplus use case. |
 | GitHub repository | [Nexgen-XMUM/Nexflow](https://github.com/Nexgen-XMUM/Nexflow) |
 | Live Demo | [Public Replit deployment](https://orbyte-smart-yield-nexgen.replit.app/) · [Local workspace](#4-open-the-app) · [Standalone local YOLO](#local-yolo-image-demo) |
-| Demo video | TODO — HUMAN VERIFICATION: add the final public video link and confirm organizer duration |
+| Demo video | [Watch the NexFlow project video on YouTube](https://youtu.be/RVNASReQL-Y) |
 | Slide deck / PRD | TODO — HUMAN VERIFICATION: add final share links |
 | Replit proof | [Public-access evidence PDF](submission/SDC2026_Nexgen_Replit_POU.pdf); owner deployment screenshot still needed |
 | Technical declaration | [Official form filled as unsigned draft](submission/SDC2026_Nexgen_TechDeclaration.pdf) |
