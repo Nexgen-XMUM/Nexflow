@@ -1,479 +1,571 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title data-i18n="welcome.pageTitle">NexFlow · Orbyte Smart Yield — 智能烘焙打烊清仓与 AI 自动化演示</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title data-i18n="home.pageTitle">NexFlow — Welcome</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- 三语言字典：与工作台共用 frontend/i18n.js 和 nexflow_lang 偏好 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500;62..125,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<!-- 三语言字典：与 /login 和 /app 工作台共用 frontend/i18n.js 与 nexflow_lang -->
 <script src="/app/assets/i18n.js"></script>
 <style>
-/* ==========================================================================
-   1. 设计令牌：深海蓝 + 纯白 (Light) 与极夜蓝 (Dark)
-   ========================================================================== */
-:root, html[data-theme="light"] {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-alt: #f1f5f9;
-  --sunk: #e2e8f0;
-  --ink: #0f172a;
-  --ink-secondary: #334155;
-  --muted: #64748b;
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
-
-  --brand: #1e40af;
-  --brand-hover: #1e3a8a;
-  --brand-light: #eff6ff;
-  --brand-border: #bfdbfe;
-  --brand-ink: #ffffff;
-  --accent: #2563eb;
-
-  --amber: #f59e0b;
-  --amber-bg: #fef3c7;
-  --ok: #059669;
-  --ok-bg: #ecfdf5;
-
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 10px 25px -5px rgba(30, 64, 175, 0.08), 0 8px 10px -6px rgba(30, 64, 175, 0.04);
-  --shadow-lg: 0 25px 50px -12px rgba(15, 23, 42, 0.18);
-  --display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
-  --body: "Figtree", system-ui, sans-serif;
-  color-scheme: light;
+/* Swiss grid: 12 columns, hairline rules, flush-left type, one accent.
+   Fold 1 = header + headline + [Purpose | Monster | Features]; everything else lives below the fold. */
+:root {
+  --paper: #f4f4f0;      /* cool off-white */
+  --ink: #121412;
+  --muted: #6b6e68;
+  --line: #d6d7d0;
+  --green: #1e6b47;      /* rescue green — the one accent */
+  --lilac: #c4b0f0;      /* the monster */
+  --lilac-deep: #9d84e0;
+  --pink: #f2a3b9;
+  --mustard: #e3a03a;
+  --font-display: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Instrument Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --gutter: clamp(16px, 3vw, 40px);
 }
-
-html[data-theme="dark"] {
-  --bg: #070d19;
-  --surface: #0f172a;
-  --surface-alt: #162033;
-  --sunk: #1e293b;
-  --ink: #f8fafc;
-  --ink-secondary: #cbd5e1;
-  --muted: #94a3b8;
-  --line: #1e293b;
-  --line-strong: #334155;
-
-  --brand: #3b82f6;
-  --brand-hover: #60a5fa;
-  --brand-light: rgba(59, 130, 246, 0.15);
-  --brand-border: rgba(59, 130, 246, 0.35);
-  --brand-ink: #ffffff;
-  --accent: #60a5fa;
-
-  --amber: #fbbf24;
-  --amber-bg: rgba(245, 158, 11, 0.15);
-  --ok: #34d399;
-  --ok-bg: rgba(16, 185, 129, 0.15);
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.7);
-  color-scheme: dark;
-}
-
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--body);
-  font-size: 16px;
-  line-height: 1.6;
-  transition: background-color 0.25s ease, color 0.25s ease;
-}
-button { font: inherit; cursor: pointer; }
-a { color: inherit; text-decoration: none; }
-h1, h2, h3, h4 { font-family: var(--display); margin: 0; letter-spacing: -0.02em; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.mono { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
 .muted { color: var(--muted); }
-.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-/* ==========================================================================
-   2. 顶部导航栏
-   ========================================================================== */
-header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 72px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 32px;
-  z-index: 100;
-  box-shadow: var(--shadow-sm);
-  transition: background 0.25s ease;
-}
-.brand { display: flex; align-items: center; gap: 12px; }
-.logo {
-  width: 40px; height: 40px; border-radius: 12px;
-  background: linear-gradient(135deg, var(--brand), var(--accent));
-  display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 20px;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-}
-.brand span { font-family: var(--display); font-weight: 700; font-size: 19px; }
-.nav-links { display: flex; align-items: center; gap: 28px; }
-.nav-links a { font-weight: 600; font-size: 14.5px; color: var(--ink-secondary); transition: color 0.2s; }
-.nav-links a:hover { color: var(--brand); }
-.nav-actions { display: flex; align-items: center; gap: 12px; }
-
-/* ==========================================================================
-   2b. 语言切换器（与工作台 .lang-switch 视觉一致，键盘可用）
-   ========================================================================== */
-.lang-switch {
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 38px; padding: 0 10px 0 11px;
-  border: 1px solid var(--line); border-radius: 12px;
-  background: var(--surface); color: var(--ink-secondary);
-  flex: none;
-}
-.lang-switch:hover { border-color: var(--line-strong); background: var(--surface-alt); }
-.lang-switch:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-light); }
-.lang-icon { font-size: 14px; line-height: 1; flex: none; }
-.lang-switch select {
-  appearance: none; -webkit-appearance: none;
-  border: 0; background: transparent; color: inherit;
-  font: inherit; font-weight: 600; font-size: 13.5px;
-  padding: 0 16px 0 0; max-width: 150px; cursor: pointer;
-  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position: right 5px center, right 1px center;
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
-}
-.lang-switch select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-.btn {
-  padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 14.5px;
-  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-  transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;
-}
-.btn:hover { background: var(--surface-alt); border-color: var(--line-strong); }
-.btn-primary {
-  background: var(--brand); border-color: var(--brand); color: var(--brand-ink);
-  box-shadow: 0 4px 14px rgba(30, 64, 175, 0.3);
-}
-.btn-primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+/* ---------- Fold 1 ---------- */
+.fold { min-height: 100svh; display: grid; grid-template-rows: auto auto 1fr auto; padding: 0 max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left)); }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 20px; }
 
-/* ==========================================================================
-   3. Hero 核心价值主张区
-   ========================================================================== */
-.hero {
-  padding: 150px 0 90px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: "";
-  position: absolute;
-  top: 40px; left: 50%; transform: translateX(-50%);
-  width: 700px; height: 400px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
-  z-index: 0; pointer-events: none;
-}
-.hero-inner { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; }
-.badge-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--brand-light); border: 1px solid var(--brand-border); color: var(--brand);
-  padding: 6px 16px; border-radius: 99px; font-weight: 700; font-size: 13px; margin-bottom: 22px;
-}
-.hero h1 { font-size: clamp(38px, 5vw, 56px); line-height: 1.15; margin-bottom: 20px; }
-.hero h1 span { color: var(--brand); }
-.hero p { font-size: 18px; color: var(--muted); max-width: 660px; margin: 0 auto 36px; line-height: 1.6; }
-.hero-cta { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 50px; }
-.hero-cta .btn { padding: 14px 28px; font-size: 16px; }
+.top { align-items: center; padding: 18px 0 14px; border-bottom: 1px solid var(--ink); }
+.brand { grid-column: 1 / 4; font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -.02em; text-decoration: none; }
+.brand sup { font-family: var(--font-mono); font-weight: 400; font-size: 9px; color: var(--muted); margin-left: 4px; }
+.top nav { grid-column: 4 / 10; display: flex; gap: 28px; }
+.top nav a { text-decoration: none; }
+.top nav a:hover { color: var(--green); }
+.top .hint { grid-column: 10 / 13; margin: 0; display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.top .hint button { background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; font: inherit; letter-spacing: inherit; text-transform: inherit; }
 
-/* 预览图/看板骨架 */
-.hero-preview {
-  background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
-  padding: 14px; box-shadow: var(--shadow-lg); max-width: 1040px; margin: 0 auto;
+/* 语言切换器：沿用等宽排版，与 Swiss grid 保持一致 */
+.lang { display: inline-flex; align-items: center; }
+.lang select {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  color: inherit; background: transparent; border: 0; border-bottom: 1px solid var(--ink);
+  padding: 2px 14px 2px 0; cursor: pointer; appearance: none; -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 4px center, right 0 center; background-size: 4px 4px, 4px 4px; background-repeat: no-repeat;
 }
-.preview-bar { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
-.preview-dots { display: flex; gap: 6px; }
-.preview-dots span { width: 11px; height: 11px; border-radius: 50%; background: var(--line-strong); }
-.preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; text-align: left; }
-.p-card { background: var(--surface-alt); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-.p-card b { display: block; font-size: 22px; color: var(--brand); font-family: var(--display); margin-bottom: 4px; }
-.p-card span { font-size: 12.5px; color: var(--muted); }
+.lang select:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
 
-/* ==========================================================================
-   4. 核心功能亮点 (Feature Highlights)
-   ========================================================================== */
-.features { padding: 90px 0; background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.sec-header { text-align: center; max-width: 680px; margin: 0 auto 60px; }
-.sec-header h2 { font-size: 34px; margin-bottom: 12px; }
-.sec-header p { color: var(--muted); font-size: 16.5px; }
+.headline { padding: clamp(20px, 4vh, 44px) 0 clamp(14px, 3vh, 28px); align-items: end; border-bottom: 1px solid var(--line); }
+.headline h1 { grid-column: 1 / 10; margin: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 82%; font-size: clamp(40px, 7.4vw, 112px); line-height: .9; letter-spacing: -.035em; text-wrap: balance; }
+.headline h1 em { font-style: normal; color: var(--green); }
+.headline p { grid-column: 10 / 13; margin: 0; max-width: 32ch; color: var(--muted); font-size: 14px; }
 
-.feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.feat-card {
-  background: var(--bg); border: 1px solid var(--line); border-radius: 18px; padding: 30px;
-  transition: transform 0.25s, box-shadow 0.25s; position: relative; overflow: hidden;
-}
-.feat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--brand-border); }
-.feat-icon {
-  width: 50px; height: 50px; border-radius: 14px; background: var(--brand-light); border: 1px solid var(--brand-border);
-  color: var(--brand); display: grid; place-items: center; font-size: 24px; margin-bottom: 20px;
-}
-.feat-card h3 { font-size: 20px; margin-bottom: 10px; }
-.feat-card p { color: var(--muted); font-size: 14.5px; line-height: 1.55; margin: 0; }
+.stage { align-items: stretch; min-height: 0; }
+.col { padding: clamp(16px, 3vh, 28px) 0; display: flex; flex-direction: column; min-width: 0; }
+.col.purpose { grid-column: 1 / 5; }
+.col.monster-col { grid-column: 5 / 9; align-items: center; justify-content: center; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+.col.features { grid-column: 9 / 13; }
 
-/* ==========================================================================
-   5. 客户证言 (Testimonials)
-   ========================================================================== */
-.testimonials { padding: 90px 0; }
-.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.testi-card {
-  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 28px;
-  box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;
-}
-.testi-card p { font-size: 15px; font-style: italic; color: var(--ink-secondary); margin: 0 0 20px; line-height: 1.6; }
-.testi-author { display: flex; align-items: center; gap: 12px; }
-.testi-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--brand-light); display: grid; place-items: center; font-size: 20px; }
-.testi-author b { display: block; font-size: 14px; }
-.testi-author small { color: var(--muted); font-size: 12px; }
+.slider-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.slides { position: relative; flex: 1; min-height: 190px; margin-top: 18px; }
+.slide { position: absolute; inset: 0; opacity: 0; transform: translateY(8px); transition: opacity .45s, transform .45s; pointer-events: none; }
+.slide.on { opacity: 1; transform: none; pointer-events: auto; }
+.slide .idx { font-family: var(--font-display); font-weight: 500; font-size: 13px; color: var(--green); }
+.slide h3 { margin: 8px 0 10px; font-family: var(--font-display); font-weight: 800; font-stretch: 90%; font-size: clamp(22px, 2.3vw, 32px); line-height: 1.02; letter-spacing: -.02em; text-wrap: balance; }
+.slide p { margin: 0; color: var(--muted); max-width: 40ch; font-size: 14px; }
+.slide code { font-family: var(--font-mono); font-size: 12px; color: var(--ink); background: #e8e8e2; padding: 2px 8px; }
+.slider-nav { display: flex; gap: 8px; align-items: center; }
+.slider-nav button { width: 30px; height: 30px; border: 1px solid var(--ink); background: transparent; cursor: pointer; display: grid; place-items: center; }
+.slider-nav button:hover { background: var(--ink); color: var(--paper); }
+.bar { flex: 1; height: 1px; background: var(--line); position: relative; }
+.bar i { position: absolute; left: 0; top: -1px; height: 3px; background: var(--ink); transition: width .45s; }
 
-/* ==========================================================================
-   6. 底部 CTA 与页脚
-   ========================================================================== */
-.cta-banner {
-  padding: 80px 0 100px;
-  background: linear-gradient(135deg, #1e3a8a, #2563eb);
-  color: #fff; text-align: center; position: relative; overflow: hidden;
-}
-.cta-banner h2 { font-size: 38px; margin-bottom: 14px; }
-.cta-banner p { font-size: 17px; opacity: 0.9; max-width: 600px; margin: 0 auto 30px; }
-.cta-banner .btn { background: #fff; color: #1e3a8a; border: 0; padding: 16px 34px; font-size: 16.5px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-.cta-banner .btn:hover { background: #f8fafc; transform: translateY(-2px); }
+/* Monster */
+.monster { position: relative; width: min(100%, 340px); aspect-ratio: 1; border: 0; background: none; padding: 0; cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.monster svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.monster .body { transform-origin: 50% 92%; transition: transform .35s cubic-bezier(.3,1.6,.5,1); }
+.monster.rubbing .body { animation: wiggle .28s ease-in-out infinite; }
+.monster.squish .body { transform: scale(1.06, .93); }
+.monster .heart { transform-origin: 200px 250px; animation: beat 2.6s ease-in-out infinite; }
+.monster .brow { transition: transform .25s; }
+.monster:hover .brow, .monster.rubbing .brow { transform: translateY(-6px); }
+.monster .lid { transform: scaleY(0); transition: transform .09s; }
+.monster.blink .lid, .monster.happy .lid { transform: scaleY(1); }
+.monster .happy-eye { opacity: 0; transition: opacity .15s; }
+.monster.happy .happy-eye { opacity: 1; }
+.monster.happy .eye-ball { opacity: 0; }
+@keyframes wiggle { 0%,100% { transform: rotate(-2.2deg) scale(1.02,.98); } 50% { transform: rotate(2.2deg) scale(.98,1.02); } }
+@keyframes beat { 0%,100% { transform: scale(1); } 8% { transform: scale(1.06); } 16% { transform: scale(.98); } 24% { transform: scale(1.04); } }
+.rub { margin-top: 10px; display: grid; justify-items: center; gap: 8px; text-align: center; }
+.meter { width: 140px; height: 3px; background: var(--line); position: relative; }
+.meter i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--green); transition: width .15s; }
 
-footer {
-  background: var(--surface); border-top: 1px solid var(--line); padding: 40px 0; text-align: center; color: var(--muted); font-size: 14px;
-}
+.foot { padding: 12px 0 max(14px, env(safe-area-inset-bottom)); border-top: 1px solid var(--ink); align-items: center; }
+.foot .l { grid-column: 1 / 7; }
+.foot .r { grid-column: 7 / 13; text-align: right; }
+.foot a { text-decoration: none; }
+.foot a:hover { color: var(--green); }
 
-/* 响应式适配 */
-@media (max-width: 960px) {
-  .feat-grid, .testi-grid, .preview-grid { grid-template-columns: 1fr; }
-  .nav-links { display: none; }
+/* ---------- Below the fold ---------- */
+.below { padding: 0 max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left)); }
+.section { padding: clamp(48px, 9vh, 96px) 0; border-bottom: 1px solid var(--line); row-gap: 28px; }
+.section-label { grid-column: 1 / 4; }
+.section-label h2 { margin: 6px 0 0; font-family: var(--font-display); font-weight: 800; font-stretch: 85%; font-size: clamp(26px, 3vw, 40px); line-height: 1; letter-spacing: -.02em; }
+.stats { grid-column: 4 / 13; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px; }
+.stat { border-top: 1px solid var(--ink); padding-top: 12px; }
+.stat b { display: block; font-family: var(--font-display); font-weight: 800; font-stretch: 80%; font-size: clamp(38px, 5vw, 72px); line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat span { display: block; margin-top: 10px; color: var(--muted); font-size: 14px; max-width: 26ch; }
+.quotes { grid-column: 4 / 13; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px; }
+.quote { border-top: 1px solid var(--ink); padding-top: 14px; display: flex; flex-direction: column; gap: 16px; }
+.quote p { margin: 0; font-size: 16px; line-height: 1.45; }
+.quote footer b { display: block; font-weight: 600; }
+.cta { align-items: end; }
+.cta h2 { grid-column: 1 / 9; margin: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 82%; font-size: clamp(34px, 5.5vw, 80px); line-height: .92; letter-spacing: -.03em; text-wrap: balance; }
+.cta .go { grid-column: 9 / 13; justify-self: end; display: grid; gap: 10px; justify-items: end; }
+.btn { display: inline-flex; align-items: center; gap: 12px; height: 48px; padding: 0 22px; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); text-decoration: none; font-weight: 600; cursor: pointer; }
+.btn:hover { background: var(--green); border-color: var(--green); }
+.btn:disabled { opacity: .7; cursor: progress; }
+.legal { padding: 18px 0 max(24px, env(safe-area-inset-bottom)); }
+.legal p { grid-column: 1 / 13; margin: 0; text-transform: none; letter-spacing: 0; font-size: 12px; }
+
+/* ---------- Login card ---------- */
+.scrim { position: fixed; inset: 0; background: rgba(18, 20, 18, .35); display: grid; place-items: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 50; }
+.scrim.open { opacity: 1; pointer-events: auto; }
+.card { width: min(420px, 100%); background: var(--paper); border: 1px solid var(--ink); padding: 26px; transform: translateY(16px) scale(.98); transition: transform .3s cubic-bezier(.3,1.4,.5,1); }
+.scrim.open .card { transform: none; }
+.card-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--ink); padding-bottom: 10px; }
+.card h2 { margin: 18px 0 4px; font-family: var(--font-display); font-weight: 800; font-stretch: 85%; font-size: 34px; line-height: 1; letter-spacing: -.02em; }
+.card form { display: grid; gap: 14px; margin-top: 18px; }
+.field { display: grid; gap: 6px; }
+.field input { height: 44px; border: 0; border-bottom: 1px solid var(--ink); background: transparent; font: inherit; font-size: 16px; padding: 0; color: var(--ink); }
+.field input:focus { outline: none; border-bottom: 2px solid var(--green); }
+.roles { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--ink); }
+.roles label { position: relative; text-align: center; padding: 10px 4px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.roles label + label { border-left: 1px solid var(--ink); }
+.roles input { position: absolute; opacity: 0; }
+.roles label:has(input:checked) { background: var(--ink); color: var(--paper); }
+.roles label:has(input:focus-visible) { outline: 2px solid var(--green); outline-offset: 2px; }
+.card .btn { width: 100%; justify-content: space-between; }
+.card form > a { justify-self: start; }
+.close { background: none; border: 0; cursor: pointer; padding: 0; }
+.err { color: #b3261e; min-height: 1em; margin: 0; font-size: 13px; }
+.demo-note { margin: 0; font-size: 13px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .top nav { display: none; }
+  .brand { grid-column: 1 / 7; } .top .hint { grid-column: 7 / 13; }
+  .hint-text { display: none; }
+  .headline h1 { grid-column: 1 / 13; } .headline p { grid-column: 1 / 13; margin-top: 14px; }
+  .col.purpose, .col.features { grid-column: 1 / 13; }
+  .col.monster-col { grid-column: 1 / 13; order: -1; border: 0; border-bottom: 1px solid var(--line); }
+  .col.features { border-top: 1px solid var(--line); }
+  .monster { width: min(72vw, 280px); }
+  .foot .l, .foot .r { grid-column: 1 / 13; text-align: left; }
+  .section-label, .stats, .quotes, .cta h2, .cta .go { grid-column: 1 / 13; }
+  .cta .go { justify-self: start; justify-items: start; }
 }
-@media (max-width: 720px) {
-  /* 英文/马来语文案更长：允许换行，避免按钮与切换器溢出 */
-  header { padding: 0 16px; gap: 10px; }
-  .nav-actions { gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-  .brand span { font-size: 16px; }
-  .lang-switch { padding: 0 8px; }
-  .lang-switch select { max-width: 104px; font-size: 12.5px; }
-  .btn { padding: 9px 14px; font-size: 13.5px; }
+@media (max-width: 600px) {
+  .stats, .quotes { grid-template-columns: 1fr; row-gap: 24px; }
+  .top { row-gap: 8px; }
+  .brand { grid-column: 1 / 13; }
+  .top .hint { grid-column: 1 / 13; justify-content: space-between; }
+  .hint-text { display: inline; }
 }
-@media (max-width: 520px) {
-  header { height: auto; min-height: 72px; padding: 10px 14px; flex-wrap: wrap; }
-  .nav-actions { width: 100%; justify-content: space-between; }
-  #launchDemoBtn { flex: 1 1 auto; justify-content: center; }
+@media (prefers-reduced-motion: reduce) {
+  .slide, .monster .body, .bar i, .card, .scrim { transition: none; }
+  .monster .heart, .monster.rubbing .body { animation: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- 顶部导航栏 -->
-<header>
-  <div class="brand">
-    <div class="logo" aria-hidden="true">O</div>
-    <span>Orbyte Smart Yield</span>
-  </div>
-  <div class="nav-links">
-    <a href="#features" data-i18n="welcome.nav.features">核心功能</a>
-    <a href="#preview" data-i18n="welcome.nav.preview">指挥台预览</a>
-    <a href="#testimonials" data-i18n="welcome.nav.testimonials">客户评价</a>
-  </div>
-  <div class="nav-actions">
-    <label class="lang-switch" for="langSelect">
-      <span class="lang-icon" aria-hidden="true">🌐</span>
-      <span class="sr-only" data-i18n="app.langLabel">界面语言</span>
-      <select id="langSelect" data-i18n-aria="app.langLabel" aria-label="界面语言">
-        <option value="en" lang="en">English</option>
-        <option value="ms" lang="ms">Bahasa Melayu</option>
-        <option value="zh-CN" lang="zh-CN">简体中文</option>
-      </select>
-    </label>
-    <button type="button" class="btn" id="themeToggleBtn" data-i18n-aria="app.themeToggleAria" aria-label="切换深色或浅色模式">
-      <span id="themeIcon" aria-hidden="true">🌙</span>
-      <span id="themeText">深色模式</span>
-    </button>
-    <a href="/login" class="btn btn-primary" id="launchDemoBtn">🚀 <span data-i18n="welcome.nav.launch">启动完整 Demo</span></a>
-  </div>
-</header>
+<div class="fold">
+  <header class="top grid">
+    <a class="brand" href="#top">NexFlow<sup>ORBYTE SMART YIELD</sup></a>
+    <nav class="mono" data-i18n-aria="home.navAria" aria-label="Sections">
+      <a href="#purpose" data-i18n="home.nav.purpose">Purpose</a>
+      <a href="#features" data-i18n="home.nav.features">Features</a>
+      <a href="#numbers" data-i18n="home.nav.numbers">Numbers</a>
+      <a href="#voices" data-i18n="home.nav.voices">Voices</a>
+    </nav>
+    <p class="hint mono muted">
+      <label class="lang">
+        <span class="sr-only" data-i18n="app.langLabel">Language</span>
+        <select id="langSelect" data-i18n-aria="app.langLabel" aria-label="Language">
+          <option value="en" lang="en">English</option>
+          <option value="ms" lang="ms">Bahasa Melayu</option>
+          <option value="zh-CN" lang="zh-CN">简体中文</option>
+        </select>
+      </label>
+      <span class="hint-text" data-i18n="home.hintRub">Rub the monster to log in</span>
+      <span class="hint-text" aria-hidden="true">·</span>
+      <button type="button" id="loginLink" data-i18n="home.login">Log in</button>
+    </p>
+  </header>
 
-<!-- Hero 核心价值主张区 -->
-<section class="hero">
-  <div class="wrap">
-    <div class="hero-inner">
-      <div class="badge-pill">✨ <span data-i18n="welcome.hero.badge">烘焙门店打烊促销自动化 SaaS</span></div>
-      <h1><span data-i18n="welcome.hero.titleLead">让每一炉余量面包 </span><span data-i18n="welcome.hero.titleAccent">智能变现</span><span data-i18n="welcome.hero.titleTail">，零库存浪费</span></h1>
-      <p data-i18n="welcome.hero.body">专为烘焙店与餐饮零售打造的 AI 闭环 Yield 系统。从店员秒级语音/自然语言盘点、代码安全毛利测算、到老板微信/WhatsApp 一键群发审批与减碳印记追踪。</p>
-      <div class="hero-cta">
-        <a href="/login" class="btn btn-primary">⚡ <span data-i18n="welcome.hero.ctaPrimary">立即体验互动 Demo</span></a>
-        <a href="#features" class="btn" data-i18n="welcome.hero.ctaSecondary">了解五大核心模块</a>
+  <section class="headline grid">
+    <h1><span data-i18n="home.headlineLead">Every leftover loaf, </span><em data-i18n="home.headlineAccent">sold before close.</em></h1>
+    <p data-i18n="home.headlineBody">AI closing-time clearance for bakeries. Staff count in one line, the system prices it safely, and regulars get the deal on WhatsApp.</p>
+  </section>
+
+  <main class="stage grid">
+    <section class="col purpose" id="purpose" aria-roledescription="carousel" data-i18n-aria="home.purpose.aria" aria-label="Purpose">
+      <div class="slider-head">
+        <span class="mono" data-i18n="home.purpose.label">Purpose</span>
+        <span class="mono muted" data-count></span>
       </div>
-
-      <div class="hero-preview" id="preview">
-        <div class="preview-bar">
-          <div class="preview-dots"><span></span><span></span><span></span></div>
-          <span style="font-size:12.5px;color:var(--muted);font-weight:600;margin-left:6px" data-i18n="welcome.preview.bar">Orbyte Smart Yield · 实时运营指挥台预览</span>
-        </div>
-        <div class="preview-grid">
-          <div class="p-card">
-            <b data-i18n="welcome.preview.value1">RM 180.00</b>
-            <span data-i18n="welcome.preview.label1">今晚智能挽回沉淀营收</span>
-          </div>
-          <div class="p-card">
-            <b data-i18n="welcome.preview.value2">22.6 kg</b>
-            <span data-i18n="welcome.preview.label2">联合国 SDG 12.3 累计减碳量</span>
-          </div>
-          <div class="p-card">
-            <b data-i18n="welcome.preview.value3">100% 自动化</b>
-            <span data-i18n="welcome.preview.label3">从 POS 盘点到 WhatsApp 触达</span>
-          </div>
-        </div>
+      <div class="slides" aria-live="polite">
+        <article class="slide">
+          <span class="idx">01</span>
+          <h3 data-i18n="home.p1.title">1.3 billion tonnes of food is thrown away every year.</h3>
+          <p data-i18n="home.p1.body">A lot of it is perfectly good bread at 9 pm. We give the last batch of the day a second shot instead of the bin.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">02</span>
+          <h3 data-i18n="home.p2.title">Saving food should feel like a treat.</h3>
+          <p data-i18n="home.p2.body">No lectures. A surprise box at a third of the price turns rescuing food into an everyday find for the neighbourhood.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">03</span>
+          <h3 data-i18n="home.p3.title">Good for the shop, good for the street.</h3>
+          <p data-i18n="home.p3.body">Independent bakeries win back their costs, and regulars get great bakes at a fair price.</p>
+        </article>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- 核心功能亮点 (Feature Highlights) -->
-<section class="features" id="features">
-  <div class="wrap">
-    <div class="sec-header">
-      <h2 data-i18n="welcome.features.title">全链路智能化打烊清仓架构</h2>
-      <p data-i18n="welcome.features.body">用严密的确定性代码逻辑保障毛利底线，用轻量化 AI 提升门店运营与熟客转化效率。</p>
-    </div>
-
-    <div class="feat-grid">
-      <div class="feat-card">
-        <div class="feat-icon">🏪</div>
-        <h3 data-i18n="welcome.f1.title">AI 自然语言 POS 盘点</h3>
-        <p><span data-i18n="welcome.f1.bodyLead">店员下班前只需说一句或输入 </span><code>12 croissants, 5 chocolate slices</code><span data-i18n="welcome.f1.bodyTail">，系统自动识别匹配商品与成本价。</span></p>
+      <div class="slider-nav">
+        <button type="button" data-prev data-i18n-aria="home.prevPurpose" aria-label="Previous purpose">←</button>
+        <button type="button" data-next data-i18n-aria="home.nextPurpose" aria-label="Next purpose">→</button>
+        <span class="bar"><i></i></span>
       </div>
+    </section>
 
-      <div class="feat-card">
-        <div class="feat-icon">⚙️</div>
-        <h3 data-i18n="welcome.f2.title">自动定价与毛利红线保护</h3>
-        <p data-i18n="welcome.f2.body">老板后台自由设定清仓折扣率（如 50% OFF）。内置破发成本预警，绝不出现折后价低于成本的盲目亏损。</p>
-      </div>
-
-      <div class="feat-card">
-        <div class="feat-icon">💬</div>
-        <h3 data-i18n="welcome.f3.title">WhatsApp 熟客群实时推送</h3>
-        <p data-i18n="welcome.f3.body">审批通过后一键群发至熟客福利群，实时模拟已读蓝勾（✓✓）与熟客抢购留单，提升复购率。</p>
-      </div>
-
-      <div class="feat-card">
-        <div class="feat-icon">📊</div>
-        <h3 data-i18n="welcome.f4.title">BI 圆环经营看板</h3>
-        <p data-i18n="welcome.f4.body">多维度可视化追踪月度目标达成率、挽回营收、避免浪费食物重量及各品类贡献排行。</p>
-      </div>
-
-      <div class="feat-card">
-        <div class="feat-icon">👑</div>
-        <h3 data-i18n="welcome.f5.title">老板后台 (Admin Panel)</h3>
-        <p data-i18n="welcome.f5.body">商品成本原价管理、折扣率滑块调节、文案抬头与群组名称自定义，数据实时双向同步。</p>
-      </div>
-
-      <div class="feat-card">
-        <div class="feat-icon">🌍</div>
-        <h3 data-i18n="welcome.f6.title">SDG 12.3 环保减碳足迹</h3>
-        <p data-i18n="welcome.f6.body">每完成一次临期清仓，自动核算减少的二氧化碳排放与食物浪费克数，为门店ESG运营加分。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 客户证言 (Testimonials) -->
-<section class="testimonials" id="testimonials">
-  <div class="wrap">
-    <div class="sec-header">
-      <h2 data-i18n="welcome.testi.title">深受东南亚独立烘焙主理人信赖</h2>
-      <p data-i18n="welcome.testi.body">听听 Uncle Wong 与各大社区面包店主的使用反馈。</p>
-      <p class="muted" style="font-size:13px;margin-top:10px" data-i18n="welcome.testi.disclaimer">以下评价与数据均为 Demo 示例内容，用于演示展示，不代表真实合作门店。</p>
-    </div>
-
-    <div class="testi-grid">
-      <div class="testi-card">
-        <p data-i18n="welcome.testi1.body">“以前每天晚上点算剩面包头大如斗，现在店员手机一输，老伴在 WhatsApp 上一键点批准，熟客不到 10 分钟就把可颂抢光了！”</p>
-        <div class="testi-author">
-          <div class="testi-avatar">👨‍🍳</div>
-          <div>
-            <b data-i18n="welcome.testi1.name">Uncle Wong</b>
-            <small data-i18n="welcome.testi1.role">Uncle Wong’s Bakery 主理人</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="testi-card">
-        <p data-i18n="welcome.testi2.body">“BI 看板让每个月的挽回营收和减碳数字一目了然。不仅减少了食物浪费，还帮我们培养了一批粘性极高的 WhatsApp 熟客群。”</p>
-        <div class="testi-author">
-          <div class="testi-avatar">👩‍💼</div>
-          <div>
-            <b data-i18n="welcome.testi2.name">Auntie Lim</b>
-            <small data-i18n="welcome.testi2.role">Penang Artisan Bakes 运营总监</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="testi-card">
-        <p data-i18n="welcome.testi3.body">“定价毛利保护功能太棒了！系统会自动提醒哪些打烊面包清仓价接近成本，防止店员盲目打折造成亏损。极力推荐！”</p>
-        <div class="testi-author">
-          <div class="testi-avatar">🧑‍🍳</div>
-          <div>
-            <b data-i18n="welcome.testi3.name">Farid</b>
-            <small data-i18n="welcome.testi3.role">KL Star Pastry 创始人</small>
-          </div>
-        </div>
+    <div class="col monster-col">
+      <button class="monster" id="monster" type="button" data-i18n-aria="home.monsterAria" aria-label="Rub the monster to log in (or press Enter)">
+        <svg viewBox="0 0 400 400" aria-hidden="true">
+          <defs>
+            <!-- knitted fuzz -->
+            <filter id="fuzz" x="-10%" y="-10%" width="120%" height="120%">
+              <feTurbulence type="fractalNoise" baseFrequency="1.4 .35" numOctaves="2" seed="3" result="n"/>
+              <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .22 0" result="w"/>
+              <feComposite in="w" in2="SourceGraphic" operator="in" result="t"/>
+              <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="t"/></feMerge>
+            </filter>
+            <filter id="soft"><feGaussianBlur stdDeviation="10"/></filter>
+            <radialGradient id="bodyG" cx="42%" cy="30%" r="75%">
+              <stop offset="0" stop-color="#e2d6fb"/><stop offset=".55" stop-color="#c4b0f0"/><stop offset="1" stop-color="#9d84e0"/>
+            </radialGradient>
+            <radialGradient id="heartG" cx="40%" cy="30%" r="80%">
+              <stop offset="0" stop-color="#fbd0dc"/><stop offset="1" stop-color="#e98aa6"/>
+            </radialGradient>
+            <radialGradient id="eyeG" cx="40%" cy="35%" r="70%">
+              <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e4e2ee"/>
+            </radialGradient>
+            <clipPath id="eyeL"><ellipse cx="160" cy="150" rx="27" ry="31"/></clipPath>
+            <clipPath id="eyeR"><ellipse cx="236" cy="146" rx="29" ry="33"/></clipPath>
+          </defs>
+          <ellipse cx="200" cy="378" rx="140" ry="14" fill="#121412" opacity=".08" filter="url(#soft)"/>
+          <g class="body">
+            <!-- body blob -->
+            <path filter="url(#fuzz)" fill="url(#bodyG)" d="M200 42c62 0 98 40 112 96 14 56 54 92 54 158 0 58-50 78-166 78S34 354 34 296c0-66 40-102 54-158C102 82 138 42 200 42z"/>
+            <!-- brows -->
+            <g class="brow" stroke="#e3a03a" stroke-width="11" stroke-linecap="round" fill="none">
+              <path d="M138 104q14-12 30-10"/><path d="M226 92q18-6 32 6"/>
+            </g>
+            <!-- eyes -->
+            <g class="eye-ball">
+              <ellipse cx="160" cy="150" rx="27" ry="31" fill="url(#eyeG)"/>
+              <ellipse cx="236" cy="146" rx="29" ry="33" fill="url(#eyeG)"/>
+              <g id="pupilL"><ellipse cx="160" cy="150" rx="14" ry="17" fill="#121412"/><circle cx="155" cy="143" r="4" fill="#fff"/></g>
+              <g id="pupilR"><ellipse cx="236" cy="146" rx="15" ry="18" fill="#121412"/><circle cx="231" cy="139" r="4.5" fill="#fff"/></g>
+              <!-- eyelids for blinking -->
+              <rect class="lid" clip-path="url(#eyeL)" x="130" y="116" width="60" height="68" fill="#b9a3ee" style="transform-origin:160px 119px"/>
+              <rect class="lid" clip-path="url(#eyeR)" x="204" y="110" width="64" height="72" fill="#b9a3ee" style="transform-origin:236px 113px"/>
+            </g>
+            <!-- happy ^ ^ eyes while being rubbed -->
+            <g class="happy-eye" stroke="#121412" stroke-width="7" stroke-linecap="round" fill="none">
+              <path d="M142 156q18-22 36 0"/><path d="M216 152q20-24 40 0"/>
+            </g>
+            <!-- mouth -->
+            <path d="M248 188q4 22-28 22" stroke="#e3a03a" stroke-width="12" stroke-linecap="round" fill="none"/>
+            <g transform="translate(40 84) scale(.8)">
+            <!-- heart -->
+            <path class="heart" filter="url(#fuzz)" fill="url(#heartG)" d="M200 318c-58-30-98-62-98-104 0-28 22-46 46-46 22 0 40 14 52 32 12-18 30-32 52-32 24 0 46 18 46 46 0 42-40 74-98 104z"/>
+            <!-- mitten hands -->
+            <path filter="url(#fuzz)" fill="#b9a3ee" d="M96 300c-6-26 14-40 30-30 4-14 22-16 30-4 8-10 26-6 28 8 10-4 24 6 18 22l-8 50H104c-8-14-10-30-8-46z"/>
+            <path filter="url(#fuzz)" fill="#b9a3ee" d="M304 300c6-26-14-40-30-30-4-14-22-16-30-4-8-10-26-6-28 8-10-4-24 6-18 22l8 50h90c8-14 10-30 8-46z"/>
+            </g>
+          </g>
+        </svg>
+      </button>
+      <div class="rub">
+        <span class="meter" aria-hidden="true"><i id="meter"></i></span>
+        <span class="mono muted" id="rubText" data-i18n="home.rubIdle">Rub me to log in</span>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- 底部 CTA 引导 -->
-<section class="cta-banner">
-  <div class="wrap">
-    <h2 data-i18n="welcome.cta.title">准备好让您的烘焙店告别库存浪费了吗？</h2>
-    <p data-i18n="welcome.cta.body">无需复杂部署，立即启动互动 Demo，体验零门槛的 AI 智能打烊清仓系统。</p>
-    <a href="/login" class="btn">🚀 <span data-i18n="welcome.cta.button">立即启动系统 Demo</span></a>
-  </div>
-</section>
+    <section class="col features" id="features" aria-roledescription="carousel" data-i18n-aria="home.features.aria" aria-label="Features">
+      <div class="slider-head">
+        <span class="mono" data-i18n="home.features.label">Features</span>
+        <span class="mono muted" data-count></span>
+      </div>
+      <div class="slides" aria-live="polite">
+        <article class="slide">
+          <span class="idx">01</span>
+          <h3 data-i18n="home.f1.title">Count leftovers in one line.</h3>
+          <p><span data-i18n="home.f1.bodyLead">Staff type or say </span><code>12 croissants, 5 chocolate slices</code><span data-i18n="home.f1.bodyTail"> before closing. NexFlow matches each item and its cost price.</span></p>
+        </article>
+        <article class="slide">
+          <span class="idx">02</span>
+          <h3 data-i18n="home.f2.title">Auto pricing with a margin floor.</h3>
+          <p data-i18n="home.f2.body">The owner sets the clearance discount. Built-in checks stop any price from dropping below cost.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">03</span>
+          <h3 data-i18n="home.f3.title">One-tap WhatsApp to regulars.</h3>
+          <p data-i18n="home.f3.body">Once approved, the deal goes to the regulars group, with read ticks and reservations simulated for the demo.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">04</span>
+          <h3 data-i18n="home.f4.title">A dashboard the owner reads at a glance.</h3>
+          <p data-i18n="home.f4.body">Monthly target, recovered revenue, food saved by weight, and which categories sell best.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">05</span>
+          <h3 data-i18n="home.f5.title">Owner admin panel.</h3>
+          <p data-i18n="home.f5.body">Edit cost prices, slide the discount rate, and set the message header and group name. Changes sync both ways.</p>
+        </article>
+        <article class="slide">
+          <span class="idx">06</span>
+          <h3 data-i18n="home.f6.title">SDG 12.3 carbon footprint.</h3>
+          <p data-i18n="home.f6.body">Every clearance logs the CO₂e and grams of food kept out of the bin, ready for the shop's ESG story.</p>
+        </article>
+      </div>
+      <div class="slider-nav">
+        <button type="button" data-prev data-i18n-aria="home.prevFeature" aria-label="Previous feature">←</button>
+        <button type="button" data-next data-i18n-aria="home.nextFeature" aria-label="Next feature">→</button>
+        <span class="bar"><i></i></span>
+      </div>
+    </section>
+  </main>
 
-<!-- 页脚 -->
-<footer>
-  <div class="wrap">
-    <p data-i18n="welcome.footer.note">© 2026 NexFlow · Orbyte Smart Yield — hackathon prototype. 页面中的经营数字与客户评价均为 Demo 示例，非真实门店数据。</p>
+  <footer class="foot grid mono">
+    <span class="l muted" data-i18n="home.footLeft">Hackathon prototype · 2026</span>
+    <span class="r"><a href="#numbers" data-i18n="home.footRight">Scroll for numbers &amp; voices ↓</a></span>
+  </footer>
+</div>
+
+<div class="below">
+  <section class="section grid" id="numbers">
+    <div class="section-label">
+      <span class="mono muted" data-i18n="home.numbers.label">Demo figures</span>
+      <h2 data-i18n="home.numbers.title">One evening, one shop.</h2>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>RM 180.00</b><span data-i18n="home.stat1">Revenue recovered tonight from bakes that would have been binned.</span></div>
+      <div class="stat"><b>22.6 kg</b><span data-i18n="home.stat2">CO₂e avoided, counted toward UN SDG 12.3.</span></div>
+      <div class="stat"><b>100%</b><span data-i18n="home.stat3">Automated, from the POS count to the WhatsApp message.</span></div>
+    </div>
+  </section>
+
+  <section class="section grid" id="voices">
+    <div class="section-label">
+      <span class="mono muted" data-i18n="home.voices.label">Sample testimonials for the demo</span>
+      <h2 data-i18n="home.voices.title">Bakers in Southeast Asia.</h2>
+    </div>
+    <div class="quotes">
+      <blockquote class="quote" style="margin:0">
+        <p data-i18n="home.q1.body">“Counting leftover bread every night was a headache. Now staff type it on their phone, my wife approves on WhatsApp, and regulars clear the croissants in ten minutes.”</p>
+        <footer><b>Uncle Wong</b><span class="muted" data-i18n="home.q1.role">Owner, Uncle Wong’s Bakery</span></footer>
+      </blockquote>
+      <blockquote class="quote" style="margin:0">
+        <p data-i18n="home.q2.body">“The dashboard shows recovered revenue and carbon saved every month. Less waste, and a WhatsApp group of very loyal regulars.”</p>
+        <footer><b>Auntie Lim</b><span class="muted" data-i18n="home.q2.role">Operations, Penang Artisan Bakes</span></footer>
+      </blockquote>
+      <blockquote class="quote" style="margin:0">
+        <p data-i18n="home.q3.body">“The margin guard is the best part. It warns us when a clearance price gets close to cost, so nobody discounts us into a loss.”</p>
+        <footer><b>Farid</b><span class="muted" data-i18n="home.q3.role">Founder, KL Star Pastry</span></footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="section grid cta">
+    <h2 data-i18n="home.cta.title">Ready to stop binning tonight’s bread?</h2>
+    <div class="go">
+      <button class="btn" type="button" id="ctaLogin"><span data-i18n="home.cta.button">Launch the demo</span> <span aria-hidden="true">→</span></button>
+      <span class="mono muted" data-i18n="home.cta.note">No setup. No account check.</span>
+    </div>
+  </section>
+
+  <footer class="legal grid mono muted">
+    <p data-i18n="home.legal">© 2026 NexFlow · Orbyte Smart Yield — hackathon prototype. Figures and testimonials on this page are demo examples, not real shop data.</p>
+  </footer>
+</div>
+
+<!-- Login card: opens after rubbing the monster, the top "Log in" link, or the bottom CTA -->
+<div class="scrim" id="scrim" aria-hidden="true">
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="card-head">
+      <span class="mono" data-i18n="home.dialog.kicker">Log in · Demo</span>
+      <button class="close mono" type="button" id="closeLogin" data-i18n-aria="home.dialog.closeAria" aria-label="Close">Close ✕</button>
+    </div>
+    <h2 id="loginTitle" data-i18n="home.dialog.title">Hey, you found me.</h2>
+    <p class="muted demo-note" data-i18n="home.dialog.body">Demo entry: any email and password work. No account is checked.</p>
+    <form id="loginForm" novalidate>
+      <div class="roles" role="radiogroup" data-i18n-aria="home.dialog.rolesAria" aria-label="Enter as">
+        <label><input type="radio" name="role" value="boss" checked><span data-i18n="home.role.owner">Owner</span></label>
+        <label><input type="radio" name="role" value="staff"><span data-i18n="home.role.staff">Staff</span></label>
+        <label><input type="radio" name="role" value="customer"><span data-i18n="home.role.customer">Customer</span></label>
+      </div>
+      <label class="field"><span class="mono muted" data-i18n="home.dialog.email">Email</span><input id="email" type="email" autocomplete="email" placeholder="you@bakery.com"></label>
+      <label class="field"><span class="mono muted" data-i18n="home.dialog.password">Password</span><input id="password" type="password" autocomplete="current-password" placeholder="••••••••"></label>
+      <p class="err" id="err" role="alert"></p>
+      <button class="btn" type="submit" id="submitBtn"><span id="submitLabel" data-i18n="home.dialog.enter">Enter NexFlow</span> <span aria-hidden="true">→</span></button>
+      <a class="mono muted" href="/login"><span data-i18n="home.dialog.createAccount">New here? Create an account</span> →</a>
+    </form>
   </div>
-</footer>
+</div>
 
 <script>
-// 主题切换逻辑（沿用 orbyte_theme，与工作台一致）
-function updateThemeUI(theme) {
-  const isDark = theme === 'dark';
-  document.getElementById('themeIcon').textContent = isDark ? '🌞' : '🌙';
-  document.getElementById('themeText').textContent = window.T(isDark ? 'app.themeLight' : 'app.themeDark');
-}
+const $ = s => document.querySelector(s);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// 三语言文案入口：i18n.js 在 head 已加载；缺失时退回键名，页面不会崩溃。
+const T = (key, vars) => (window.NexFlowI18N ? window.NexFlowI18N.t(key, vars) : key);
 
-const savedTheme = localStorage.getItem('orbyte_theme') || 'light';
-document.documentElement.setAttribute('data-theme', savedTheme);
-updateThemeUI(savedTheme);
-
-document.getElementById('themeToggleBtn').addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('orbyte_theme', next);
-  updateThemeUI(next);
+/* ---------- Sliders (Purpose left, Features right) ---------- */
+document.querySelectorAll('.col[aria-roledescription="carousel"]').forEach(col => {
+  const slides = [...col.querySelectorAll('.slide')], count = col.querySelector('[data-count]'), bar = col.querySelector('.bar i');
+  let i = 0, timer = null;
+  const show = n => {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, k) => { s.classList.toggle('on', k === i); s.setAttribute('aria-hidden', String(k !== i)); });
+    count.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+  };
+  const auto = () => { clearInterval(timer); if(!reduced) timer = setInterval(() => show(i + 1), 6500); };
+  col.querySelector('[data-prev]').onclick = () => { show(i - 1); auto(); };
+  col.querySelector('[data-next]').onclick = () => { show(i + 1); auto(); };
+  col.addEventListener('mouseenter', () => clearInterval(timer));
+  col.addEventListener('mouseleave', auto);
+  show(0); auto();
 });
 
-// 语言切换：只重画文案，不重设主题、不跳转、不清空任何状态
+/* ---------- Monster eyes ---------- */
+const monster = $('#monster'), svg = monster.querySelector('svg');
+const pupils = [{el: $('#pupilL'), cx: 160, cy: 150, r: 11}, {el: $('#pupilR'), cx: 236, cy: 146, r: 12}];
+let target = null, lastMove = 0, cur = pupils.map(() => ({x: 0, y: 0}));
+
+function toSvg(x, y){
+  const p = svg.createSVGPoint(); p.x = x; p.y = y;
+  return p.matrixTransform(svg.getScreenCTM().inverse());
+}
+addEventListener('pointermove', e => { target = toSvg(e.clientX, e.clientY); lastMove = performance.now(); }, {passive: true});
+
+function tick(t){
+  let look = target;
+  if(!look || t - lastMove > 3000){ // idle: look around on its own
+    const a = t / 1400;
+    look = {x: 200 + Math.sin(a) * 160, y: 150 + Math.sin(a * .7) * 60};
+  }
+  pupils.forEach((p, k) => {
+    const dx = look.x - p.cx, dy = look.y - p.cy, d = Math.hypot(dx, dy) || 1;
+    const m = Math.min(p.r, d / 6);
+    const tx = dx / d * m, ty = dy / d * m;
+    cur[k].x += (tx - cur[k].x) * .18; cur[k].y += (ty - cur[k].y) * .18;
+    p.el.setAttribute('transform', `translate(${cur[k].x.toFixed(2)} ${cur[k].y.toFixed(2)})`);
+  });
+  if(!reduced) requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+(function blink(){
+  setTimeout(() => {
+    monster.classList.add('blink');
+    setTimeout(() => { monster.classList.remove('blink'); blink(); }, 140);
+  }, 2800 + Math.random() * 3200);
+})();
+
+/* ---------- Rub to log in ---------- */
+const NEED = 8; // direction changes needed
+let rub = 0, lastX = null, lastDir = 0, decay = null;
+const meter = $('#meter'), rubText = $('#rubText');
+
+function paintRub(){
+  // 运行时文字走字典：切换语言后按当前进度重绘
+  const key = rub === 0 ? 'home.rubIdle' : rub < NEED ? 'home.rubMore' : 'home.rubDone';
+  rubText.textContent = T(key);
+}
+function setRub(v){
+  rub = Math.max(0, v);
+  meter.style.width = Math.min(100, rub / NEED * 100) + '%';
+  monster.classList.toggle('rubbing', rub > 0);
+  monster.classList.toggle('happy', rub >= 3);
+  paintRub();
+}
+monster.addEventListener('pointermove', e => {
+  if(e.pointerType !== 'mouse' && e.buttons === 0) return;
+  if(lastX !== null){
+    const dx = e.clientX - lastX;
+    if(Math.abs(dx) > 6){
+      const dir = Math.sign(dx);
+      if(lastDir && dir !== lastDir) setRub(rub + 1);
+      lastDir = dir; lastX = e.clientX;
+      if(rub >= NEED){ setRub(0); openLogin(); }
+    }
+  } else lastX = e.clientX;
+  clearTimeout(decay);
+  decay = setTimeout(() => { setRub(0); lastX = null; lastDir = 0; }, 700);
+});
+monster.addEventListener('pointerleave', () => { lastX = null; lastDir = 0; });
+monster.addEventListener('pointerdown', e => { monster.setPointerCapture?.(e.pointerId); monster.classList.add('squish'); });
+monster.addEventListener('pointerup', () => monster.classList.remove('squish'));
+monster.addEventListener('pointercancel', () => monster.classList.remove('squish'));
+monster.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openLogin(); } });
+// 触屏与无鼠标环境：轻点也能打开登录弹窗，动画不是进入系统的必经步骤
+monster.addEventListener('click', e => { if(e.detail !== 0) openLogin(); });
+
+/* ---------- Login card ---------- */
+const scrim = $('#scrim');
+let opener = null;
+function openLogin(){
+  opener = document.activeElement;
+  scrim.classList.add('open'); scrim.setAttribute('aria-hidden', 'false');
+  setTimeout(() => $('#email').focus(), 120);
+}
+function closeLogin(){
+  scrim.classList.remove('open'); scrim.setAttribute('aria-hidden', 'true');
+  opener?.focus?.();
+}
+$('#loginLink').onclick = openLogin;
+$('#ctaLogin').onclick = openLogin;
+$('#closeLogin').onclick = closeLogin;
+scrim.addEventListener('click', e => { if(e.target === scrim) closeLogin(); });
+addEventListener('keydown', e => { if(e.key === 'Escape' && scrim.classList.contains('open')) closeLogin(); });
+
+/* Demo entry: no account check, no email or password validation.
+   Owner, staff and customer all open the owner workspace. */
+$('#loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = $('#email').value.trim();
+  const role = new FormData(e.target).get('role') || 'boss';
+  const label = $('#submitLabel'), btn = $('#submitBtn');
+  $('#err').textContent = '';
+  // 只记录演示身份用于本页回显，不代表任何认证结果；不保存密码
+  try { localStorage.setItem('orbyte_demo_user', JSON.stringify({ email, role, demo: true })); } catch {}
+  btn.disabled = true;
+  label.textContent = T('home.dialog.opening');
+  // 轻微视觉过渡后进入老板工作台；系统开启“减少动态效果”时直接跳转
+  setTimeout(() => location.assign('/app#boss'), reduced ? 0 : 450);
+});
+
+/* ---------- 切换语言：只重画文案，不重置轮播、动画或输入 ---------- */
 if (window.NexFlowI18N) {
-  window.NexFlowI18N.onChange(() => updateThemeUI(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'));
+  window.NexFlowI18N.onChange(() => paintRub());
 }
 </script>
 </body>

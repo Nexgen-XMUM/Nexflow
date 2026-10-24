@@ -36,9 +36,9 @@ def test_showcase_pages_share_the_workspace_dictionary(tmp_path):
 
 def test_showcase_pages_use_translation_keys_instead_of_hardcoded_copy(tmp_path):
     welcome, login, _ = fetch_pages(tmp_path)
-    assert welcome.count('data-i18n="welcome.') >= 20
+    assert welcome.count('data-i18n="home.') >= 30
     assert login.count('data-i18n="auth.') >= 15
-    assert '<title data-i18n="welcome.pageTitle">' in welcome
+    assert '<title data-i18n="home.pageTitle">' in welcome
     assert '<title data-i18n="auth.pageTitle">' in login
     # 动态文案也走字典：登录页的 Toast、校验提示与成功弹窗
     for key in ("auth.toast.filled", "auth.err.emailInvalid", "auth.modal.title", "auth.login.submitting"):
@@ -50,7 +50,7 @@ def test_dictionary_carries_every_key_used_by_the_showcase_pages(tmp_path):
     used = set()
     for page in (welcome, login):
         used.update(re.findall(r'data-i18n(?:-ph|-aria|-title)?="([a-z][A-Za-z.]+)"', page))
-        used.update(re.findall(r"'((?:auth|welcome)\.[A-Za-z.]+)'", page))
+        used.update(re.findall(r"'((?:auth|home|welcome)\.[A-Za-z.]+)'", page))
     used.discard("auth.role.")  # 运行时拼接，实际键是 auth.role.owner/staff/user
     assert used, "没有解析到任何展示页词条"
     missing = sorted(key for key in used if "'" + key + "': [" not in dictionary)

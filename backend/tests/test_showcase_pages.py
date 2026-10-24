@@ -22,12 +22,32 @@ def test_welcome_page_is_served_at_root_with_live_links(tmp_path):
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
         page = response.text
-        assert 'id="launchDemoBtn"' in page
-        assert page.count('href="/login"') == 3  # 顶部按钮、Hero 主按钮、底部 CTA
+        # 小怪兽欢迎页：顶部 Log in 与底部 Launch the demo 都打开内嵌登录弹窗
+        assert 'id="loginLink"' in page and 'id="ctaLogin"' in page
+        assert 'id="monster"' in page and 'id="loginForm"' in page
+        # 唯一指向 /login 的入口是「创建账号」
+        assert page.count('href="/login"') == 1
+        # 顶部导航的四个锚点都必须有真实落点
+        for anchor in ("purpose", "features", "numbers", "voices"):
+            assert f'href="#{anchor}"' in page
+            assert f'id="{anchor}"' in page
         # 旧文件链接与失效锚点都已修掉，不允许再指向不存在的页面
         assert "orbyte_smart_yield_with_onboarding.html" not in page
         assert 'href="#benefits"' not in page
-        assert 'id="preview"' in page  # 导航「指挥台预览」有真实落点
+
+
+def test_welcome_demo_entry_always_opens_the_owner_workspace(tmp_path):
+    """任意邮箱、任意密码、任意角色都直接进入 /app#boss，不做校验也不分角色跳转。"""
+    with demo_client(tmp_path) as client:
+        page = client.get("/").text
+    start = page.index("$('#loginForm').addEventListener('submit'")
+    handler = page[start:page.index("});", start) + 3]
+    assert "location.assign('/app#boss')" in handler
+    assert "'/app#' + role" not in page  # 不再按角色分别跳转
+    assert "return;" not in handler.split("location.assign")[0]  # 提交前没有验证拦截
+    assert "orbyte_demo_user" in handler  # 只记录演示身份用于回显
+    # 密码不会写入任何存储
+    assert "password" not in handler.lower().replace("$('#password')", "")
 
 
 def test_login_page_points_at_the_workspace(tmp_path):
