@@ -7,10 +7,10 @@ from backend import main
 
 
 def test_catalogue_uses_inventory_without_private_fields(tmp_path, monkeypatch):
-    data = json.loads(main.INVENTORY_PATH.read_text())
+    data = json.loads(main.INVENTORY_PATH.read_text(encoding="utf-8"))
     data["products"][0]["name"] = "New catalogue name"
     path = tmp_path / "inventory.json"
-    path.write_text(json.dumps(data))
+    path.write_text(json.dumps(data), encoding="utf-8")
     monkeypatch.setattr(main, "INVENTORY_PATH", path)
     before = path.read_bytes()
     with TestClient(main.app) as client:
@@ -58,7 +58,7 @@ def test_frontend_entry_does_not_expose_repository():
         for asset in ('customer.js', 'customer.css'):
             response = client.get('/app/assets/' + asset)
             assert response.status_code == 200
-            assert response.text == (Path(__file__).resolve().parents[2] / 'frontend' / asset).read_text()
+            assert response.text == (Path(__file__).resolve().parents[2] / 'frontend' / asset).read_text(encoding="utf-8")
         assert 'id="consumerShop"' in page.text
         assert '/api/blind-boxes/inventory' in page.text
         assert '/api/blind-boxes/calculate' in page.text

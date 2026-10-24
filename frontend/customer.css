@@ -163,6 +163,9 @@ button:disabled { opacity: .55; cursor: wait; }
 .refresh-button { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: #475569; font-size: 9px; font-weight: 700; }
 .refresh-button:hover { border-color: #bfdbfe; background: #f8fbff; color: var(--brand); }
 .refresh-button span { margin-right: 4px; font-size: 14px; }
+.refresh-button[aria-busy="true"] span:first-child { display: inline-block; animation: account-refresh 1s linear infinite; }
+@keyframes account-refresh { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .refresh-button[aria-busy="true"] span:first-child { animation: none; } }
 .orders { color: #64748b; font-size: 10px; }
 .orders.muted { padding: 12px 0; }
 .order { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 15px; padding: 13px 2px; border-top: 1px solid #eef2f7; color: #334155; }
@@ -251,8 +254,203 @@ footer { display: flex; align-items: center; gap: 8px; padding: 17px 4px 0; colo
 .pay-line.total b { color: #1e40af; font-size: 18px; }
 .pay-hint { margin: 8px 0 0; color: #94a3b8; font-size: 9px; line-height: 1.6; }
 .pay-error { min-height: 14px; margin: 5px 0 0; color: #b42318; font-size: 10px; line-height: 1.5; }
+.pay-error[data-busy="true"] { color: #64748b; }
 .pay-actions { display: flex; gap: 8px; margin-top: 12px; }
 .pay-cancel, .pay-submit { flex: 1; height: 34px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .pay-cancel { border: 1px solid #cbd5e1; background: #fff; color: #475569; }
 .pay-submit { border: 1px solid #1e40af; background: #1e40af; color: #fff; }
 .pay-submit:disabled { opacity: .6; cursor: wait; }
+
+/* NexFlow bakery palette for the embedded customer workspace. */
+@scope (#purchaseModule) {
+  :scope {
+    --bg: #f6f1e7;
+    --surface: #fffdf8;
+    --ink: #3c332d;
+    --secondary: #5e5146;
+    --muted: #857565;
+    --line: #e6dac9;
+    --brand: #a9573b;
+    --brand-hover: #8f452e;
+    --brand-pale: #f8e9df;
+    --green: #637e61;
+    --display: Georgia, "Times New Roman", serif;
+  }
+  .topbar { background: #fffdf8; }
+  .brand-mark { background: linear-gradient(145deg, #8f452e, #c57958); }
+  .location svg, .page-kicker { color: #857565; stroke: #857565; }
+  .demo-chip { color: #637e61; background: #eaf1e5; border-color: #d5e2cb; }
+  .demo-chip i, .pending-line i { background: #71836b; }
+  .avatar { background: #f8e9df; color: #8f452e; }
+  .hero {
+    background: radial-gradient(ellipse at 73% 30%, rgba(232,199,181,.38), transparent 37%),
+      linear-gradient(112deg, #49342a 0%, #80513d 58%, #a9573b 100%);
+    box-shadow: 0 15px 38px rgba(73,52,42,.16);
+  }
+  .hero h1 em { color: #f2d2bd; }
+  .hero-copy > p, .hero-meta { color: #f4e5d7; }
+  .art-sticker { background: #fff4e4; color: #8f452e; }
+  .steps { background: #fffdf8; }
+  .step-no { border-color: #d4c2ad; color: #857565; }
+  .step.active .step-no { box-shadow: 0 3px 8px rgba(169,87,59,.22); }
+  .card { background: #fffdf8; border-radius: 18px; box-shadow: 0 8px 24px rgba(73,52,42,.045); }
+  .heading-icon, .offer-empty-icon { color: #a9573b; background: #f8e9df; }
+  .privacy-note { border-color: #e8c7b5; background: #fbf1e9; color: #8f452e; }
+  .primary-button { box-shadow: 0 4px 10px rgba(169,87,59,.22); }
+  .primary-button:hover:not(:disabled) { box-shadow: 0 6px 14px rgba(169,87,59,.28); }
+  .offer { border-color: #e8c7b5; background: linear-gradient(115deg, #fbf6ee, #f8e9df); color: #5e5146; }
+  .offer.empty { background: #fffaf2; color: #857565; }
+  .points-panel { background: radial-gradient(circle at 89% 12%, #d486645c, transparent 34%), linear-gradient(130deg, #49342a, #a9573b); }
+  .points-value span, .points-panel .demo-initial-points-note { color: #f2d2bd; }
+  .redeem-button { border-color: #e8c7b5; background: #f8e9df; color: #8f452e; }
+  .order-status { background: #f8e9df; color: #8f452e; }
+  .order button { border-color: #e8c7b5; color: #8f452e; }
+  .footer-mark { background: #a9573b; }
+}
+
+#purchaseModule .pay-panel { background: #fffdf8; box-shadow: 0 24px 60px rgba(73,52,42,.24); }
+#purchaseModule .pay-head h3, #purchaseModule .pay-line b { color: #3c332d; }
+#purchaseModule .pay-x { background: #eee7d9; color: #5e5146; }
+#purchaseModule .pay-line { color: #5e5146; }
+#purchaseModule .pay-line input[type="checkbox"] { accent-color: #a9573b; }
+#purchaseModule .pay-input-wrap input { border-color: #d4c2ad; color: #3c332d; }
+#purchaseModule .pay-max { border-color: #e8c7b5; background: #f8e9df; color: #8f452e; }
+#purchaseModule .pay-line.total { border-color: #e6dac9; }
+#purchaseModule .pay-line.total b { color: #a9573b; }
+#purchaseModule .pay-cancel { border-color: #d4c2ad; background: #fffdf8; color: #5e5146; }
+#purchaseModule .pay-submit { border-color: #a9573b; background: #a9573b; }
+
+/* Nexgen customer experience shares the Orbyte evergreen and parchment palette. */
+@scope (#purchaseModule) {
+  :scope {
+    --bg: #f2f3eb;
+    --surface: #fbfcf6;
+    --ink: #263b35;
+    --secondary: #52665e;
+    --muted: #78877e;
+    --line: #dce4da;
+    --brand: #246a5b;
+    --brand-hover: #195448;
+    --brand-pale: #e2eee7;
+    --green: #47745c;
+    --display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  }
+  .topbar { background: #fbfcf6; }
+  .brand-mark, .footer-mark { background: linear-gradient(145deg, #174f45, #31806b); }
+  .brand-mark span { background: #e0bd73; }
+  .location svg, .page-kicker { color: #78877e; stroke: #78877e; }
+  .demo-chip { color: #47745c; background: #e4efe5; border-color: #c9ddca; }
+  .demo-chip i, .pending-line i { background: #56856b; }
+  .avatar, .user-dot { background: #e2eee7; color: #246a5b; }
+  .hero {
+    background: radial-gradient(ellipse at 73% 30%, rgba(130,184,166,.27), transparent 38%),
+      linear-gradient(112deg, #203c34 0%, #246a5b 61%, #4b927b 100%);
+    box-shadow: 0 15px 38px rgba(28,76,63,.18);
+  }
+  .hero h1 em { color: #c5dfd1; }
+  .hero-copy > p, .hero-meta { color: #e1eee5; }
+  .art-sticker { background: #f1f2e8; color: #246a5b; }
+  .step.active .step-no { box-shadow: 0 3px 8px rgba(36,106,91,.22); }
+  .heading-icon, .offer-empty-icon { color: #246a5b; background: #e2eee7; }
+  .privacy-note { border-color: #bfd7ca; background: #eef4ec; color: #246a5b; }
+  .primary-button, .offer-actions button { box-shadow: 0 4px 10px rgba(36,106,91,.2); }
+  .primary-button:hover:not(:disabled) { box-shadow: 0 6px 14px rgba(36,106,91,.25); }
+  .offer { border-color: #bfd7ca; background: linear-gradient(115deg, #f6f7ef, #e7f0e8); color: #52665e; }
+  .offer.empty { background: #fbfcf6; color: #78877e; }
+  .points-panel { background: radial-gradient(circle at 89% 12%, #82b8a65c, transparent 34%), linear-gradient(130deg, #203c34, #246a5b); }
+  .points-value span, .points-panel .demo-initial-points-note { color: #d4e8db; }
+  .redeem-button { border-color: #bfd7ca; background: #e2eee7; color: #195448; }
+  .order-status { background: #e2eee7; color: #195448; }
+  .order button { border-color: #bfd7ca; color: #195448; }
+  .order button:hover:not(:disabled) { background: #e2eee7; }
+}
+#purchaseModule .pay-panel { background: #fbfcf6; }
+#purchaseModule .pay-head h3, #purchaseModule .pay-line b { color: #263b35; }
+#purchaseModule .pay-x { background: #e7ece2; color: #52665e; }
+#purchaseModule .pay-line { color: #52665e; }
+#purchaseModule .pay-line input[type="checkbox"] { accent-color: #246a5b; }
+#purchaseModule .pay-input-wrap input { border-color: #c7d4c8; color: #263b35; }
+#purchaseModule .pay-max { border-color: #bfd7ca; background: #e2eee7; color: #195448; }
+#purchaseModule .pay-line.total { border-color: #dce4da; }
+#purchaseModule .pay-line.total b { color: #246a5b; }
+#purchaseModule .pay-cancel { border-color: #c7d4c8; background: #fbfcf6; color: #52665e; }
+#purchaseModule .pay-submit { border-color: #246a5b; background: #246a5b; }
+
+/* Nexgen customer desk: match the warm butter-paper language of Orbyte’s welcome and sign-in. */
+@scope (#purchaseModule) {
+  :scope {
+    --bg: #f7f0e4;
+    --surface: #fffaf0;
+    --ink: #49342a;
+    --secondary: #665548;
+    --muted: #927e6c;
+    --line: #e4d7c5;
+    --brand: #b95b3f;
+    --brand-hover: #a64b33;
+    --brand-pale: #f5e4d9;
+    --green: #71866d;
+    --display: "Fraunces", Georgia, serif;
+    --body: "DM Sans", sans-serif;
+  }
+  .topbar { background: #fffaf0; border-color: #e4d7c5; }
+  .brand-mark, .footer-mark { background: linear-gradient(145deg, #a64b33, #c57958); }
+  .brand-mark span { background: #e0bd73; }
+  .brand-copy b { font-family: var(--display); letter-spacing: -.035em; }
+  .location svg, .page-kicker { color: #927e6c; stroke: #927e6c; }
+  .demo-chip { color: #536b4e; background: #e6eadf; border-color: #d7e0cf; }
+  .demo-chip i, .pending-line i { background: #71866d; }
+  .avatar, .user-dot { background: #f5e4d9; color: #a64b33; }
+  .hero {
+    background: radial-gradient(ellipse at 73% 30%, rgba(232,199,181,.35), transparent 38%),
+      linear-gradient(112deg, #49342a 0%, #80513d 58%, #a9573b 100%);
+    box-shadow: 0 15px 38px rgba(73,52,42,.16);
+  }
+  .hero h1 { font-family: var(--display); letter-spacing: -.05em; }
+  .hero h1 em { color: #f2d2bd; }
+  .hero-copy > p, .hero-meta { color: #f4e5d7; }
+  .art-sticker { background: #fff4e4; color: #8f452e; }
+  .steps, .card { background: #fffaf0; border-color: #e4d7c5; }
+  .step-no { border-color: #d4c1a9; color: #927e6c; }
+  .step.active .step-no { box-shadow: 0 3px 8px rgba(185,91,63,.22); }
+  .heading-icon, .offer-empty-icon { color: #a9573b; background: #f5e4d9; }
+  .privacy-note { border-color: #e4c4b3; background: #fbf1e9; color: #8f452e; }
+  .primary-button, .offer-actions button { background: #b95b3f; box-shadow: 0 4px 10px rgba(185,91,63,.2); }
+  .primary-button:hover:not(:disabled) { background: #a64b33; box-shadow: 0 6px 14px rgba(185,91,63,.25); }
+  .offer { border-color: #e4c4b3; background: linear-gradient(115deg, #fbf6ee, #f5e4d9); color: #665548; }
+  .offer.empty { background: #fffaf0; color: #927e6c; }
+  .points-panel { background: radial-gradient(circle at 89% 12%, #d486645c, transparent 34%), linear-gradient(130deg, #49342a, #a9573b); }
+  .points-value span, .points-panel .demo-initial-points-note { color: #f2d2bd; }
+  .redeem-button { border-color: #e4c4b3; background: #f5e4d9; color: #8f452e; }
+  .order-status { background: #f5e4d9; color: #8f452e; }
+  .order button { border-color: #e4c4b3; color: #8f452e; }
+  .order button:hover:not(:disabled) { background: #f5e4d9; }
+}
+#purchaseModule .pay-panel { background: #fffaf0; }
+#purchaseModule .pay-head h3, #purchaseModule .pay-line b { color: #49342a; }
+#purchaseModule .pay-x { background: #eee4d5; color: #665548; }
+#purchaseModule .pay-line { color: #665548; }
+#purchaseModule .pay-line input[type="checkbox"] { accent-color: #b95b3f; }
+#purchaseModule .pay-input-wrap input { border-color: #d4c1a9; color: #49342a; }
+#purchaseModule .pay-max { border-color: #e4c4b3; background: #f5e4d9; color: #8f452e; }
+#purchaseModule .pay-line.total { border-color: #e4d7c5; }
+#purchaseModule .pay-line.total b { color: #b95b3f; }
+#purchaseModule .pay-cancel { border-color: #d4c1a9; background: #fffaf0; color: #665548; }
+#purchaseModule .pay-submit { border-color: #b95b3f; background: #b95b3f; }
+
+/* Checkout: make the amount, point controls and recovery guidance easy to scan. */
+#purchaseModule .pay-panel { width: min(480px, 100%); padding: 24px; border-radius: 20px; }
+#purchaseModule .pay-head h3 { font-size: 20px; }
+#purchaseModule .pay-line { min-height: 38px; gap: 16px; font-size: 14px; }
+#purchaseModule .pay-line input[type="checkbox"] { width: 18px; height: 18px; }
+#purchaseModule .pay-input-wrap input { min-height: 40px; font-size: 14px; }
+#purchaseModule .pay-max { min-height: 36px; padding-inline: 11px; font-size: 12px; }
+#purchaseModule .pay-line.total { margin-top: 12px; padding-top: 14px; }
+#purchaseModule .pay-line.total b { font-size: 24px; }
+#purchaseModule .pay-balance-hint { margin: 4px 0 0; color: #8f452e; font-size: 12px; line-height: 1.5; }
+#purchaseModule .pay-balance-hint:empty { display: none; }
+#purchaseModule .pay-hint, #purchaseModule .pay-error { font-size: 12px; line-height: 1.55; }
+#purchaseModule .pay-actions { gap: 12px; margin-top: 18px; }
+#purchaseModule .pay-cancel, #purchaseModule .pay-submit { min-height: 46px; font-size: 14px; }
+#purchaseModule #pay-use-value:focus-visible, #purchaseModule .pay-max:focus-visible,
+#purchaseModule .pay-cancel:focus-visible, #purchaseModule .pay-submit:focus-visible,
+#purchaseModule .pay-x:focus-visible { outline: 3px solid #d48664; outline-offset: 2px; }

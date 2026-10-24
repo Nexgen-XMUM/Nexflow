@@ -37,14 +37,19 @@ window.NexFlowI18N = (function () {
     'common.badResponse': ['The service returned an unreadable response. Please retry.', 'Perkhidmatan mengembalikan respons yang tidak dapat dibaca. Sila cuba lagi.', '服务返回的内容无法读取，请重试。'],
 
     /* ---------------- 顶栏 / 语言 ---------------- */
-    'app.brandSub': ['Uncle Wong’s Bakery · Closing clearance automation',
+    'app.brandSub': ['Nexgen · Bakery operations workspace',
       'Uncle Wong’s Bakery · Automasi pelepasan stok tutup kedai',
       'Uncle Wong’s Bakery · 打烊清仓自动化'],
     'app.themeDark': ['Dark mode', 'Mod gelap', '深色模式'],
     'app.themeLight': ['Light mode', 'Mod cerah', '浅色模式'],
     'app.themeToggleAria': ['Switch between dark and light mode', 'Tukar antara mod gelap dan cerah', '切换深色或浅色模式'],
     'app.tour': ['Product tour', 'Panduan produk', '功能导览'],
-    'app.resetDraft': ['Reset draft', 'Set semula draf', '重置草稿'],
+    'app.resetDraft': ['Reset workspace', 'Tetapkan semula ruang kerja', '重置工作台'],
+    'app.resetConfirm': [
+      'Reset this page session? Current counts, drafts, and activity on this page will be cleared. Confirmed server actions will not be undone.',
+      'Tetapkan semula sesi halaman ini? Kiraan, draf dan aktiviti semasa akan dipadam. Tindakan yang telah disahkan pada server tidak akan dibatalkan.',
+      '要重置当前页面会话吗？本页的盘点、草稿和活动记录会清空；已确认的后端操作不会撤销。'
+    ],
     'app.langLabel': ['Language', 'Bahasa', '界面语言'],
     'app.sidebarToggle': ['Collapse or expand the menu', 'Kuncupkan atau kembangkan menu', '收起或展开侧边菜单'],
 
@@ -97,20 +102,25 @@ window.NexFlowI18N = (function () {
     'pos.cardSub': ['Type the leftovers in one line, for example', 'Taip baki dalam satu baris, contohnya', '一句话写完剩余数量，例如'],
     'pos.cardSubTail': ['then press Enter or tap “Recognise”.', 'kemudian tekan Enter atau “Kenal pasti”.', '，按回车或点“识别”。'],
     'pos.quickAria': ['Quick entry of leftover items', 'Input pantas item baki', '快速输入剩余商品'],
+    'pos.quickPlaceholder': ['e.g. 12 croissants, 5 chocolate slices', 'cth. 12 croissant, 5 keping coklat', '例如：12 个牛角包，5 片巧克力蛋糕'],
     'pos.parse': ['Recognise', 'Kenal pasti', '识别'],
-    'pos.submit': ['Submit count', 'Hantar kiraan', '提交盘点'],
+    'pos.submit': ['Generate review draft', 'Jana draf semakan', '生成审核草稿'],
     'pos.rowsLoading': ['Loading products…', 'Memuatkan produk…', '正在从后端载入商品…'],
     'pos.loadingRows': ['Loading products from the catalogue…', 'Memuatkan produk daripada katalog…', '正在从后端载入商品…'],
+    'pos.retryProducts': ['Retry product load', 'Cuba muat semula produk', '重新加载商品'],
+    'pos.catalogEmpty': ['The backend catalogue returned no products. Retry or check the store catalogue.',
+      'Katalog backend tidak mengembalikan produk. Cuba lagi atau semak katalog kedai.',
+      '后端商品目录没有返回商品。请重试或检查门店目录。'],
     'pos.stock': ['Available stock {n}', 'Stok tersedia {n}', '可用库存 {n}'],
     'pos.decAria': ['Reduce {name}', 'Kurangkan {name}', '减少 {name}'],
     'pos.incAria': ['Add {name}', 'Tambah {name}', '增加 {name}'],
     'pos.qtyAria': ['Leftover quantity for {name}', 'Kuantiti baki untuk {name}', '{name} 剩余数量'],
-    'pos.loadFail': ['Could not load products. Check the service and tap “Reset draft” to try again: {err}',
-      'Produk gagal dimuatkan. Semak perkhidmatan dan tekan “Set semula draf” untuk cuba lagi: {err}',
-      '商品加载失败，请检查服务后点击“重置演示”重试：{err}'],
-    'pos.errNotLoaded': ['Products are not loaded yet. Tap “Reset draft” to try again.',
-      'Produk belum dimuatkan. Tekan “Set semula draf” untuk cuba lagi.',
-      '商品未加载，请点击“重置演示”重试。'],
+    'pos.loadFail': ['Could not load products from the backend: {err}',
+      'Produk tidak dapat dimuatkan daripada backend: {err}',
+      '无法从后端加载商品：{err}'],
+    'pos.errNotLoaded': ['The product list is not ready. Retry loading products before submitting.',
+      'Senarai produk belum sedia. Muat semula produk sebelum menghantar.',
+      '商品列表尚未就绪，请重新加载后再提交。'],
     'pos.errInteger': ['{name}: the quantity must be a whole number, not a decimal or a negative.',
       '{name}: kuantiti mesti nombor bulat, bukan perpuluhan atau negatif.',
       '{name}：数量必须是非负整数，不能是小数或负数。'],
@@ -153,6 +163,8 @@ window.NexFlowI18N = (function () {
       'Lihat jualan hari ini dan apa yang berlaku pada baki stok secara sekilas.',
       '轻松了解今天的销售与余货处理情况。'],
     'dash.refresh': ['Refresh data', 'Muat semula data', '刷新数据'],
+    'dash.reviewGroup': ['Next action', 'Tindakan seterusnya', '下一步操作'],
+    'dash.reviewHint': ['Review the current draft before sharing it.', 'Semak draf semasa sebelum berkongsi.', '分享之前先审核当前草稿。'],
     'dash.notice': ['Demo environment · the transactions and handovers below are for product experience.',
       'Persekitaran demo · transaksi dan serahan di bawah adalah untuk pengalaman produk.',
       '演示环境 · 以下交易与交接数据用于产品体验。'],
@@ -200,7 +212,7 @@ window.NexFlowI18N = (function () {
       'Angka tidak dapat dimuatkan: {err}. Tekan “Muat semula data” untuk cuba lagi.',
       '经营数据没有加载出来：{err}。可以点“刷新数据”再试一次。'],
     'dash.badFormat': ['Unexpected dashboard data format', 'Format data papan pemuka tidak sah', '经营数据格式无效'],
-    'dash.sharePrefix': ['NexFlow · today’s results', 'NexFlow · hasil hari ini', 'NexFlow · 今日成果'],
+    'dash.sharePrefix': ['Nexgen · today’s results', 'NexFlow · hasil hari ini', 'NexFlow · 今日成果'],
     'dash.shareBody': ['Today {revenue} was paid (including orders not yet picked up); customers picked up {pickup}; {donation} was handed to charity partners; those items amount to about {carbon} of estimated food-footprint emissions. Figures come from the demo ledger: predicted sales, pending pickups and pending donations do not count as completed; carbon figures are estimates, not certified reductions or carbon credits.',
       'Hari ini {revenue} telah dibayar (termasuk pesanan yang belum diambil); pelanggan telah mengambil {pickup}; {donation} telah diserahkan kepada rakan kebajikan; item tersebut menyamai kira-kira {carbon} anggaran pelepasan jejak karbon makanan. Angka ini daripada lejar demo: jualan dijangka, pengambilan tertunggak dan sumbangan tertunggak tidak dikira selesai; angka karbon ialah anggaran, bukan pengurangan bercertifikat atau kredit karbon.',
       '今天已收到 {revenue}（含已付款、还没取餐的订单）；顾客已取走 {pickup}；已交给公益机构 {donation}；这些取走和交接的食物，约减少碳排放 {carbon}（估算）。数字来自演示账本：预计售出、待取餐和待捐赠都不算已完成；碳排是估算，不是认证减排量或碳积分。'],
@@ -461,9 +473,16 @@ window.NexFlowI18N = (function () {
       '先选时间和口味偏好，我们会为你锁定一份报价。'],
     'shop.date': ['Pickup date', 'Tarikh pengambilan', '取餐日期'],
     'shop.slot': ['Pickup slot', 'Slot pengambilan', '取餐时段'],
+    'shop.slotDemoLocked': ['22:00 – 22:30 (not in demo: clock 21:35)', '22:00 – 22:30 (tiada dalam demo: jam 21:35)', '22:00 – 22:30（演示时钟 21:35，不可选）'],
     'shop.likes': ['Preferred taste', 'Rasa digemari', '喜欢的口味'],
     'shop.optional': ['optional', 'pilihan', '选填'],
     'shop.likesPh': ['Leave blank for any taste, e.g. bread, dessert', 'Biarkan kosong untuk semua rasa, cth. bread, dessert', '留空不限口味，例如 bread, dessert'],
+    'shop.diets': ['Required diets', 'Diet diperlukan', '必须满足的饮食'],
+    'shop.dietsPh': ['Leave blank for none, e.g. vegetarian, halal', 'Biarkan kosong jika tiada, cth. vegetarian, halal', '留空不限，例如 vegetarian, halal'],
+    'shop.dislikes': ['Tastes to skip', 'Rasa untuk dilangkau', '不想要的口味'],
+    'shop.dislikesPh': ['Leave blank for none, e.g. dessert', 'Biarkan kosong jika tiada, cth. dessert', '留空不限，例如 dessert'],
+    'shop.slotHint': ['Pickup is in 30-minute slots, Malaysia time (UTC+08:00).', 'Pengambilan dalam slot 30 minit, waktu Malaysia (UTC+08:00).', '取餐按 30 分钟时段，马来西亚时间（UTC+08:00）。'],
+    'quote.likeDislikeClash': ['The same taste cannot be both liked and skipped.', 'Rasa yang sama tidak boleh disukai dan dilangkau serentak.', '同一种口味不能同时“喜欢”和“不想要”。'],
     'shop.allergens': ['Allergens to avoid', 'Alergen untuk dielakkan', '需要避开的过敏原'],
     'shop.allergensPh': ['Leave blank for no extra exclusions, e.g. peanut, milk', 'Biarkan kosong tanpa pengecualian tambahan, cth. peanut, milk', '留空不额外排除，例如 peanut, milk'],
     'shop.privacyTitle': ['Contents stay secret', 'Kandungan kekal rahsia', '惊喜内容暂时保密'],
@@ -480,7 +499,7 @@ window.NexFlowI18N = (function () {
     'shop.availablePoints': ['Available points', 'Mata tersedia', '可用积分'],
     'shop.pendingPoints': ['Points on the way', 'Mata dalam proses', '待到账积分'],
     'shop.pointsRedeemTitle': ['Points can offset the simulated payment', 'Mata boleh menolak bayaran simulasi', '积分可在模拟付款时抵扣'],
-    'shop.pointsFootnote': ['100 points = RM1 · each order offsets at most 30% of its quote', '100 mata = RM1 · setiap pesanan menolak paling banyak 30% daripada sebut harga', '100 积分 = RM1 · 每笔最多抵扣本单报价的 30%'],
+    'shop.pointsFootnote': ['1 point = RM0.01 · redeem up to 30% of each quote', '1 mata = RM0.01 · tebus sehingga 30% daripada setiap sebut harga', '1 积分 = RM0.01 · 每笔最多抵扣报价的 30%'],
     'shop.pointsFootnote2': ['Balance and pickup rewards are read from the backend ledger.', 'Baki dan ganjaran pengambilan dibaca daripada lejar backend.', '余额与取餐奖励从后端账本读取。'],
     'shop.impactNoteTitle': ['Good food should not be wasted', 'Makanan baik tidak patut dibazirkan', '好食物不该被浪费'],
     'shop.impactNoteBody': ['CO₂e is only an estimate, not a certified reduction or carbon credit.', 'CO₂e hanyalah anggaran, bukan pengurangan bercertifikat atau kredit karbon.', 'CO₂e 仅作估算，不是经认证减排或碳积分。'],
@@ -488,22 +507,28 @@ window.NexFlowI18N = (function () {
     'shop.ordersTitle': ['My orders', 'Pesanan saya', '我的订单'],
     'shop.ordersRefresh': ['Refresh orders', 'Muat semula pesanan', '刷新订单'],
     'shop.ordersLoading': ['Loading…', 'Memuatkan…', '载入中…'],
-    'shop.footer1': ['Orbyte Smart Yield', 'Orbyte Smart Yield', 'Orbyte Smart Yield'],
+    'shop.footer1': ['Orbyte Smart Yield · Nexgen', 'NexFlow', 'NexFlow'],
     'shop.footerDemo': ['Hackathon Demo', 'Demo Hackathon', 'Hackathon Demo'],
-    'shop.footerNote': ['Quotes, payment and points are simulated locally', 'Sebut harga, bayaran dan mata disimulasikan setempat', '报价、付款与积分均为本地模拟'],
+    'shop.footerNote': ['Quotes and simulated payments use the demo service; points balances come from the account ledger.', 'Sebut harga dan bayaran simulasi menggunakan servis demo; baki mata dibaca daripada lejar akaun.', '报价和模拟付款由演示服务处理；积分余额读取自账户账本。'],
 
     /* ---------------- 付款弹窗 ---------------- */
     'pay.title': ['Simulated payment', 'Bayaran simulasi', '模拟付款'],
     'pay.closeAria': ['Close the payment dialog', 'Tutup dialog bayaran', '关闭付款弹窗'],
     'pay.price': ['Quote for this order', 'Sebut harga pesanan ini', '本单报价'],
     'pay.points': ['Points available', 'Mata tersedia', '当前可用积分'],
+    'pay.pointsUnavailable': ['Unavailable', 'Tidak tersedia', '暂不可用'],
+    'pay.balanceUnavailable': ['Points could not be verified. You can still pay without points; refresh your account to try again.',
+      'Mata tidak dapat disahkan. Anda masih boleh membayar tanpa mata; muat semula akaun untuk mencuba lagi.',
+      '暂时无法核实积分。你仍可不使用积分继续付款；刷新账户后可再试。'],
+    'pay.noPoints': ['No points can be applied to this quote.', 'Tiada mata yang boleh digunakan untuk sebut harga ini.', '本次报价没有可用的抵扣积分。'],
     'pay.usePoints': ['Use points', 'Guna mata', '使用积分抵扣'],
     'pay.useValue': ['Points to use', 'Mata digunakan', '使用积分'],
     'pay.max': ['Use the maximum', 'Guna maksimum', '使用可用上限'],
     'pay.discount': ['Discount', 'Potongan', '抵扣金额'],
     'pay.total': ['To pay', 'Perlu dibayar', '应付'],
-    'pay.hint': ['100 points = RM1; each order offsets at most 30% of its quote.', '100 mata = RM1; setiap pesanan menolak paling banyak 30% daripada sebut harga.', '100 积分 = RM1，每笔最多抵扣本单报价的 30%。'],
+    'pay.hint': ['1 point = RM0.01. Use whole points; the maximum redemption is 30% of this quote.', '1 mata = RM0.01. Gunakan mata bulat; penebusan maksimum ialah 30% daripada sebut harga ini.', '1 积分 = RM0.01。只能使用整数积分，且最多抵扣本次报价的 30%。'],
     'pay.submit': ['Confirm simulated payment', 'Sahkan bayaran simulasi', '确认模拟付款'],
+    'pay.processing': ['Processing payment…', 'Memproses bayaran…', '付款处理中…'],
     'pay.errInteger': ['Points must be a whole number, zero or more.', 'Mata mesti nombor bulat, sifar atau lebih.', '使用积分需为非负整数'],
     'pay.errMax': ['At most {n} points for this order.', 'Maksimum {n} mata untuk pesanan ini.', '本单最多可使用 {n} 分'],
     'pay.uncertain': ['The last payment result is unknown. Retry with the original payment details; do not change the points.',
@@ -540,6 +565,7 @@ window.NexFlowI18N = (function () {
       '先确认当前报价，或选择“放弃此报价”后再获取新报价。'],
     'quote.needDate': ['Choose a pickup date', 'Pilih tarikh pengambilan', '请选择取餐日期'],
     'quote.created': ['Quote ready. Stock is not held until you confirm.', 'Sebut harga sedia. Stok tidak ditahan sehingga anda sahkan.', '报价已生成。确认前不会占用库存。'],
+    'quote.loading': ['Finding a quote… Please keep this page open.', 'Sedang mencari sebut harga… Sila kekalkan halaman ini terbuka.', '正在获取报价…请不要关闭页面。'],
     'quote.noCombo': ['Current stock cannot build a box. Try again later; blank optional fields were treated as no preference.',
       'Stok semasa tidak dapat membentuk kotak. Cuba lagi nanti; medan pilihan kosong dianggap tiada keutamaan.',
       '目前库存无法组成盲盒，请稍后再试；选填留空已按不限偏好处理。'],
@@ -655,6 +681,7 @@ window.NexFlowI18N = (function () {
     'rescue.handoffOk': ['Confirm handover', 'Sahkan serahan', '确认交接'],
 
     /* ---------------- 打烊去向（动态） ---------------- */
+    'common.offline': ['Cannot reach the service. Check your connection, then retry.', 'Tidak dapat menghubungi perkhidmatan. Semak sambungan anda, kemudian cuba lagi.', '无法连接服务，请检查网络后重试。'],
     'rescue.offline': ['Cannot reach the backend. Check that uvicorn is running, then retry.',
       'Tidak dapat menghubungi backend. Pastikan uvicorn berjalan, kemudian cuba lagi.',
       '连不上后端。请确认 uvicorn 正在运行，然后重试。'],
@@ -696,7 +723,7 @@ window.NexFlowI18N = (function () {
       '组不成盲盒，已列出捐赠建议和处理建议。'],
     'rescue.noStockLeft': ['No stock left.', 'Tiada stok berbaki.', '没有剩余库存。'],
     'rescue.calcFail': ['Calculation failed: {err}', 'Pengiraan gagal: {err}', '计算失败：{err}'],
-    'rescue.contactText': ['[Demo message, not sent] Hello {recipient},\nWe are the NexFlow demo store. After closing tonight we have {items}, {qty} items in total, about {weight}, registered as edible with storage checked.\nCould your organisation receive them tonight? The method and time are still to be confirmed by both sides.',
+    'rescue.contactText': ['[Demo message, not sent] Hello {recipient},\nWe are the Nexgen demo store. After closing tonight we have {items}, {qty} items in total, about {weight}, registered as edible with storage checked.\nCould your organisation receive them tonight? The method and time are still to be confirmed by both sides.',
       '[Mesej demo, tidak dihantar] Salam {recipient},\nKami kedai demo NexFlow. Selepas tutup kedai malam ini kami ada {items}, {qty} unit kesemuanya, kira-kira {weight}, didaftarkan sebagai boleh dimakan dengan penyimpanan disemak.\nBolehkah organisasi anda menerimanya malam ini? Cara dan masa masih perlu disahkan oleh kedua pihak.',
       '【演示文案，未发送】您好，{recipient}：\n我们是 Nexflow 演示门店。今晚打烊后有 {items}，共 {qty} 件、约 {weight}，门店已登记为可食用并核对储存。\n请问贵机构今晚是否方便接收？接收方式和时间待双方确认。'],
     'rescue.optionLine': ['{qty} items · score {score} · carbon estimate {co2} CO₂e',
@@ -746,6 +773,27 @@ window.NexFlowI18N = (function () {
       'Serahan simulasi kepada {recipient} direkodkan. Ini tidak bermakna pengangkutan selesai atau organisasi telah menandatangani.',
       '已记录模拟交接给 {recipient}。这不代表运输已完成或机构已签收。'],
     'rescue.handoffFail': ['Handover failed: {err}', 'Serahan gagal: {err}', '交接失败：{err}'],
+    'rescue.receiptTitle': ['Donation handover record', 'Rekod serahan sumbangan', '捐赠交接记录'],
+    'rescue.receiptSubtitle': ['System record of an operator-confirmed demo handover.', 'Rekod sistem bagi serahan demo yang disahkan pengendali.', '由操作人员确认的演示交接系统记录。'],
+    'rescue.receiptNotice': [
+      'This is not an official receipt issued or signed by the recipient organisation. The backend stores the donation record creation time, not a separate handover timestamp.',
+      'Ini bukan resit rasmi yang dikeluarkan atau ditandatangani organisasi penerima. Backend menyimpan masa rekod sumbangan dicipta, bukan cap masa serahan berasingan.',
+      '这不是接收机构签发或签署的正式收据。后端保存的是捐赠记录创建时间，并没有单独记录交接时间。'
+    ],
+    'rescue.receiptReference': ['Record reference', 'Rujukan rekod', '记录编号'],
+    'rescue.receiptRecipient': ['Recipient organisation', 'Organisasi penerima', '接收机构'],
+    'rescue.receiptCreated': ['Donation record created', 'Rekod sumbangan dicipta', '捐赠记录创建时间'],
+    'rescue.receiptStatus': ['Handover status', 'Status serahan', '交接状态'],
+    'rescue.receiptConfirmed': ['Operator-confirmed (demo)', 'Disahkan pengendali (demo)', '操作人员已确认（演示）'],
+    'rescue.receiptItems': ['Items', 'Item', '物品'],
+    'rescue.receiptQuantity': ['Total quantity', 'Jumlah unit', '总数量'],
+    'rescue.receiptWeight': ['Total weight', 'Jumlah berat', '总重量'],
+    'rescue.receiptImpact': ['Estimated CO₂e', 'Anggaran CO₂e', 'CO₂e 估算'],
+    'rescue.receiptEstimateNote': ['Estimate only; not a verified environmental credit.', 'Anggaran sahaja; bukan kredit alam sekitar yang disahkan.', '仅为估算，不是经核证的环境信用。'],
+    'rescue.receiptView': ['View record', 'Lihat rekod', '查看记录'],
+    'rescue.receiptPrint': ['Print / Save as PDF', 'Cetak / Simpan sebagai PDF', '打印 / 保存为 PDF'],
+    'rescue.receiptClose': ['Close', 'Tutup', '关闭'],
+    'rescue.receiptUnavailable': ['The saved handover record is incomplete, so a receipt view cannot be prepared.', 'Rekod serahan yang disimpan tidak lengkap, jadi paparan resit tidak dapat disediakan.', '已保存的交接记录不完整，无法生成记录页面。'],
 
     /* ---------------- 草稿与审批 ---------------- */
     'draft.badgePending': ['Pending review', 'Menunggu semakan', '待审批'],
@@ -780,9 +828,9 @@ window.NexFlowI18N = (function () {
       '金额和 CO₂e 由后端计算；生成草稿不扣库存、不发送消息。'],
     'draft.approve': ['Simulate approve & send', 'Simulasi lulus & hantar', '模拟批准并群发'],
     'draft.reject': ['Reject', 'Tolak', '拒绝'],
-    'draft.ownerLock': ['🔒 Only the owner role can simulate an approval. Switch to Uncle Wong on the left.',
-      '🔒 Hanya peranan pemilik boleh meluluskan simulasi. Tukar kepada Uncle Wong di kiri.',
-      '🔒 演示中只有老板角色可以模拟批准。请在左侧切换到 Uncle Wong。'],
+    'draft.ownerLock': ['Only the owner role can simulate an approval. Switch to Uncle Wong on the left.',
+      'Hanya peranan pemilik boleh meluluskan simulasi. Tukar kepada Uncle Wong di kiri.',
+      '演示中只有老板角色可以模拟批准。请在左侧切换到 Uncle Wong。'],
     'draft.emptyTitle': ['No promo waiting for approval', 'Tiada promosi menunggu kelulusan', '现在没有待审批的促销'],
     'draft.emptyBody': ['After staff submit the closing count, the draft appears here.', 'Selepas staf menghantar kiraan tutup kedai, draf muncul di sini.', '店员提交打烊盘点后，草稿会出现在这里。'],
     'draft.emptyBtn': ['Go to closing count', 'Pergi ke kiraan tutup kedai', '去打烊盘点'],
@@ -839,6 +887,8 @@ window.NexFlowI18N = (function () {
     'tour.back': ['Back', 'Kembali', '上一步'],
     'tour.next': ['Next', 'Seterusnya', '下一步'],
     'tour.done': ['Start using it', 'Mula guna', '开始使用'],
+    'tour.scrollDown': ['↓ Scroll down to see this part', '↓ Tatal ke bawah untuk melihat bahagian ini', '↓ 向下滚动查看这一部分'],
+    'tour.scrollUp': ['↑ Scroll up to see this part', '↑ Tatal ke atas untuk melihat bahagian ini', '↑ 向上滚动查看这一部分'],
     'tour.sidebarTitle': ['Left navigation', 'Navigasi kiri', '左侧导航'],
     'tour.sidebarDesc': ['One workspace: closing count, dashboard, surprise boxes, customer purchase and end-of-day handover. Tap ☰ to collapse or expand the menu.',
       'Satu ruang kerja: kiraan tutup kedai, papan pemuka, kotak kejutan, pembelian pelanggan dan serahan akhir hari. Tekan ☰ untuk kuncupkan atau kembangkan menu.',
@@ -869,7 +919,7 @@ window.NexFlowI18N = (function () {
       '模拟批准后，在这里播放送达、已读和虚构熟客回复；不实际发送、不扣库存、不生成订单。'],
 
     /* ================= 展示页：欢迎页 ================= */
-    'welcome.pageTitle': ['NexFlow · Orbyte Smart Yield — Smart end-of-day clearance for bakeries',
+    'welcome.pageTitle': ['Orbyte Smart Yield · Nexgen bakery operations',
       'NexFlow · Orbyte Smart Yield — Pelepasan stok pintar untuk kedai roti',
       'NexFlow · Orbyte Smart Yield — 智能烘焙打烊清仓与 AI 自动化演示'],
     'welcome.nav.features': ['Features', 'Ciri utama', '核心功能'],
@@ -887,7 +937,7 @@ window.NexFlowI18N = (function () {
       '专为烘焙店与餐饮零售打造的 AI 闭环 Yield 系统。从店员秒级语音/自然语言盘点、代码安全毛利测算、到老板微信/WhatsApp 一键群发审批与减碳印记追踪。'],
     'welcome.hero.ctaPrimary': ['Try the interactive demo', 'Cuba demo interaktif', '立即体验互动 Demo'],
     'welcome.hero.ctaSecondary': ['See the core modules', 'Lihat modul teras', '了解五大核心模块'],
-    'welcome.preview.bar': ['Orbyte Smart Yield · live operations console preview',
+    'welcome.preview.bar': ['Nexgen · live operations console preview',
       'Orbyte Smart Yield · pratonton konsol operasi langsung',
       'Orbyte Smart Yield · 实时运营指挥台预览'],
     'welcome.preview.value1': ['RM 180.00', 'RM 180.00', 'RM 180.00'],
@@ -956,17 +1006,17 @@ window.NexFlowI18N = (function () {
       'Tiada pemasangan rumit. Lancarkan demo interaktif dan cuba aliran pelepasan berbantukan AI.',
       '无需复杂部署，立即启动互动 Demo，体验零门槛的 AI 智能打烊清仓系统。'],
     'welcome.cta.button': ['Launch the system demo', 'Lancarkan demo sistem', '立即启动系统 Demo'],
-    'welcome.footer.note': ['© 2026 NexFlow · Orbyte Smart Yield — hackathon prototype. Every figure and testimonial on this page is demo content, not real store data.',
+    'welcome.footer.note': ['© 2026 Orbyte Smart Yield · Nexgen — hackathon prototype. Every figure and testimonial on this page is demo content, not real store data.',
       '© 2026 NexFlow · Orbyte Smart Yield — prototaip hackathon. Semua angka dan testimoni di halaman ini ialah kandungan demo, bukan data kedai sebenar.',
       '© 2026 NexFlow · Orbyte Smart Yield — hackathon prototype. 页面中的经营数字与客户评价均为 Demo 示例，非真实门店数据。'],
 
     /* ================= 展示页：登录与注册 ================= */
-    'auth.pageTitle': ['Sign in · Orbyte Smart Yield', 'Log masuk · Orbyte Smart Yield', '登录与注册 · Orbyte Smart Yield'],
-    'auth.brand.sub': ['Smart end-of-day clearance and AI automation for bakeries',
+    'auth.pageTitle': ['Orbyte Smart Yield · Nexgen · Sign in', 'Log masuk · NexFlow', '登录与注册 · NexFlow'],
+    'auth.brand.sub': ['Nexgen · Bakery operations',
       'Pelepasan stok pintar dan automasi AI untuk kedai roti',
       '智能烘焙打烊清仓与 AI 自动化系统'],
     'auth.back': ['Back to home', 'Kembali ke laman utama', '返回欢迎页'],
-    'auth.backTitle': ['Back to the NexFlow welcome page', 'Kembali ke halaman alu-aluan NexFlow', '返回 NexFlow 欢迎页'],
+    'auth.backTitle': ['Back to the Orbyte welcome page', 'Kembali ke halaman alu-aluan NexFlow', '返回 NexFlow 欢迎页'],
     'auth.themeToggleAria': ['Switch between dark and light mode', 'Tukar antara mod gelap dan cerah', '切换深色或浅色模式'],
     'auth.step.login': ['STEP 1 OF 2 · SIGN IN', 'LANGKAH 1 DARIPADA 2 · LOG MASUK', 'STEP 1 OF 2 · 身份认证'],
     'auth.step.signup': ['STEP 1 OF 2 · CREATE ACCOUNT', 'LANGKAH 1 DARIPADA 2 · CIPTA AKAUN', 'STEP 1 OF 2 · 创建新账号'],
@@ -1014,7 +1064,7 @@ window.NexFlowI18N = (function () {
       '这是比赛演示流程：不对接账号体系、不校验密码，任意角色都会进入老板主界面。'],
     'auth.modal.emailLabel': ['Sign-in email:', 'E-mel log masuk:', '登录邮箱：'],
     'auth.modal.roleLabel': ['Current role:', 'Peranan semasa:', '当前角色：'],
-    'auth.modal.enter': ['Enter the owner workspace', 'Masuk ke ruang kerja pemilik', '进入老板主界面'],
+    'auth.modal.enter': ['Continue to workspace', 'Teruskan ke ruang kerja', '进入工作台'],
     'auth.modal.stay': ['Stay on this page', 'Kekal di halaman ini', '留在本页继续预览'],
     'auth.toast.themeDark': ['Switched to dark mode', 'Ditukar ke mod gelap', '已切换至深色模式'],
     'auth.toast.themeLight': ['Switched to light mode', 'Ditukar ke mod cerah', '已切换至浅色模式'],
@@ -1030,13 +1080,13 @@ window.NexFlowI18N = (function () {
     'auth.hint.optional': ['Demo mode: this can stay empty and you will still enter the system',
       'Mod demo: medan ini boleh dibiarkan kosong dan anda tetap akan masuk ke sistem',
       '演示模式可留空，仍会进入系统'],
-    'auth.toast.success': ['🎉 Demo sign-in complete — entering the owner workspace…', '🎉 Log masuk demo berjaya — memasuki ruang kerja pemilik…', '🎉 演示登录成功，正在进入老板主界面…'],
+    'auth.toast.success': ['Demo sign-in complete — entering the owner workspace…', 'Log masuk demo berjaya — memasuki ruang kerja pemilik…', '演示登录成功，正在进入老板主界面…'],
     'auth.toast.stay': ['Staying on this page. Tap “Enter the owner workspace” whenever you are ready.',
       'Kekal di halaman ini. Tekan “Masuk ke ruang kerja pemilik” bila anda sedia.',
       '已留在展示页；随时点「进入老板主界面」即可继续演示。'],
 
     /* ================= 展示页：小怪兽欢迎页（/） ================= */
-    'home.pageTitle': ['NexFlow — Welcome', 'NexFlow — Selamat datang', 'NexFlow — 欢迎'],
+    'home.pageTitle': ['Orbyte Smart Yield · Welcome', 'NexFlow — Selamat datang', 'NexFlow — 欢迎'],
     'home.navAria': ['Sections', 'Bahagian halaman', '页面导航'],
     'home.nav.purpose': ['Purpose', 'Tujuan', '理念'],
     'home.nav.features': ['Features', 'Ciri', '功能'],
@@ -1073,7 +1123,7 @@ window.NexFlowI18N = (function () {
     'home.features.aria': ['Features carousel', 'Karusel ciri', '功能轮播'],
     'home.f1.title': ['Count leftovers in one line.', 'Kira baki dalam satu baris.', '一行字完成余量盘点。'],
     'home.f1.bodyLead': ['Staff type or say ', 'Staf taip atau sebut ', '打烊前，店员输入或说出 '],
-    'home.f1.bodyTail': [' before closing. NexFlow matches each item and its cost price.',
+    'home.f1.bodyTail': [' before closing. Nexgen matches each item and its cost price.',
       ' sebelum tutup kedai. NexFlow memadankan setiap item dan harga kosnya.',
       '，NexFlow 自动匹配商品与成本价。'],
     'home.f2.title': ['Auto pricing with a margin floor.', 'Harga automatik dengan had margin.', '自动定价，守住毛利底线。'],
@@ -1126,7 +1176,7 @@ window.NexFlowI18N = (function () {
     'home.cta.title': ['Ready to stop binning tonight’s bread?', 'Sedia berhenti membuang roti malam ini?', '准备好不再把今晚的面包丢掉了吗？'],
     'home.cta.button': ['Launch the demo', 'Lancarkan demo', '启动演示'],
     'home.cta.note': ['No setup. No account check.', 'Tiada pemasangan. Tiada semakan akaun.', '无需部署，不校验账号。'],
-    'home.legal': ['© 2026 NexFlow · Orbyte Smart Yield — hackathon prototype. Figures and testimonials on this page are demo examples, not real shop data.',
+    'home.legal': ['© 2026 Orbyte Smart Yield · Nexgen — hackathon prototype. Figures and testimonials on this page are demo examples, not real shop data.',
       '© 2026 NexFlow · Orbyte Smart Yield — prototaip hackathon. Angka dan testimoni di halaman ini ialah contoh demo, bukan data kedai sebenar.',
       '© 2026 NexFlow · Orbyte Smart Yield — 黑客松原型。本页的数字与评价均为演示示例，非真实门店数据。'],
     'home.dialog.kicker': ['Log in · Demo', 'Log masuk · Demo', '登录 · 演示'],
@@ -1138,7 +1188,7 @@ window.NexFlowI18N = (function () {
     'home.dialog.rolesAria': ['Enter as', 'Masuk sebagai', '选择身份'],
     'home.dialog.email': ['Email', 'E-mel', '邮箱'],
     'home.dialog.password': ['Password', 'Kata laluan', '密码'],
-    'home.dialog.enter': ['Enter NexFlow', 'Masuk NexFlow', '进入 NexFlow'],
+    'home.dialog.enter': ['Enter Nexgen', 'Masuk NexFlow', '进入 NexFlow'],
     'home.dialog.opening': ['Opening…', 'Membuka…', '正在进入…'],
     'home.dialog.createAccount': ['New here? Create an account', 'Baru di sini? Cipta akaun', '第一次来？创建账号'],
     'home.role.owner': ['Owner', 'Pemilik', '老板'],
@@ -1150,7 +1200,7 @@ window.NexFlowI18N = (function () {
   var lang = DEFAULT_LANG;
 
   function normalize(value) { return LANGS.indexOf(value) >= 0 ? value : DEFAULT_LANG; }
-  function stored() { try { return localStorage.getItem(STORE_KEY); } catch (e) { return null; } }
+  function stored() { return null; } // This handoff is English-only; ignore saved locale preferences.
   function persist(value) { try { localStorage.setItem(STORE_KEY, value); } catch (e) { /* private mode */ } }
 
   function t(key, vars) {
@@ -1248,3 +1298,256 @@ window.NexFlowI18N = (function () {
 
 /* 短别名：页面与模块统一用 T('key') 取文案 */
 window.T = function (key, vars) { return window.NexFlowI18N.t(key, vars); };
+
+/* Current editorial welcome copy. Kept separate from the older application
+   dictionary so changing the landing locale never changes business data. */
+(function welcomeLocale() {
+  'use strict';
+  if (typeof document === 'undefined' || !document.getElementById || !document.createTreeWalker) return;
+  var picker = document.getElementById('welcomeLanguage');
+  if (!picker) return;
+  // English is the first-visit default; only an explicit selection is saved.
+  var key = 'orbyte_welcome_language', language = 'en';
+  var rows = [
+    ['Page language', '页面语言', 'Bahasa halaman'],
+    ['Orbyte Smart Yield · Nexgen Bakery Workflow', 'Orbyte Smart Yield · Nexgen 烘焙工作流程', 'Orbyte Smart Yield · Aliran Kerja Bakeri Nexgen'],
+    ['Orbyte Smart Yield · Nexgen YOLO Scan', 'Orbyte Smart Yield · Nexgen YOLO 扫描', 'Orbyte Smart Yield · Imbasan YOLO Nexgen'],
+    ['GOOD BREAD', '好面包', 'ROTI YANG BAIK'],
+    ['BETTER CLOSE', '更好的打烊流程', 'PENUTUPAN LEBIH BAIK'],
+    ['LESS LEFT BEHIND', '减少剩余与浪费', 'KURANG LEBIHAN'],
+    ['Primary navigation', '主导航', 'Navigasi utama'],
+    ['Sign in', '登录', 'Log masuk'],
+    ['Our purpose', '品牌初衷', 'Tujuan'],
+    ['Features', '功能', 'Ciri'],
+    ['Numbers', '示例数据', 'Angka'],
+    ['Voices', '使用故事', 'Kisah'],
+    ['YOLO interface', 'YOLO 界面', 'Antara muka YOLO'],
+    ['← Back to welcome', '← 返回欢迎页', '← Kembali ke halaman utama'],
+    ['Toggle dark mode', '切换深色模式', 'Tukar mod gelap'],
+    ['BAKERY CLOSING WORKFLOW', '烘焙门店打烊流程', 'ALIRAN PENUTUPAN BAKERI'],
+    ['Give the day’s last bread', '让一天最后的面包', 'Roti terakhir hari ini,'],
+    ['a better ending.', '拥有更好的归宿。', 'pengakhiran yang lebih baik.'],
+    ['Built for independent bakeries that count leftovers by hand, write closing offers in a rush, and need a clear next step for surplus stock. Nexgen connects counts, cost-aware pricing, owner-reviewed offers, rescue and outcome records.', '为独立烘焙门店而建：让手动盘点剩余面包、匆忙准备打烊优惠的团队，找到处理余量的明确下一步。Nexgen 将盘点、成本定价、店主审核优惠、食物救援与结果记录连接起来。', 'Dibina untuk bakeri bebas yang mengira lebihan secara manual dan menyediakan tawaran pada saat akhir. Nexgen menghubungkan kiraan, harga berasaskan kos, tawaran yang disemak pemilik, penyelamatan makanan dan rekod hasil.'],
+    ['Explore the features', '探索功能', 'Terokai ciri'],
+    ['Open YOLO interface', '打开 YOLO 界面', 'Buka antara muka YOLO'],
+    ['Closing overview', '打烊概览', 'Ringkasan penutupan'],
+    ['Orbyte Smart Yield · Closing overview', 'Orbyte Smart Yield · 打烊概览', 'Orbyte Smart Yield · Ringkasan penutupan'],
+    ['Example recovered sales · not live data', '挽回销售额示例 · 非实时数据', 'Contoh jualan dipulihkan · bukan data langsung'],
+    ['Sample CO₂e estimate · not verified impact', 'CO₂e 估算示例 · 效果未经验证', 'Contoh anggaran CO₂e · impak belum disahkan'],
+    ['One clear close', '清晰的打烊流程', 'Penutupan yang jelas'],
+    ['Count → offer → sale, pickup or rescue', '盘点 → 优惠 → 销售、取货或救援', 'Kiraan → tawaran → jualan, pengambilan atau penyelamatan'],
+    ['WHY ORBYTE BUILT NEXGEN', 'ORBYTE 创立 NEXGEN 的初衷', 'MENGAPA ORBYTE MEMBINA NEXGEN'],
+    ['Closing work was scattered. Good bread was getting left behind.', '打烊工作分散，好面包却被遗忘。', 'Kerja penutupan berselerak. Roti yang baik terbiar.'],
+    ['Small bakery teams often count surplus by hand, work out discounts separately, write promotions after the rush, then decide what to sell, box, donate or discard with information spread across notes and messages. The result is extra closing work and little clarity about what happened next.', '小型烘焙团队常常手动盘点余量、单独计算折扣，在忙碌过后才撰写促销文案，再依靠分散的笔记和消息决定销售、装盒、捐赠或丢弃。这增加了打烊负担，也难以看清后续结果。', 'Pasukan bakeri kecil sering mengira lebihan secara manual, mengira diskaun berasingan dan menulis promosi selepas waktu sibuk. Keputusan untuk menjual, membungkus, menderma atau membuang bergantung pada nota dan mesej yang berselerak. Ini menambah kerja penutupan dan menyukarkan semakan hasil.'],
+    ['01 · COUNT BY HAND', '01 · 手动盘点', '01 · KIRAAN MANUAL'],
+    ['One more task at closing', '打烊时又多一项工作', 'Satu lagi tugas sebelum tutup'],
+    ['Leftover quantities can be recorded in different places, making the final count slow to reconcile.', '剩余数量记录在不同地方，导致最终核对费时费力。', 'Kuantiti lebihan direkodkan di pelbagai tempat, menjadikan kiraan akhir lambat diselaraskan.'],
+    ['02 · OFFERS IN A RUSH', '02 · 匆忙准备优惠', '02 · TAWARAN TERGESA-GESA'],
+    ['Pricing and promos split apart', '定价与促销彼此分离', 'Harga dan promosi terpisah'],
+    ['Markdowns, cost checks and customer messages are easy to handle as separate tasks.', '折扣、成本核对与顾客消息容易变成互不相连的工作。', 'Diskaun, semakan kos dan mesej pelanggan mudah dikendalikan sebagai tugas berasingan.'],
+    ['03 · OUTCOMES UNCLEAR', '03 · 结果不够清晰', '03 · HASIL TIDAK JELAS'],
+    ['No simple record of the next step', '缺少下一步的清晰记录', 'Tiada rekod langkah seterusnya yang mudah'],
+    ['Sale, pickup, donation and waste decisions can be hard to review together the next day.', '第二天难以一起回顾销售、取货、捐赠和废弃处理的结果。', 'Keputusan jualan, pengambilan, derma dan sisa sukar disemak bersama pada hari berikutnya.'],
+    ['Orbyte built Nexgen to connect that last-hour routine: count once, check a fair next step, and keep an honest record of the outcome.', 'Orbyte 创立 Nexgen，是为了连接打烊前最后一小时的工作：一次盘点，确认合理的下一步，并如实记录结果。', 'Orbyte membina Nexgen untuk menyatukan rutin jam terakhir: kira sekali, semak langkah yang wajar dan rekodkan hasil dengan jujur.'],
+    ['THE NEXGEN TOOLKIT', 'NEXGEN 功能工具箱', 'KIT ALAT NEXGEN'],
+    ['Six practical parts of a clearer close', '六项实用功能，让打烊更清晰', 'Enam bahagian praktikal untuk penutupan lebih jelas'],
+    ['Deterministic pricing checks protect the margin; lightweight AI and templates help prepare offers for owner review.', '明确的定价规则保护利润；轻量 AI 与模板帮助准备优惠，交由店主审核。', 'Semakan harga berasaskan peraturan melindungi margin; AI ringan dan templat membantu menyediakan tawaran untuk semakan pemilik.'],
+    ['End-of-day stocktake', '每日打烊盘点', 'Kiraan stok akhir hari'],
+    ['Record leftover quantities once and organize the count against the product catalogue. The sample YOLO scan below is separate from live stock.', '一次记录剩余数量，并按商品目录整理盘点。下方 YOLO 样例扫描与实际库存分离。', 'Rekodkan kuantiti lebihan sekali dan susun mengikut katalog produk. Imbasan sampel YOLO di bawah berasingan daripada stok sebenar.'],
+    ['Clearance pricing & margin guard', '清仓定价与利润保护', 'Harga pelepasan & perlindungan margin'],
+    ['Check markdown prices against product cost and flag below-cost offers before an owner approves them.', '将折扣价格与商品成本核对，在店主批准前标记低于成本的优惠。', 'Semak harga diskaun berbanding kos produk dan tandakan tawaran di bawah kos sebelum kelulusan pemilik.'],
+    ['Owner-reviewed customer offers', '店主审核顾客优惠', 'Tawaran pelanggan disemak pemilik'],
+    ['Prepare AI-assisted or template promo copy for review. WhatsApp messages are not sent from this page.', '通过 AI 或模板准备促销文案以供审核。本页面不会发送 WhatsApp 消息。', 'Sediakan teks promosi berbantu AI atau templat untuk semakan. Mesej WhatsApp tidak dihantar dari halaman ini.'],
+    ['Surprise box to pickup', '从惊喜盒到取货', 'Kotak kejutan hingga pengambilan'],
+    ['Prepare a surplus offer, review the customer quote and checkout flow, confirm pickup and track loyalty points.', '准备余量优惠，审核顾客报价与结账流程，确认取货并记录会员积分。', 'Sediakan tawaran lebihan, semak sebut harga pelanggan dan aliran pembayaran, sahkan pengambilan serta jejak mata kesetiaan.'],
+    ['Food rescue & handover', '食物救援与交接', 'Penyelamatan makanan & serahan'],
+    ['Record safe surplus as a donation and confirm the handover. Recipient profiles here are placeholders.', '将安全的剩余食物记录为捐赠并确认交接。这里的接收方资料为占位信息。', 'Rekodkan lebihan yang selamat sebagai derma dan sahkan serahan. Profil penerima di sini ialah data contoh.'],
+    ['Dashboard & impact visibility', '运营看板与影响记录', 'Papan pemuka & paparan impak'],
+    ['Review paid sales, pickups and donations alongside an estimated CO₂e footprint. Impact estimates are not certified.', '一起查看已付款销售、取货和捐赠记录，以及估算的 CO₂e 足迹。影响估算未经认证。', 'Semak jualan berbayar, pengambilan dan derma bersama anggaran jejak CO₂e. Anggaran impak tidak diperakui.'],
+    ['YOLO scan interface', 'YOLO 扫描界面', 'Antara muka imbasan YOLO'],
+    ['YOLO bakery scan', 'YOLO 面包扫描', 'Imbasan bakeri YOLO'],
+    ['Choose a sample to see its fixed detection boxes and count. This is not live, connected to Nexgen, or saved to stock.', '选择样例查看固定的识别框与数量。扫描并非实时，不会连接 Nexgen，也不会保存到库存。', 'Pilih sampel untuk melihat kotak pengesanan dan kiraan tetap. Imbasan ini bukan langsung, tidak disambungkan kepada Nexgen dan tidak disimpan ke stok.'],
+    ['Choose a sample', '选择样例', 'Pilih sampel'],
+    ['Sample photos', '样例照片', 'Foto sampel'],
+    ['Upload photo', '上传照片', 'Muat naik foto'],
+    ['Detection preview', '识别预览', 'Pratonton pengesanan'],
+    ['Sample detections', '样例识别结果', 'Pengesanan sampel'],
+    ['Dashed box = lower confidence', '虚线框 = 较低置信度', 'Kotak putus-putus = keyakinan lebih rendah'],
+    ['Pick a sample photo to preview the count.', '选择样例照片以预览盘点数量。', 'Pilih foto sampel untuk melihat pratonton kiraan.'],
+    ['No photo yet', '尚未选择照片', 'Belum ada foto'],
+    ['Count sheet', '盘点表', 'Helaian kiraan'],
+    ['items', '件', 'item'],
+    ['Counts per bread type appear here after the preview.', '预览完成后，这里将显示各类面包的数量。', 'Kiraan mengikut jenis roti akan dipaparkan di sini selepas pratonton.'],
+    ['Add a bread type the preview missed', '添加预览遗漏的面包种类', 'Tambah jenis roti yang terlepas dalam pratonton'],
+    ['Add', '添加', 'Tambah'],
+    ['Confirm count', '确认数量', 'Sahkan kiraan'],
+    ['This count stays on this page; it is not saved to Nexgen stock.', '盘点数量只保留在本页，不会保存到 Nexgen 库存。', 'Kiraan ini kekal pada halaman ini; ia tidak disimpan ke stok Nexgen.'],
+    ['Recent confirmations', '最近确认记录', 'Pengesahan terkini'],
+    ['This page only', '仅限本页', 'Halaman ini sahaja'],
+    ['No confirmations yet.', '暂无确认记录。', 'Belum ada pengesahan.'],
+    ['EXAMPLE CLOSING STORIES', '打烊场景示例', 'CONTOH KISAH PENUTUPAN'],
+    ['A smoother handoff at the end of the day', '让一天结束时的交接更顺畅', 'Serahan lebih lancar pada penghujung hari'],
+    ['These short examples show the kinds of problems Nexgen is designed to address.', '以下简短示例展示了 Nexgen 希望解决的问题。', 'Contoh ringkas ini menunjukkan masalah yang ingin ditangani oleh Nexgen.'],
+    ['These are fictional examples, not real customer testimonials.', '这些是虚构示例，并非真实顾客评价。', 'Ini contoh rekaan, bukan testimoni pelanggan sebenar.'],
+    ['“I used to count leftover bread by hand at closing. Having the count and cost warning together makes it easier to review a markdown first.”', '“以前打烊时，我总要手动数剩余面包。把数量和成本提醒放在一起，就能更轻松地先审核折扣。”', '“Dahulu saya mengira lebihan roti secara manual sebelum tutup. Menggabungkan kiraan dengan amaran kos memudahkan semakan diskaun terlebih dahulu.”'],
+    ['“A customer offer, pickup record and donation handoff are easier to follow when they belong to the same closing routine.”', '“当顾客优惠、取货记录和捐赠交接属于同一套打烊流程时，跟进就更容易了。”', '“Tawaran pelanggan, rekod pengambilan dan serahan derma lebih mudah dijejaki apabila semuanya dalam rutin penutupan yang sama.”'],
+    ['“Seeing what was sold, collected or donated gives the team a clearer view of what happened after the last tray came out.”', '“看清哪些面包售出、被领取或捐出，让团队更了解最后一盘出炉之后发生了什么。”', '“Melihat apa yang dijual, diambil atau didermakan memberi pasukan gambaran lebih jelas selepas dulang terakhir keluar.”'],
+    ['Make the next close easier to follow.', '让下一次打烊更清晰。', 'Jadikan penutupan seterusnya lebih mudah diikuti.'],
+    ['Explore the product flow, inspect a YOLO sample count, and see how a leftover item can move toward a sale, pickup or rescue record.', '探索产品流程、查看 YOLO 样例盘点，了解剩余商品如何进入销售、取货或救援记录。', 'Terokai aliran produk, lihat kiraan sampel YOLO dan fahami cara item lebihan boleh menjadi rekod jualan, pengambilan atau penyelamatan.'],
+    ['Open the YOLO interface', '打开 YOLO 界面', 'Buka antara muka YOLO'],
+    ['Nexgen monster', 'Nexgen 小怪兽', 'Maskot Nexgen'],
+    ['I’m Crumb. My eyes follow your pointer; a gentle head rub opens the bakery workspace.', '我是 Crumb。我的眼睛会跟随鼠标；轻轻来回摸摸头，就能打开门店工作台。', 'Saya Crumb. Mata saya mengikuti penuding anda; usap kepala saya perlahan-lahan untuk membuka ruang kerja bakeri.'],
+    ['Crumb, the Nexgen mascot. Eyes follow your pointer. Rub the head to open the bakery workspace, or press Enter while focused.', 'Nexgen 吉祥物 Crumb。眼睛会跟随鼠标。摸摸头可打开门店工作台，也可在选中时按 Enter。', 'Crumb, maskot Nexgen. Mata mengikuti penuding anda. Usap kepala untuk membuka ruang kerja bakeri, atau tekan Enter apabila difokuskan.'],
+    ['RUB MY HEAD TO ENTER · KEYBOARD: ENTER', '摸摸头进入 · 键盘：ENTER', 'USAP KEPALA UNTUK MASUK · PAPAN KEKUNCI: ENTER'],
+    ['Explore Nexgen', '探索 Nexgen', 'Terokai Nexgen'],
+    ['Features & ask Crumb', '功能介绍与 Crumb 问答', 'Ciri & tanya Crumb'],
+    ['Nexgen guide and Crumb chat', 'Nexgen 指南与 Crumb 对话', 'Panduan Nexgen dan sembang Crumb'],
+    ['Close guide', '关闭指南', 'Tutup panduan'],
+    ['Quick links', '快速链接', 'Pautan pantas'],
+    ['Welcome page sections', '欢迎页章节', 'Bahagian halaman utama'],
+    ['Dashboard preview', '运营看板预览', 'Pratonton papan pemuka'],
+    ['Six features', '六项功能', 'Enam ciri'],
+    ['Why Orbyte built Nexgen', 'Orbyte 为何创立 Nexgen', 'Mengapa Orbyte membina Nexgen'],
+    ['Independent bakeries often count leftovers by hand, write offers after closing and make surplus decisions with scattered information. Nexgen brings the count, fair next steps and outcome records into one clear routine.', '独立烘焙门店常手动盘点余量、打烊后才准备优惠，并依据分散的信息决定剩余食物的去向。Nexgen 把盘点、合理的下一步和结果记录整合成一套清晰流程。', 'Bakeri bebas sering mengira lebihan secara manual, menulis tawaran selepas tutup dan membuat keputusan berdasarkan maklumat berselerak. Nexgen menyatukan kiraan, langkah yang wajar dan rekod hasil dalam satu rutin yang jelas.'],
+    ['Go to the welcome story', '查看品牌故事', 'Lihat kisah pengenalan'],
+    ['Six capabilities', '六项能力', 'Enam keupayaan'],
+    ['01 · End-of-day stocktake', '01 · 每日打烊盘点', '01 · Kiraan stok akhir hari'],
+    ['Record leftover quantities once. The YOLO sample below is a separate fixed replay and never changes stock.', '一次记录余量。下方 YOLO 样例是独立的固定重播，绝不会更改库存。', 'Rekodkan kuantiti lebihan sekali. Sampel YOLO di bawah ialah ulang tayang tetap yang berasingan dan tidak mengubah stok.'],
+    ['Go to this feature', '查看此功能', 'Lihat ciri ini'],
+    ['02 · Clearance & margin guard', '02 · 清仓与利润保护', '02 · Pelepasan & perlindungan margin'],
+    ['Check clearance prices against cost and flag below-cost offers before owner approval.', '核对清仓价格与成本，在店主批准前标记低于成本的优惠。', 'Semak harga pelepasan berbanding kos dan tandakan tawaran di bawah kos sebelum kelulusan pemilik.'],
+    ['03 · Customer offers', '03 · 顾客优惠', '03 · Tawaran pelanggan'],
+    ['Prepare promo copy for owner review. WhatsApp messages are not sent from this page.', '准备促销文案供店主审核。本页面不会发送 WhatsApp 消息。', 'Sediakan teks promosi untuk semakan pemilik. Mesej WhatsApp tidak dihantar dari halaman ini.'],
+    ['04 · Surprise box to pickup', '04 · 从惊喜盒到取货', '04 · Kotak kejutan hingga pengambilan'],
+    ['Review a surplus offer and customer checkout, then confirm pickup and loyalty points.', '审核余量优惠和顾客结账，然后确认取货与会员积分。', 'Semak tawaran lebihan dan pembayaran pelanggan, kemudian sahkan pengambilan serta mata kesetiaan.'],
+    ['05 · Food rescue handover', '05 · 食物救援交接', '05 · Serahan penyelamatan makanan'],
+    ['Record a donation handover; recipient profiles are placeholders.', '记录捐赠交接；接收方资料为占位信息。', 'Rekodkan serahan derma; profil penerima ialah data contoh.'],
+    ['06 · Dashboard & impact', '06 · 运营看板与影响', '06 · Papan pemuka & impak'],
+    ['Review paid, pickup and donated outcomes with estimated, not certified, CO₂e.', '查看付款、取货和捐赠结果，以及估算而非认证的 CO₂e 数据。', 'Semak hasil pembayaran, pengambilan dan derma bersama CO₂e yang dianggarkan, bukan diperakui.'],
+    ['Closing stories', '打烊场景故事', 'Kisah penutupan'],
+    ['Ask Crumb', '向 Crumb 提问', 'Tanya Crumb'],
+    ['I can tell you why Nexgen exists, explain its six feature areas, or describe the sample scan.', '我可以介绍 Nexgen 的创立初衷、解释六项功能，或说明样例扫描。', 'Saya boleh menerangkan tujuan Nexgen, enam bidang cirinya atau imbasan sampel.'],
+    ['Suggested questions', '建议问题', 'Soalan cadangan'],
+    ['Why Nexgen?', '为什么创立 Nexgen？', 'Mengapa Nexgen?'],
+    ['Is the scan live?', '扫描是实时的吗？', 'Adakah imbasan ini langsung?'],
+    ['Ask Crumb a question', '向 Crumb 提一个问题', 'Tanya Crumb satu soalan'],
+    ['Ask Crumb…', '问问 Crumb…', 'Tanya Crumb…'],
+    ['Send', '发送', 'Hantar'],
+    ['Crumb answers with a small set of prepared replies.', 'Crumb 会使用预先准备的简短回复。', 'Crumb menjawab menggunakan beberapa balasan yang telah disediakan.'],
+    ['Sample figures are not live · WhatsApp messages aren’t sent · YOLO counts don’t update stock · CO₂e estimates aren’t verified.', '示例数据并非实时 · WhatsApp 消息不会发送 · YOLO 数量不会更新库存 · CO₂e 估算未经验证。', 'Angka sampel bukan data langsung · Mesej WhatsApp tidak dihantar · Kiraan YOLO tidak mengemas kini stok · Anggaran CO₂e belum disahkan.'],
+    ['The YOLO sample scan is below the six feature cards. It uses fixed examples, is not live, and does not update stock.', 'YOLO 样例扫描位于六项功能卡片下方。它使用固定样例，并非实时扫描，也不会更新库存。', 'Imbasan sampel YOLO berada di bawah enam kad ciri. Ia menggunakan contoh tetap, bukan imbasan langsung dan tidak mengemas kini stok.'],
+    ['Independent bakeries count leftovers by hand after long shifts while good bread goes unsold. Nexgen brings fair pricing, customer offers and food rescue into one clear close.', '独立烘焙团队在长时间工作后还要手动盘点，而好面包可能仍未售出。Nexgen 把合理定价、顾客优惠与食物救援连接成清晰的打烊流程。', 'Bakeri bebas mengira lebihan secara manual selepas syif panjang sementara roti yang baik tidak terjual. Nexgen menyatukan harga wajar, tawaran pelanggan dan penyelamatan makanan dalam satu rutin penutupan.'],
+    ['The six feature areas are stocktake, cost-checked clearance pricing, owner-reviewed offers, surprise boxes and pickup, food rescue, and outcome reporting.', '六项功能是：库存盘点、成本核对清仓定价、店主审核优惠、惊喜盒与取货、食物救援，以及结果报告。', 'Enam bidang ciri ialah kiraan stok, harga pelepasan dengan semakan kos, tawaran disemak pemilik, kotak kejutan dan pengambilan, penyelamatan makanan serta laporan hasil.'],
+    ['Rub the top of my head back and forth to enter the bakery workspace, or focus me and press Enter.', '在我的头顶来回摸摸，就能进入门店工作台；也可以选中我后按 Enter。', 'Usap bahagian atas kepala saya berulang-alik untuk masuk ke ruang kerja bakeri, atau fokuskan saya dan tekan Enter.'],
+    ['I can tell you why Nexgen exists, explain its six feature areas, show where the YOLO sample scan is, or help you enter.', '我可以介绍 Nexgen 的初衷、解释六项功能、告诉你 YOLO 样例扫描的位置，或帮助你进入工作台。', 'Saya boleh menerangkan tujuan Nexgen, enam cirinya, lokasi imbasan sampel YOLO atau membantu anda masuk.'],
+    ['Opening the bakery workspace.', '正在打开门店工作台。', 'Membuka ruang kerja bakeri.'],
+    ['Pet my head back and forth to open sign in.', '在我的头顶来回摸摸，就能打开登录页。', 'Usap kepala saya berulang-alik untuk membuka halaman log masuk.'],
+    ['Thanks for the head rub! Taking you to sign in.', '谢谢你摸摸头！正在前往登录页。', 'Terima kasih kerana mengusap kepala saya! Membuka halaman log masuk.'],
+    ['Hi, I’m Crumb. Open the guide to ask me about Nexgen.', '你好，我是 Crumb。打开指南，就能向我询问 Nexgen。', 'Hai, saya Crumb. Buka panduan untuk bertanya tentang Nexgen.'],
+    ['Ask me in the guide, or rub my head to enter the bakery workspace.', '在指南中向我提问，或摸摸头进入门店工作台。', 'Tanya saya dalam panduan, atau usap kepala saya untuk masuk ke ruang kerja bakeri.'],
+    ['Pick a sample photo on the left and I’ll show you how counting works.', '选择左侧的样例照片，我会展示如何盘点。', 'Pilih foto sampel di sebelah kiri dan saya akan menunjukkan cara kiraan berfungsi.'],
+    ['Scanning…', '正在扫描…', 'Mengimbas…'],
+    ['Reading the tray…', '正在查看托盘…', 'Membaca dulang…'],
+    ['Counting… let me look closely.', '正在盘点…让我仔细看看。', 'Mengira… biar saya lihat dengan teliti.'],
+    ['Sample scan', '样例扫描', 'Imbasan sampel'],
+    ['Matches AI', '与 AI 结果一致', 'Sepadan dengan AI'],
+    ['matches AI', '与 AI 结果一致', 'sepadan dengan AI'],
+    ['Bread', '面包', 'Roti'],
+    ['Confirmed', '已确认', 'Disahkan'],
+    ['Nothing detected in this photo. Add a bread type below if you want to log one.', '此照片未识别出面包。如需记录，可在下方添加面包种类。', 'Tiada apa-apa dikesan dalam foto ini. Tambah jenis roti di bawah jika anda ingin merekodkannya.'],
+    ['Preview only', '仅供预览', 'Pratonton sahaja'],
+    ['Preview only — live detection is not enabled.', '仅供预览——尚未启用实时识别。', 'Pratonton sahaja — pengesanan langsung tidak diaktifkan.'],
+    ['Preview only — live detection is not enabled. Try one of the five sample photos to see the count.', '仅供预览——尚未启用实时识别。请选择五张样例照片之一查看盘点。', 'Pratonton sahaja — pengesanan langsung tidak diaktifkan. Cuba salah satu daripada lima foto sampel untuk melihat kiraan.'],
+    ['Croissants · tray', '可颂 · 托盘', 'Croissant · dulang'],
+    ['Sourdough loaves', '酸种面包', 'Roti masam'],
+    ['Croissant + white bread', '可颂与白面包', 'Croissant + roti putih'],
+    ['Croissant + sourdough', '可颂与酸种面包', 'Croissant + roti masam'],
+    ['Croissants · basket', '可颂 · 面包篮', 'Croissant · bakul']
+  ];
+  var copy = new Map(rows.map(function (row) { return [row[0], row]; }));
+  var templates = [
+    [/^(\d+) items$/, function (n) { return n + ' 件'; }, function (n) { return n + ' item'; }],
+    [/^(\d+) boxes$/, function (n) { return n + ' 个识别框'; }, function (n) { return n + ' kotak'; }],
+    [/^AI counted (\d+)$/, function (n) { return 'AI 识别了 ' + n + ' 件'; }, function (n) { return 'AI mengira ' + n; }],
+    [/^(\d+) unsure$/, function (n) { return n + ' 项待确认'; }, function (n) { return n + ' kurang pasti'; }],
+    [/^Confirmed (\d+) items — added to Recent confirmations on this page only\.$/, function (n) { return '已确认 ' + n + ' 件——仅添加到本页的最近确认记录。'; }, function (n) { return n + ' item disahkan — ditambah ke Pengesahan terkini pada halaman ini sahaja.'; }],
+    [/^Saved! You adjusted (\d+) of my counts — nice catch\.$/, function (n) { return '已保存！你修正了 ' + n + ' 项数量——检查得很仔细。'; }, function (n) { return 'Disimpan! Anda melaraskan ' + n + ' kiraan saya — bagus!'; }],
+    [/^Saved! (\d+) items, exactly what I counted\.$/, function (n) { return '已保存！共 ' + n + ' 件，与我的盘点一致。'; }, function (n) { return 'Disimpan! ' + n + ' item, sama seperti kiraan saya.'; }],
+    [/^We have (\d+) items on the sheet\. Looking good!$/, function (n) { return '盘点表上有 ' + n + ' 件。看起来不错！'; }, function (n) { return 'Ada ' + n + ' item pada helaian. Nampak bagus!'; }],
+    [/^Added (.+)\. Set how many there are\.$/, function (s) { return '已添加 ' + s + '。请设置数量。'; }, function (s) { return s + ' ditambah. Tetapkan kuantitinya.'; }],
+    [/^I count (.+)! Check the numbers, then confirm\.$/, function (s) { return '我数到了 ' + s + '！请核对数量，然后确认。'; }, function (s) { return 'Saya mengira ' + s + '! Semak kuantiti, kemudian sahkan.'; }],
+    [/^I count (.+)\. (\d+) looks? unsure — please check the dashed box(?:es)?\.$/, function (s,n) { return '我数到了 ' + s + '。其中 ' + n + ' 项不确定——请检查虚线框。'; }, function (s,n) { return 'Saya mengira ' + s + '. ' + n + ' kurang pasti — sila semak kotak putus-putus.'; }],
+    [/^One less (.+)$/, function (s) { return s + ' 减少一件'; }, function (s) { return 'Kurangkan satu ' + s; }],
+    [/^One more (.+)$/, function (s) { return s + ' 增加一件'; }, function (s) { return 'Tambah satu ' + s; }],
+    [/^(.+) confirmed quantity$/, function (s) { return s + ' 已确认数量'; }, function (s) { return 'Kuantiti ' + s + ' yang disahkan'; }],
+    [/^(.+)\. Focus or select to reveal\.$/, function (s) { return translate(s) + '。聚焦或选择以显示。'; }, function (s) { return translate(s) + '. Fokus atau pilih untuk memaparkan.'; }]
+  ];
+  function translate(source, locale) {
+    var lang = locale || language;
+    if (lang === 'en') return source;
+    var index = lang === 'zh-CN' ? 1 : 2;
+    var row = copy.get(source);
+    if (row) return row[index];
+    for (var i = 0; i < templates.length; i++) {
+      var match = source.match(templates[i][0]);
+      if (match) return templates[i][index].apply(null, match.slice(1));
+    }
+    return source; // Product identifiers, filenames, numbers and user input stay intact.
+  }
+  var records = new WeakMap(), attributes = new WeakMap(), observer, frame = 0;
+  var excluded = 'script,style,svg,[data-language-options],.crumb-message.user,textarea,[contenteditable="true"]';
+  function apply() {
+    if (observer) observer.disconnect();
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    var node;
+    while ((node = walker.nextNode())) {
+      if (!node.parentElement || node.parentElement.closest(excluded)) continue;
+      var raw = node.nodeValue, previous = records.get(node);
+      var source = previous && previous.output === raw ? previous.source : raw;
+      var text = source.trim();
+      if (!text) continue;
+      var output = source.replace(text, function () { return translate(text); });
+      records.set(node, {source: source, output: output});
+      if (raw !== output) node.nodeValue = output;
+    }
+    document.querySelectorAll('[aria-label],[placeholder],[title],[alt]').forEach(function (el) {
+      if (el.closest('svg')) return;
+      var saved = attributes.get(el) || {};
+      ['aria-label','placeholder','title','alt'].forEach(function (attr) {
+        if (!el.hasAttribute(attr)) return;
+        var raw = el.getAttribute(attr), previous = saved[attr];
+        var source = previous && previous.output === raw ? previous.source : raw;
+        var output = translate(source);
+        saved[attr] = {source:source, output:output};
+        if (raw !== output) el.setAttribute(attr, output);
+      });
+      attributes.set(el, saved);
+    });
+    document.documentElement.lang = language;
+    var title = document.documentElement.dataset.view === 'yolo' ? 'Orbyte Smart Yield · Nexgen YOLO Scan' : 'Orbyte Smart Yield · Nexgen Bakery Workflow';
+    document.title = translate(title);
+    picker.value = language;
+    if (observer) observer.observe(document.body, {subtree:true, childList:true, characterData:true, attributes:true, attributeFilter:['aria-label','placeholder','title','alt']});
+  }
+  function setLanguage(next, persist) {
+    language = ['en','zh-CN','ms'].indexOf(next) >= 0 ? next : 'en';
+    if (persist !== false) {
+      try { localStorage.setItem(key, language); } catch (e) { /* Storage is optional. */ }
+    }
+    apply();
+    return language;
+  }
+  observer = new MutationObserver(function () {
+    if (frame) return;
+    frame = requestAnimationFrame(function () { frame = 0; apply(); });
+  });
+  picker.addEventListener('change', function () { setLanguage(picker.value); });
+  var saved;
+  try { saved = localStorage.getItem(key); } catch (e) { saved = null; }
+  setLanguage(saved || 'en', false);
+  window.NexgenWelcomeLocale = {
+    get language() { return language; },
+    setLanguage:setLanguage,
+    translate:translate
+  };
+})();
