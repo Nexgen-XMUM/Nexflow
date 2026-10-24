@@ -66,7 +66,14 @@
     else if(offerMode.mode==='message')renderOfferMessage(offerMode.key);
     else renderOfferEmpty();
   }
-  async function makeQuote(event){event.preventDefault();if($('quote-button').disabled || confirmUncertain)return;if(activeQuote()){notice('quote.activeExists',null,true);return;}notice('quote.loading');$('quote-button').disabled=true;
+  // 演示时钟停在 21:35，打烊直接跳到 22:31：22:00 时段在演示里永远取不了货，所以演示会话中禁用它。
+  function syncSlots(){
+    const late=$('pickup-slot')?.querySelector?.('option[value="22:00"]');if(!late)return;
+    const locked=!!window.Nexflow?.getContext?.().demoTime;
+    late.disabled=locked;late.textContent=locked?t('shop.slotDemoLocked'):'22:00 – 22:30';
+    if(locked&&$('pickup-slot').value==='22:00')$('pickup-slot').value='21:30';
+  }
+  async function makeQuote(event){event.preventDefault();syncSlots();if($('quote-button').disabled || confirmUncertain)return;if(activeQuote()){notice('quote.activeExists',null,true);return;}notice('quote.loading');$('quote-button').disabled=true;
     try{let pending=read(keys.quote);if(!pending){const date=$('pickup-date').value,slot=$('pickup-slot').value;if(!date)throw new Error(t('quote.needDate'));const list=id=>String($(id)?.value||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);const likeList=list('likes'),dislikeList=list('dislikes');if(likeList.some(x=>dislikeList.includes(x)))throw Object.assign(new Error('clash'),{code:'LIKE_CLASH',status:400});const [pickup_start,pickup_end]=isoSlot(date,slot);pending={body:{user_id:USER,idempotency_key:idempotency(),pickup_start,pickup_end,mode:'standard',preferences:{likes:$('likes').value.split(',').map(x=>x.trim()).filter(Boolean),avoid_allergens:$('allergens').value.split(',').map(x=>x.trim()).filter(Boolean),required_diets:list('diets'),dislikes:dislikeList}}};save(keys.quote,pending);}
       // Only the explicit competition session may prepare synthetic stock automatically.
       if(window.Nexflow?.getContext?.().demoTime){
@@ -237,6 +244,7 @@
 
   /* 切换语言：重画报价卡、订单、提示；不重新报价、不重新下单、不请求接口。 */
   function relabel(){
+    syncSlots();
     repaintOffer();
     repaintPayment();
     paintNotice();
@@ -264,9 +272,9 @@
   $('pay-submit').addEventListener('click',()=>confirmPayment());
   $('pay-cancel').addEventListener('click',closePayment);
   $('pay-close').addEventListener('click',closePayment);
+  $('pickup-slot').addEventListener('pointerdown',syncSlots);$('pickup-slot').addEventListener('focus',syncSlots);
   const saved=read('smart-yield-customer-active-quote');if(saved)renderQuote(saved);else renderOfferEmpty();
   if(read(keys.confirm)){confirmUncertain=true;const q=activeQuote();if(q)renderQuote(q);notice('pay.detectedPending',null,true);}
   if(window.NexFlowI18N) window.NexFlowI18N.onChange(relabel);
-  window.Nexflow.registerPurchase({mount:async()=>{}, getBalance:user=>api(`/customer/account?user_id=${encodeURIComponent(user)}`), relabel});
-  refreshAccount();
-})();
+  window.Nexflow.registerPurchase({mount:async()=>{}, getBalance:user=>api(`/customer/account?user_id=${encodeURIComponent(user)}`), relabel, onContextChanged:syncSlots});
+  refreshAccount();})();

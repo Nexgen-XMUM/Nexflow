@@ -1,5 +1,6 @@
 """Run with `python3 demo.py`; server dependencies come from the project .venv."""
 
+import os
 import socket
 import subprocess
 import time
@@ -35,7 +36,7 @@ def create_demo_app():
 
 
 def main():
-    python = ROOT / ".venv" / "bin" / "python"
+    python = ROOT / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
     if not python.is_file():
         print("找不到项目的 .venv。请先建立项目虚拟环境并安装 requirements.txt。")
         return 1

@@ -263,18 +263,22 @@ test('product tour is opt-in; the workspace loads backend data and posts user co
   assert.match(html, /await api\('\/api\/generate-promo', payload\)/);
 });
 
-test('product tour scrolls to below-the-fold targets before positioning its spotlight', () => {
-  const helper = html.match(/function tourTargetNeedsScroll\(rect, viewportHeight\)\s*\{[\s\S]*?\n  \}/);
-  assert.ok(helper, 'tour visibility check exists');
-  const needsScroll = vm.runInNewContext(`(${helper[0]})`);
-  assert.equal(needsScroll({ top: 820, bottom: 900 }, 800), true);
-  assert.equal(needsScroll({ top: 40, bottom: 700 }, 800), false);
+test('product tour never scrolls the page; it frames the visible part and keeps its card on screen', () => {
+  const helper = html.match(/function tourVisiblePart\(rect, viewportWidth, viewportHeight\)\s*\{[\s\S]*?\n  \}/);
+  assert.ok(helper, 'tour visibility helper exists');
+  const visible = vm.runInNewContext(`(${helper[0]})`);
+  // A sidebar taller than the screen is clipped to the screen instead of triggering a scroll.
+  assert.deepEqual({ ...visible({ top: 64, bottom: 1400, left: 0, right: 250 }, 1440, 900) },
+    { top: 64, bottom: 900, left: 0, right: 250, width: 250, height: 836 });
+  // A target entirely below the fold has no visible part; the card asks the user to scroll.
+  assert.equal(visible({ top: 1000, bottom: 1100, left: 300, right: 1000 }, 1440, 900), null);
   const start = html.indexOf('  function place(){');
   const end = html.indexOf("\n  $('#startTourBtn')", start);
   const place = html.slice(start, end);
-  assert.match(place, /tourTargetNeedsScroll\(r, window\.innerHeight\)/);
-  assert.match(place, /block:'center', inline:'nearest'/);
-  assert.match(place, /if\(tourOn\) place\(\)/);
+  assert.doesNotMatch(html, /scrollIntoView|window\.scroll(To|By)\(/);
+  assert.match(place, /tour\.scrollDown/);
+  assert.match(place, /top = Math\.max\(16, Math\.min\(top, vh - ph - 16\)\)/);
+  assert.match(html, /addEventListener\('scroll', \(\) => \{ if\(tourOn\) place\(\); \}/);
 });
 
 test('stepper does not rewrite invalid values and role controls remain simulated', async () => {

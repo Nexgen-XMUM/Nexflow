@@ -149,11 +149,11 @@ def test_stock_boundary(client, qty, status):
 @pytest.mark.parametrize("method, route", [("GET", "/api/inventory"), ("POST", "/api/generate-promo")])
 @pytest.mark.parametrize("damage", ["missing", "json", "fields", "negative", "alias", "id", "currency", "nan"])
 def test_inventory_unavailable(client, inventory_file, damage, method, route):
-    data = json.loads(inventory_file.read_text())
+    data = json.loads(inventory_file.read_text(encoding="utf-8"))
     if damage == "missing":
         inventory_file.unlink()
     elif damage == "json":
-        inventory_file.write_text("{broken")
+        inventory_file.write_text("{broken", encoding="utf-8")
     else:
         if damage == "fields":
             del data["products"][0]["cost_price"]
@@ -167,7 +167,7 @@ def test_inventory_unavailable(client, inventory_file, damage, method, route):
             data["currency"] = "USD"
         elif damage == "nan":
             data["products"][0]["retail_price"] = float("nan")
-        inventory_file.write_text(json.dumps(data))
+        inventory_file.write_text(json.dumps(data), encoding="utf-8")
     response = client.request(method, route, **(
         {"json": [{"item": "croissant", "qty": 1}]} if method == "POST" else {}
     ))
@@ -210,9 +210,9 @@ def test_money_and_carbon_multiple_items(client):
 
 
 def test_money_half_cent_rounds_unit_before_multiplying(client, inventory_file):
-    data = json.loads(inventory_file.read_text())
+    data = json.loads(inventory_file.read_text(encoding="utf-8"))
     data["products"][0]["retail_price"] = "6.01"
-    inventory_file.write_text(json.dumps(data))
+    inventory_file.write_text(json.dumps(data), encoding="utf-8")
     response = client.post(
         "/api/generate-promo", json=[{"item": "croissant", "qty": 3}]
     )
@@ -226,9 +226,9 @@ def test_money_half_cent_rounds_unit_before_multiplying(client, inventory_file):
 
 @pytest.mark.parametrize("mixed", [False, True])
 def test_loss_is_allowed_and_not_offset_by_profitable_items(client, inventory_file, mixed):
-    data = json.loads(inventory_file.read_text())
+    data = json.loads(inventory_file.read_text(encoding="utf-8"))
     data["products"][0]["cost_price"] = "4.00"
-    inventory_file.write_text(json.dumps(data))
+    inventory_file.write_text(json.dumps(data), encoding="utf-8")
     body = [{"item": "croissant", "qty": 2}]
     if mixed:
         body.append({"item": "chocolate_slice", "qty": 3})
@@ -247,9 +247,9 @@ def test_loss_is_allowed_and_not_offset_by_profitable_items(client, inventory_fi
 
 
 def test_money_break_even_is_not_a_loss(client, inventory_file):
-    data = json.loads(inventory_file.read_text())
+    data = json.loads(inventory_file.read_text(encoding="utf-8"))
     data["products"][0]["cost_price"] = "3.00"
-    inventory_file.write_text(json.dumps(data))
+    inventory_file.write_text(json.dumps(data), encoding="utf-8")
     response = client.post(
         "/api/generate-promo", json=[{"item": "croissant", "qty": 1}]
     )

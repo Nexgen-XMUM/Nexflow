@@ -2,6 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Orbyte Smart Yield · Nexgen · Bakery Operations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -289,15 +290,16 @@ details ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
 /* ============ 新手导览 ============ */
 .wizard-backdrop { position: fixed; inset: 0; background: rgba(7, 13, 25, .35); z-index: 9000; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
 .wizard-backdrop.active { opacity: 1; pointer-events: auto; }
-.wizard-spotlight { position: absolute; border-radius: 16px; border: 2.5px solid #60a5fa; box-shadow: 0 0 0 4px rgba(96, 165, 250, .28), 0 10px 32px rgba(37, 99, 235, .3); pointer-events: none; z-index: 9001; transition: all .35s cubic-bezier(.2, .9, .3, 1); display: none; }
+.wizard-spotlight { position: fixed; border-radius: 16px; border: 2.5px solid #60a5fa; box-shadow: 0 0 0 4px rgba(96, 165, 250, .28), 0 10px 32px rgba(37, 99, 235, .3); pointer-events: none; z-index: 9001; transition: all .35s cubic-bezier(.2, .9, .3, 1); display: none; }
 .wizard-spotlight.active { display: block; }
-.wizard-popover { position: absolute; width: 340px; max-width: calc(100vw - 32px); background: var(--surface-elevated); border: 1px solid var(--brand-border); border-radius: 18px; box-shadow: var(--shadow-lg); z-index: 9002; padding: 20px 20px 18px; transition: top .32s cubic-bezier(.2, .9, .3, 1), left .32s cubic-bezier(.2, .9, .3, 1); display: none; }
+.wizard-popover { position: fixed; width: 340px; max-width: calc(100vw - 32px); background: var(--surface-elevated); border: 1px solid var(--brand-border); border-radius: 18px; box-shadow: var(--shadow-lg); z-index: 9002; padding: 20px 20px 18px; transition: top .32s cubic-bezier(.2, .9, .3, 1), left .32s cubic-bezier(.2, .9, .3, 1); display: none; }
 .wizard-popover.active { display: block; }
 .wizard-step-tag { display: inline-block; font-size: 11px; font-weight: 700; color: var(--brand); background: var(--brand-light); padding: 2px 8px; border-radius: 99px; margin-bottom: 6px; }
 .wizard-close { position: absolute; top: 14px; right: 14px; background: transparent; border: 0; color: var(--muted); font-size: 18px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; }
 .wizard-close:hover { background: var(--sunk); color: var(--ink); }
 .wizard-title { font-size: 17px; margin: 0 0 8px; padding-right: 24px; }
 .wizard-desc { font-size: 13.5px; color: var(--muted); margin: 0 0 18px; }
+.wizard-scroll-hint { font-size: 12.5px; font-weight: 600; color: var(--brand); margin: -8px 0 16px; }
 .wizard-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .wizard-dots { display: flex; gap: 5px; align-items: center; }
 .wizard-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--line-strong); transition: all .25s ease; }
@@ -1002,6 +1004,7 @@ html[data-theme="dark"] .nav-item:hover { background: #3c2f27; }
   <button type="button" class="wizard-close" id="wizardClose" data-i18n-aria="tour.closeAria" aria-label="关闭导览">✕</button>
   <h4 class="wizard-title" id="wizardTitle"></h4>
   <p class="wizard-desc" id="wizardDesc"></p>
+  <p class="wizard-scroll-hint" id="wizardScrollHint" hidden></p>
   <div class="wizard-foot">
     <div class="wizard-dots" id="wizardDots"></div>
     <div class="wizard-btns">
@@ -1638,17 +1641,17 @@ loadProducts(); // 再从后端取商品列表
     {target:'#guide-role', tab:'dash', place:'right', title:'tour.roleTitle', desc:'tour.roleDesc'},
     {target:'#guide-phone', tab:'pos', place:'left', title:'tour.phoneTitle', desc:'tour.phoneDesc'}
   ];
-  let idx = 0, tourOn = false, placeTimer = null;
+  let idx = 0, tourOn = false;
 
-  function tourTargetNeedsScroll(rect, viewportHeight){
-    const margin = 24;
-    return rect.top < margin || rect.bottom > viewportHeight - margin;
+  // 导览从不移动页面：只框出目标在屏幕内露出的部分；完全不在屏幕内时返回 null，由说明卡提示用户自己滚动。
+  function tourVisiblePart(rect, viewportWidth, viewportHeight){
+    const top = Math.max(rect.top, 0), bottom = Math.min(rect.bottom, viewportHeight);
+    const left = Math.max(rect.left, 0), right = Math.min(rect.right, viewportWidth);
+    if(bottom - top < 8 || right - left < 8) return null;
+    return {top, bottom, left, right, width: right - left, height: bottom - top};
   }
 
   function show(i){
-    clearTimeout(placeTimer); placeTimer = null;
-    $('#wizardSpotlight').style.visibility = '';
-    $('#wizardPopover').style.visibility = '';
     idx = i;
     const s = STEPS_TOUR[i];
     if(s.tab && state.tab !== s.tab) switchTab(s.tab);
@@ -1668,12 +1671,9 @@ loadProducts(); // 再从后端取商品列表
     show(0);
   }
   function stop(){
-    clearTimeout(placeTimer); placeTimer = null;
     tourOn = false;
     document.body.classList.remove('mobile-nav-open');
     ['#wizardBackdrop', '#wizardSpotlight', '#wizardPopover'].forEach(s => $(s).classList.remove('active'));
-    $('#wizardSpotlight').style.visibility = '';
-    $('#wizardPopover').style.visibility = '';
   }
   function next(){ if(idx < STEPS_TOUR.length - 1) show(idx + 1); else stop(); }
   function prev(){ if(idx > 0) show(idx - 1); }
@@ -1685,33 +1685,32 @@ loadProducts(); // 再从后端取商品列表
       if(s.target === '#guide-sidebar' || s.target === '#guide-role') document.body.classList.add('mobile-nav-open');
       else document.body.classList.remove('mobile-nav-open');
     }
-    const r = el.getBoundingClientRect();
-    const spot = $('#wizardSpotlight'), pop = $('#wizardPopover');
-    if(tourTargetNeedsScroll(r, window.innerHeight)){
-      spot.style.visibility = 'hidden';
-      pop.style.visibility = 'hidden';
-      el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'center', inline:'nearest'});
-      clearTimeout(placeTimer);
-      placeTimer = setTimeout(() => { placeTimer = null; if(tourOn) place(); }, reduced ? 30 : 420);
-      return;
+    const vw = window.innerWidth, vh = window.innerHeight, pad = 6;
+    const full = el.getBoundingClientRect(), r = tourVisiblePart(full, vw, vh);
+    const spot = $('#wizardSpotlight'), pop = $('#wizardPopover'), hint = $('#wizardScrollHint');
+    hint.hidden = !!r;
+    if(!r) hint.textContent = T(full.top >= vh ? 'tour.scrollDown' : 'tour.scrollUp');
+    spot.style.visibility = r ? '' : 'hidden';
+    if(r){
+      const top = Math.max(r.top - pad, 2), left = Math.max(r.left - pad, 2);
+      spot.style.top = top + 'px'; spot.style.left = left + 'px';
+      spot.style.width = (Math.min(r.right + pad, vw - 2) - left) + 'px';
+      spot.style.height = (Math.min(r.bottom + pad, vh - 2) - top) + 'px';
     }
-    spot.style.visibility = '';
-    pop.style.visibility = '';
-    const sy = window.pageYOffset, sx = window.pageXOffset, pad = 6;
-    spot.style.width = (r.width + pad * 2) + 'px'; spot.style.height = (r.height + pad * 2) + 'px';
-    spot.style.top = (r.top + sy - pad) + 'px'; spot.style.left = (r.left + sx - pad) + 'px';
-    const pw = Math.min(340, window.innerWidth - 32), ph = pop.offsetHeight || 200;
-    if(window.innerWidth <= 820){
-      pop.style.position = 'fixed'; pop.style.top = (window.innerHeight - ph - 16) + 'px'; pop.style.left = '16px';
-      return;
-    }
-    pop.style.position = 'absolute';
+    const pw = Math.min(340, vw - 32), ph = pop.offsetHeight || 200;
     let top, left;
-    if(s.place === 'bottom'){ top = r.bottom + sy + 14; left = r.left + sx + r.width / 2 - pw / 2; }
-    else if(s.place === 'right'){ top = r.top + sy + 12; left = r.right + sx + 18; if(left + pw > window.innerWidth - 16){ top = r.bottom + sy + 14; left = r.left + sx; } }
-    else { top = r.top + sy + 20; left = r.left + sx - pw - 18; if(left < 16){ top = r.bottom + sy + 14; left = 16; } }
-    if(s.target === '#guide-role') top = Math.min(top, r.bottom + sy - ph);
-    left = Math.max(16, Math.min(left, window.innerWidth - pw - 16));
+    if(vw <= 820){ top = vh - ph - 16; left = 16; }
+    else if(!r){ top = (vh - ph) / 2; left = (vw - pw) / 2; }
+    else {
+      if(s.place === 'bottom'){ top = r.bottom + 14; left = r.left + r.width / 2 - pw / 2; }
+      else if(s.place === 'right'){ top = r.top + 12; left = r.right + 18; if(left + pw > vw - 16){ top = r.bottom + 14; left = r.left; } }
+      else { top = r.top + 20; left = r.left - pw - 18; if(left < 16){ top = r.bottom + 14; left = 16; } }
+      if(s.target === '#guide-role') top = Math.min(top, r.bottom - ph);
+      if(top + ph > vh - 16 && r.top - ph - 14 >= 16) top = r.top - ph - 14; // 下方放不下就放到目标上方
+    }
+    // 说明卡始终完整留在屏幕内
+    top = Math.max(16, Math.min(top, vh - ph - 16));
+    left = Math.max(16, Math.min(left, vw - pw - 16));
     pop.style.top = top + 'px'; pop.style.left = left + 'px';
   }
 
@@ -1721,6 +1720,7 @@ loadProducts(); // 再从后端取商品列表
   $('#wizardBack').addEventListener('click', prev);
   $('#wizardNext').addEventListener('click', next);
   window.addEventListener('resize', () => { if(tourOn) place(); });
+  window.addEventListener('scroll', () => { if(tourOn) place(); }, {passive: true}); // 用户自己滚动时跟随，导览本身不滚动
   window.addEventListener('keydown', e => {
     if(!tourOn) return;
     if(e.key === 'Escape') stop();
