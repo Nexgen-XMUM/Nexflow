@@ -35,7 +35,7 @@
 | Live Demo | [Public Replit deployment](https://nexflow-kadenyeojinhong.replit.app/) · [Local workspace](#4-open-the-app) · [Standalone local YOLO](#local-yolo-image-demo) |
 | Demo video | [Watch the NexFlow project video on YouTube](https://youtu.be/RVNASReQL-Y) |
 | Slide deck / PRD | TODO — HUMAN VERIFICATION: add final share links |
-| Replit proof | Proof-of-use PDF pending (`submission/SDC2026_Nexgen_Replit_POU.pdf`); public deployment is live |
+| Replit proof | [Replit proof of use](../submission/SDC2026_Nexgen_Replit_POU.pdf) — publishing panel for nexflow-kadenyeojinhong.replit.app |
 | Technical declaration | [Official form filled as unsigned draft](../submission/SDC2026_Nexgen_TechDeclaration.pdf) |
 | RunPod | Not used. No endpoint or proof-of-use PDF; team accepts the template-compliance risk. |
 
@@ -459,7 +459,7 @@ Additional contributors appear in the commit history under the handles `panpan54
 
 The current public deployment is https://nexflow-kadenyeojinhong.replit.app/ (see How We Use Replit above). Earlier evidence: the team's previous deployment, https://orbyte-smart-yield-nexgen.replit.app/ ; on 2026-10-24 the homepage rendered in a browser; `/login`, `/app`, two sampled scripts and read-only demo/inventory APIs returned HTTP 200. `integration.js` matches the checked-out main baseline byte-for-byte, while sampled HTML and `i18n.js` differ. Full feature/source parity is not asserted. No public checkout or paid API call was performed.
 
-Replit proof PDF (`submission/SDC2026_Nexgen_Replit_POU.pdf`) is still to be added. TODO — HUMAN VERIFICATION: owner project/deployment dashboard, source commit, plan/region and sponsor-voucher redemption. `.replit` runs `python replit_run.py`, the same entry point as the public deployment.
+[Replit proof PDF](../submission/SDC2026_Nexgen_Replit_POU.pdf) shows the Replit publishing panel for the current deployment. TODO — HUMAN VERIFICATION: owner project/deployment dashboard, source commit, plan/region and sponsor-voucher redemption. `.replit` runs `python replit_run.py`, the same entry point as the public deployment.
 
 ## How We Use RunPod
 
@@ -479,7 +479,7 @@ Replit proof PDF (`submission/SDC2026_Nexgen_Replit_POU.pdf`) is still to be add
 |---|---|
 | [Preliminary](../submission/SDC2026_Nexgen_Preliminary.pdf) | Official form populated; unsigned draft; identity, KPI target, workshops and IP questions need human confirmation |
 | [Technical declaration](../submission/SDC2026_Nexgen_TechDeclaration.pdf) | Official form populated plus appendix; unsigned draft; license/tool completeness needs team review |
-| Replit proof (`SDC2026_Nexgen_Replit_POU.pdf`) | **Pending** — not yet in `submission/`; public deployment is live |
+| [Replit proof](../submission/SDC2026_Nexgen_Replit_POU.pdf) | Replit publishing panel: Nexflow published, public, nexflow-kadenyeojinhong.replit.app |
 | RunPod proof | Intentionally absent: not used, team accepts risk |
 | [Submission status](submission-status.md) | Remaining actions, checks and final upload steps |
 | [Compliance audit](submission-compliance-audit.md) | Required vs example vs organizer confirmation |

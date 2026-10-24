@@ -84,7 +84,8 @@ All source code is in this repository. The template's `src/` corresponds to `bac
 │   └── project-guide.md     # Full guide: walkthrough, API overview, screenshots, 中文快速开始
 ├── submission/              # Prepared submission documents
 │   ├── SDC2026_Nexgen_Preliminary.pdf
-│   └── SDC2026_Nexgen_TechDeclaration.pdf
+│   ├── SDC2026_Nexgen_TechDeclaration.pdf
+│   └── SDC2026_Nexgen_Replit_POU.pdf
 ├── replit_run.py            # Replit entry point (binds 0.0.0.0:$PORT)
 ├── demo.py                  # Promo-only local demo with auto browser open
 ├── requirements.txt
@@ -152,7 +153,7 @@ On Windows, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`. The fr
 - **Run configuration:** `.replit` runs `python replit_run.py`, which binds the competition runner to `0.0.0.0:$PORT` with a temporary SQLite database, so every restart is a clean demo.
 - **Secrets:** None are needed; the runner forces the local promotional template, so no API key is stored in the Repl or the repository.
 
-Account ownership, deployment-source commit and sponsor-credit use still need owner confirmation. Replit proof-of-use PDF: **pending** — to be added as `submission/SDC2026_Nexgen_Replit_POU.pdf`.
+📄 Proof of use: [`submission/SDC2026_Nexgen_Replit_POU.pdf`](submission/SDC2026_Nexgen_Replit_POU.pdf) — Replit publishing panel showing the Nexflow project published, public, at nexflow-kadenyeojinhong.replit.app.
 
 ## How We Use RunPod
 
@@ -185,8 +186,8 @@ All five members are affiliated with Xiamen University Malaysia (XMUM).
 - [x] Team name, domain (Domain 2) and SDG track filled in
 - [x] Slide deck link added
 - [x] Demo video link added
-- [x] Replit used (public deployment, `.replit` + `replit_run.py`)
-- [ ] Replit proof of use in `submission/` — `SDC2026_Nexgen_Replit_POU.pdf` still to be added
+- [x] Live demo published on Replit (`.replit` + `replit_run.py`)
+- [x] Replit used, with proof of use in `submission/` (`SDC2026_Nexgen_Replit_POU.pdf`)
 - [ ] RunPod — not used; team accepts the template-compliance risk
 - [x] Preliminary submission (`SDC2026_Nexgen_Preliminary.pdf`) — unsigned fields need human confirmation
 - [x] Technology declaration (`SDC2026_Nexgen_TechDeclaration.pdf`) — unsigned fields need human confirmation
