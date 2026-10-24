@@ -1,0 +1,2 @@
+# Submission forms are binary documents; preserve bytes and avoid text merges.
+*.pdf binary

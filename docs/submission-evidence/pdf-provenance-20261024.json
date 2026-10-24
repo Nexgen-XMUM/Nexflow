@@ -1,0 +1,13 @@
+{
+  "submission/SDC2026_Nexgen_TechDeclaration.pdf": "c52459c78bd3025e9257cb6d51d7378ea7247c328f40d7ca730c768c2fec2877",
+  "submission/SDC2026_Nexgen_Preliminary.pdf": "a747564615329fd1ae783995bae81a0abd60fecf5fb2f4c2da859b7cfcce2723",
+  "submission/SDC2026_Nexgen_Replit_POU.pdf": "ec599a1981d6373b44e588c859b3931c3d6d2fe377baab534feeada1edd8cf91",
+  "official_template_commit": "d74820299e6ebd5ace04b902f8ff68303c519925",
+  "product_baseline": "7e264ee20d04a3fe968d133c4ff9f26105263165",
+  "official_pdf_sha256": {
+    "SDC2026_TeamName_Replit_POU.pdf": "9ac33a3b0f95c0bf894a97cd1bd5258c82e8c1eb4de7ce5ae27b24e64d8abb1c",
+    "SDC2026_TeamName_Runpod_POU.pdf": "b5084137c6b10847e748539cbfba2049a0948e966c1ec24e33377053e242b8e9",
+    "SDC2026_TeamName_TechDeclaration.pdf": "de863bce4354104b53bb4610b52fd3a94b966a0c3cb32f70b893e6669e0b7c5b",
+    "SDC2026_TeamName_Preliminary.pdf": "be9aca7d88e281b105dc77aed5edf1e4ebc8773e2349d72e4fdf8ba00d1f5297"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "/": 200,
+  "/app": 200,
+  "/login": 200,
+  "/app/assets/integration.js": 200,
+  "/app/assets/i18n.js": 200,
+  "/app/assets/customer.js": 200,
+  "/app/assets/rescue-module.js": 200,
+  "/showcase/images/1_croissant_9.jpg": 200,
+  "/api/inventory": 200,
+  "/api/blind-boxes/dashboard": 200,
+  "promo": {
+    "qty": 10,
+    "retail_total": "60.00",
+    "cost_total": "20.00",
+    "clearance_total": "30.00",
+    "gross_profit_total": "10.00",
+    "loss_total": "0.00",
+    "estimated_co2e_kg": "2"
+  },
+  "dashboard": {
+    "demo_only": true,
+    "simulated_revenue_sen": 570,
+    "picked_up_contribution_sen": 520,
+    "picked_up_gross_profit_sen": 120,
+    "picked_up_qty": 2,
+    "donated_qty": 8,
+    "picked_up_weight_g": 160,
+    "donated_weight_g": 640,
+    "estimated_co2e_kg": 2.0,
+    "carbon_note": "Food-footprint estimate only, not verified avoided emissions or carbon credits.",
+    "conversion_rate": null,
+    "redemption_repurchase_rate": null,
+    "unavailable_reason": "No verified visitor or regular-order attribution data",
+    "users": [
+      {
+        "id": "demo_mei_ling",
+        "points": 100,
+        "frozen_until": null
+      }
+    ]
+  }
+}
